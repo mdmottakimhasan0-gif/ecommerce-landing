@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
     nginx \
@@ -22,11 +22,13 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN cp .env.example .env || true
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 RUN npm install && npm run build
 
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p /var/www/html/database && touch /var/www/html/database/database.sqlite
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
+RUN sed -i 's/\r$//' /var/www/html/docker-entrypoint.sh
 RUN chmod +x /var/www/html/docker-entrypoint.sh
 
 EXPOSE 8080 10000

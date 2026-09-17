@@ -6,6 +6,11 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force || true
 fi
 
+# Prepare SQLite database if missing
+mkdir -p /var/www/html/database
+touch /var/www/html/database/database.sqlite || true
+chmod -R 777 /var/www/html/database /var/www/html/storage /var/www/html/bootstrap/cache || true
+
 # Cache optimizations
 php artisan config:cache || true
 php artisan route:cache || true
