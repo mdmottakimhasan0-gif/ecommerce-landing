@@ -1,0 +1,395 @@
+@extends('layouts.app')
+
+@section('title', ($settings['store_name'] ?? 'DemandHat BD') . ' - সেরা অনলাইন শপিং')
+
+@section('content')
+<div class="space-y-12 sm:space-y-16 pb-16">
+
+    <!-- Hero Promotional Banner Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+            <!-- Main Hero Carousel / Banner -->
+            <div class="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white min-h-[340px] sm:min-h-[420px] flex items-center p-6 sm:p-10 border border-emerald-800/40">
+                <div class="relative z-10 max-w-xl space-y-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider">
+                        <span>🌿</span> প্রিমিয়াম অর্গানিক ও লাইফস্টাইল কালেকশন
+                    </span>
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight text-white">
+                        প্রকৃতির খাঁটি স্বাদ ও <span class="text-emerald-400">আধুনিক গ্যাজেটের</span> সেরা সমাহার!
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md">
+                        সুন্দরবনের প্রাকৃতিক চাকের মধু, কাঠের ঘানি ভাঙা খাঁটি সরিষার তেল, স্মার্ট কিচেন চপার এবং ট্রেন্ডিং ইলেকট্রনিক্স গ্যাজেটস।
+                    </p>
+                    <div class="pt-2 flex flex-wrap items-center gap-3">
+                        <a href="{{ route('products.index') }}" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all">
+                            সব পণ্য দেখুন 🛒
+                        </a>
+                        <a href="{{ route('products.index', ['category' => 'organic-products']) }}" class="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-xl backdrop-blur-sm border border-white/20 transition-colors">
+                            খাঁটি অর্গানিক ফুড →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Decorative overlay image -->
+                <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-25 lg:opacity-40 pointer-events-none">
+                    <img src="https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=80" alt="Honey" class="w-full h-full object-cover mix-blend-luminosity">
+                </div>
+            </div>
+
+            <!-- Side Promotional Promo Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
+                <!-- Promo 1: Kitchen Tools -->
+                <div class="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-br from-amber-700 to-orange-900 text-white p-6 flex flex-col justify-between min-h-[160px] sm:min-h-[195px] border border-orange-700/40">
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/30 text-amber-200">স্মার্ট হোম ও কিচেন</span>
+                        <h3 class="text-base sm:text-lg font-black mt-1 leading-snug">মাল্টিফাংশন ভেজিটেবল চপার ও কাটার</h3>
+                        <p class="text-xs text-amber-100/90 mt-1">রান্নার সময় বাঁচান নিমেষেই! মাত্র ৳ ৭৯০</p>
+                    </div>
+                    <div class="relative z-10 pt-2">
+                        <a href="{{ route('products.index', ['category' => 'home-kitchen']) }}" class="text-xs font-bold text-white hover:text-amber-200 flex items-center gap-1">
+                            অর্ডার করুন এখনই <span>→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Promo 2: Electronics Gadgets -->
+                <div class="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-6 flex flex-col justify-between min-h-[160px] sm:min-h-[195px] border border-blue-800/40">
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/30 text-blue-200">মেগা টেক ডিসকাউন্ট</span>
+                        <h3 class="text-base sm:text-lg font-black mt-1 leading-snug">T9 ভিন্টেজ হেয়ার ট্রিমার ও স্মার্ট ওয়াচ</h3>
+                        <p class="text-xs text-blue-100/90 mt-1">১ বছরের রিপ্লেসমেন্ট গ্যারান্টি সহ!</p>
+                    </div>
+                    <div class="relative z-10 pt-2">
+                        <a href="{{ route('products.index', ['category' => 'electronics-gadgets']) }}" class="text-xs font-bold text-white hover:text-blue-200 flex items-center gap-1">
+                            অফার দেখুন <span>→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Features Bar -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+            <div class="flex items-center gap-3 p-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl flex-shrink-0">
+                    💵
+                </div>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900" data-i18n="cod_feature">ক্যাশ অন ডেলিভারি</h4>
+                    <p class="text-[11px] text-slate-500" data-i18n="cod_desc">পণ্য হাতে পেয়ে টাকা পরিশোধ</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 p-2">
+                <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl flex-shrink-0">
+                    🚚
+                </div>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900" data-i18n="fast_delivery_feature">দ্রুততম ডেলিভারি</h4>
+                    <p class="text-[11px] text-slate-500" data-i18n="fast_delivery_desc">২৪-৪৮ ঘণ্টার হোম ডেলিভারি</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 p-2">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl flex-shrink-0">
+                    🌿
+                </div>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900" data-i18n="pure_feature">১০০% খাঁটি পণ্য</h4>
+                    <p class="text-[11px] text-slate-500" data-i18n="pure_desc">ল্যাব টেস্টে বিশুদ্ধ প্রমাণিত</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 p-2">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl flex-shrink-0">
+                    🔄
+                </div>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900" data-i18n="return_feature">৭ দিনের রিটার্ন</h4>
+                    <p class="text-[11px] text-slate-500" data-i18n="return_desc">সমস্যা হলে নিশ্চিত রিপ্লেসমেন্ট</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Showcase Grid -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-lg sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                    <span>🗂️</span> <span data-i18n="special_categories">আমাদের স্পেশাল ক্যাটাগরি</span>
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5" data-i18n="special_categories_desc">আপনার প্রয়োজনীয় পণ্য সহজে খুঁজে নিন</p>
+            </div>
+            <a href="{{ route('products.index') }}" class="text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer" data-i18n="all_categories">
+                সব ক্যাটাগরি →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            @foreach($categories as $cat)
+            <a href="{{ route('products.index', ['category' => $cat->slug]) }}" 
+               class="group relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex items-center gap-4 overflow-hidden">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
+                    <img src="{{ $cat->image }}" alt="{{ $cat->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
+                        {{ $cat->name }}
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1 line-clamp-1">{{ $cat->description }}</p>
+                    <span class="inline-block mt-2 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                        {{ $cat->products_count }} টি পণ্য উপলব্ধ
+                    </span>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </section>
+
+    <!-- Flash Deals Section with Countdown Urgency Timer -->
+    @if($flashDeals->isNotEmpty())
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-rose-600 via-rose-700 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-rose-500/60">
+                <div>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-black/20 px-3 py-1 rounded-full text-rose-200 mb-1">
+                        ⚡ হট ডিসকাউন্ট অফার
+                    </span>
+                    <h2 class="text-xl sm:text-3xl font-black">আজকের মেগা ফ্ল্যাশ সেল (Flash Deals)</h2>
+                    <p class="text-xs text-rose-100/90 mt-0.5">সীমিত সময়ের জন্য বিশাল মূল্যছাড়! স্টক ফুরিয়ে যাওয়ার আগেই অর্ডার করুন।</p>
+                </div>
+
+                <!-- Live Countdown Timer -->
+                <div id="flashDealsCountdown" class="flex items-center gap-2 self-start md:self-auto bg-black/30 p-2 sm:p-3 rounded-2xl border border-white/20 backdrop-blur-sm">
+                    <span class="text-xs font-bold text-rose-200 mr-1">অফার শেষ হতে:</span>
+                    <div class="text-center">
+                        <span id="cdHours" class="bg-white text-rose-700 font-black text-sm sm:text-base px-2 py-1 rounded-lg">11</span>
+                        <span class="block text-[9px] uppercase tracking-wider text-rose-200 mt-0.5">ঘণ্টা</span>
+                    </div>
+                    <span class="font-bold">:</span>
+                    <div class="text-center">
+                        <span id="cdMinutes" class="bg-white text-rose-700 font-black text-sm sm:text-base px-2 py-1 rounded-lg">45</span>
+                        <span class="block text-[9px] uppercase tracking-wider text-rose-200 mt-0.5">মিনিট</span>
+                    </div>
+                    <span class="font-bold">:</span>
+                    <div class="text-center">
+                        <span id="cdSeconds" class="bg-white text-rose-700 font-black text-sm sm:text-base px-2 py-1 rounded-lg">30</span>
+                        <span class="block text-[9px] uppercase tracking-wider text-rose-200 mt-0.5">সেকেন্ড</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flash Deal Products Slider / Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6">
+                @foreach($flashDeals as $product)
+                <div class="bg-white rounded-2xl p-4 text-slate-900 shadow-md hover:shadow-xl transition-all flex flex-col justify-between group">
+                    <div class="relative rounded-xl overflow-hidden bg-slate-100 aspect-square mb-3">
+                        <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        @if($product->discount_percentage > 0)
+                        <span class="absolute top-2 left-2 bg-rose-600 text-white font-black text-xs px-2 py-1 rounded-md shadow">
+                            -{{ $product->discount_percentage }}% ছাড়
+                        </span>
+                        @endif
+                        <span class="absolute top-2 right-2 bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded shadow">
+                            🔥 ফ্ল্যাশ সেল
+                        </span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[11px] text-emerald-600 font-semibold uppercase tracking-wider">{{ $product->category->name }}</span>
+                            <a href="{{ route('products.show', $product->slug) }}" class="block text-sm font-bold text-slate-900 hover:text-emerald-600 transition-colors line-clamp-2 mt-0.5 leading-snug">
+                                {{ $product->name }}
+                            </a>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-slate-100">
+                            <div class="flex items-baseline gap-2 mb-3">
+                                <span class="text-lg sm:text-xl font-black text-emerald-700">৳ {{ number_format($product->sale_price) }}</span>
+                                @if($product->regular_price > $product->sale_price)
+                                <span class="text-xs text-slate-400 line-through">৳ {{ number_format($product->regular_price) }}</span>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" 
+                                        class="btn-quick-buy w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                        data-id="{{ $product->id }}"
+                                        data-name="{{ $product->name }}"
+                                        data-price="{{ $product->sale_price }}"
+                                        data-thumbnail="{{ $product->thumbnail }}">
+                                    <span data-i18n="btn_order_now">⚡ অর্ডার করুন</span>
+                                </button>
+                                <button type="button" 
+                                        class="btn-add-to-cart w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                        data-id="{{ $product->id }}"
+                                        data-name="{{ $product->name }}"
+                                        data-slug="{{ $product->slug }}"
+                                        data-price="{{ $product->sale_price }}"
+                                        data-thumbnail="{{ $product->thumbnail }}">
+                                    <span data-i18n="btn_add_to_cart">+ কার্টে নিন</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- Featured Products Showcase -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-lg sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                    <span>⭐</span> <span data-i18n="trending_title">ট্রেন্ডিং ও জনপ্রিয় পণ্যসমূহ</span>
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5" data-i18n="trending_desc">সবচেয়ে বেশি অর্ডার করা প্রিমিয়াম পণ্যসমূহ</p>
+            </div>
+            <a href="{{ route('products.index') }}" class="text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer" data-i18n="view_all">
+                সবগুলো দেখুন ({{ $allProducts->total() }}) →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            @foreach($featuredProducts as $product)
+            <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                <div class="relative rounded-xl overflow-hidden bg-slate-100 aspect-square mb-2 sm:mb-3">
+                    <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    @if($product->discount_percentage > 0)
+                    <span class="absolute top-2 left-2 bg-rose-600 text-white font-black text-[10px] sm:text-xs px-2 py-0.5 rounded shadow">
+                        -{{ $product->discount_percentage }}%
+                    </span>
+                    @endif
+                    @if($product->landingPages()->where('status', 'published')->exists())
+                    <a href="{{ url('/' . $product->landingPages()->where('status', 'published')->first()->slug) }}" 
+                       class="absolute bottom-2 left-2 bg-emerald-600/95 hover:bg-emerald-700 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md flex items-center gap-1 backdrop-blur-sm cursor-pointer">
+                        <span>🚀 স্পেশাল অফার পেজ</span>
+                    </a>
+                    @endif
+                </div>
+
+                <div class="flex-1 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] sm:text-xs text-emerald-600 font-semibold">{{ $product->category->name }}</span>
+                        <a href="{{ route('products.show', $product->slug) }}" class="block text-xs sm:text-sm font-bold text-slate-900 hover:text-emerald-600 transition-colors line-clamp-2 mt-0.5 leading-snug">
+                            {{ $product->name }}
+                        </a>
+                    </div>
+
+                    <div class="mt-2.5 pt-2.5 border-t border-slate-100">
+                        <div class="flex items-baseline gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                            <span class="text-base sm:text-lg font-black text-emerald-700">৳ {{ number_format($product->sale_price) }}</span>
+                            @if($product->regular_price > $product->sale_price)
+                            <span class="text-[11px] sm:text-xs text-slate-400 line-through">৳ {{ number_format($product->regular_price) }}</span>
+                            @endif
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+                            <button type="button" 
+                                    class="btn-quick-buy w-full py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                    data-id="{{ $product->id }}"
+                                    data-name="{{ $product->name }}"
+                                    data-price="{{ $product->sale_price }}"
+                                    data-thumbnail="{{ $product->thumbnail }}">
+                                <span data-i18n="order_now">অর্ডার করুন</span>
+                            </button>
+                            <button type="button" 
+                                    class="btn-add-to-cart w-full py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                    data-id="{{ $product->id }}"
+                                    data-name="{{ $product->name }}"
+                                    data-slug="{{ $product->slug }}"
+                                    data-price="{{ $product->sale_price }}"
+                                    data-thumbnail="{{ $product->thumbnail }}">
+                                <span data-i18n="add_to_cart_short">+ কার্ট</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </section>
+
+    <!-- Customer Reviews & Social Proof -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-sm">
+            <div class="text-center max-w-xl mx-auto mb-8">
+                <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full" data-i18n="reviews_badge">সম্মানিত গ্রাহকদের মতামত</span>
+                <h2 class="text-xl sm:text-3xl font-black text-slate-900 mt-2" data-i18n="reviews_title">আমাদের সন্তুষ্ট গ্রাহকদের রিভিউ</h2>
+                <p class="text-xs text-slate-500 mt-1" data-i18n="reviews_desc">হাজারো পরিবারের আস্থার প্রতীক DemandHat BD</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Review 1 -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                    <div class="flex items-center gap-1 text-amber-400 text-sm">★★★★★</div>
+                    <p class="text-xs text-slate-700 leading-relaxed">
+                        "সুন্দরবনের চাকের মধুটা সত্যি অসাধারণ! গন্ধ এবং স্বাদেই বোঝা যায় খাঁটি জিনিস। ঢাকার ভেতর মাত্র ২৪ ঘণ্টায় ক্যাশ অন ডেলিভারিতে পেয়েছি।"
+                    </p>
+                    <div class="flex items-center gap-3 pt-2 border-t border-slate-200">
+                        <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">ম</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">মাহমুদুল হাসান</h4>
+                            <span class="text-[10px] text-slate-400">উত্তরা, ঢাকা • ভেরিফায়েড বায়ার</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                    <div class="flex items-center gap-1 text-amber-400 text-sm">★★★★★</div>
+                    <p class="text-xs text-slate-700 leading-relaxed">
+                        "মাল্টিফাংশন চপারটি কেনার পর রান্নাঘরের পেঁয়াজ আর সবজি কাটা অনেক সহজ হয়ে গেছে। স্টিলের ব্লেডগুলো ভীষণ ধারালো। প্রোডাক্ট কোয়ালিটি নিয়ে কোনো সন্দেহ নেই।"
+                    </p>
+                    <div class="flex items-center gap-3 pt-2 border-t border-slate-200">
+                        <div class="w-8 h-8 rounded-full bg-teal-600 text-white font-bold text-xs flex items-center justify-center">র</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">রোকেয়া আক্তার</h4>
+                            <span class="text-[10px] text-slate-400">ধানমন্ডি, ঢাকা • ভেরিফায়েড বায়ার</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                    <div class="flex items-center gap-1 text-amber-400 text-sm">★★★★★</div>
+                    <p class="text-xs text-slate-700 leading-relaxed">
+                        "T9 মেটাল ট্রিমারটি দেখতে যেমন প্রিমিয়াম কাজও করে নিখুঁত। ব্যাটারি ব্যাকআপ দারুণ। সবচেয়ে ভালো লেগেছে ডেলিভারি ম্যানের সামনে চেক করে নেওয়ার সিস্টেম।"
+                    </p>
+                    <div class="flex items-center gap-3 pt-2 border-t border-slate-200">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">ত</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900">তানভীর আহমেদ</h4>
+                            <span class="text-[10px] text-slate-400">চট্টগ্রাম সদর • ভেরিফায়েড বায়ার</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Hotline & Fast Order CTA Banner -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-emerald-800 via-slate-900 to-teal-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-emerald-700/50">
+            <div class="space-y-2 text-center md:text-left">
+                <h3 class="text-xl sm:text-2xl font-black">যেকোনো প্রশ্ন বা ফোনে সরাসরি অর্ডার করতে চান?</h3>
+                <p class="text-xs sm:text-sm text-slate-300">আমাদের কাস্টমার কেয়ার টিম সপ্তাহের ৭ দিনই আপনার সেবায় প্রস্তুত।</p>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="tel:{{ $settings['store_phone'] ?? '01712-345678' }}" class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm rounded-xl shadow-lg flex items-center gap-2 hover:scale-105 transition-all">
+                    <span>📞 কল করুন: {{ $settings['store_phone'] ?? '01712-345678' }}</span>
+                </a>
+                @if(!empty($settings['store_whatsapp']))
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['store_whatsapp']) }}" target="_blank" class="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-xl border border-white/20 flex items-center gap-2 transition-colors">
+                    <span>💬 WhatsApp মেসেজ</span>
+                </a>
+                @endif
+            </div>
+        </div>
+    </section>
+
+</div>
+@endsection
