@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>@yield('title', ($settings['store_name'] ?? 'DemandHat BD') . ' - ' . ($settings['store_tagline'] ?? 'সেরা অনলাইন শপ'))</title>
     <meta name="description" content="@yield('meta_description', 'DemandHat BD - খাঁটি অর্গানিক ফুড, হোম ও কিচেন গ্যাজেট এবং ট্রেন্ডিং ইলেকট্রনিক্স পণ্যের বিশ্বস্ত অনলাইন শপ। সারাদেশে ক্যাশ অন ডেলিভারি।')">
 
