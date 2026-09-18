@@ -6,65 +6,158 @@
 <div class="space-y-12 sm:space-y-16 pb-16">
 
     <!-- Hero Promotional Banner Section -->
+    @php
+        $defaultBanners = \App\Http\Controllers\Admin\BannerController::getDefaultBanners();
+        $storedBannersRaw = $settings['home_banners'] ?? null;
+        $homeBanners = $defaultBanners;
+        if (!empty($storedBannersRaw)) {
+            $decodedBanners = json_decode($storedBannersRaw, true);
+            if (is_array($decodedBanners)) {
+                $homeBanners['banner1'] = array_merge($defaultBanners['banner1'], $decodedBanners['banner1'] ?? []);
+                $homeBanners['banner2'] = array_merge($defaultBanners['banner2'], $decodedBanners['banner2'] ?? []);
+                $homeBanners['banner3'] = array_merge($defaultBanners['banner3'], $decodedBanners['banner3'] ?? []);
+            }
+        }
+        $b1 = $homeBanners['banner1'];
+        $b2 = $homeBanners['banner2'];
+        $b3 = $homeBanners['banner3'];
+    @endphp
+
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-            <!-- Main Hero Carousel / Banner -->
-            <div class="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white min-h-[340px] sm:min-h-[420px] flex items-center p-6 sm:p-10 border border-emerald-800/40">
-                <div class="relative z-10 max-w-xl space-y-4">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider">
-                        <span>🌿</span> প্রিমিয়াম অর্গানিক ও লাইফস্টাইল কালেকশন
+            <!-- Main Hero Carousel / Banner 1 (Left 2/3) -->
+            @php
+                $b1HasImage = !empty($b1['image']);
+                $b1ShowText = !empty($b1['show_text']) || (!$b1HasImage && !empty($b1['title']));
+            @endphp
+            @if(!empty($b1['is_active']))
+            <div class="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 min-h-[260px] sm:min-h-[360px] lg:min-h-[420px] flex items-center group">
+                @if($b1HasImage)
+                    <!-- Full Banner 1 Image -->
+                    <a href="{{ $b1['btn1_link'] ?? route('products.index') }}" class="absolute inset-0 w-full h-full block z-0" title="{{ $b1['title'] ?? 'Banner 1' }}">
+                        <img src="{{ $b1['image'] }}" alt="{{ $b1['title'] ?? 'Banner 1' }}" class="w-full h-full object-cover object-center group-hover:scale-[1.01] transition-transform duration-700">
+                    </a>
+                @else
+                    <div class="absolute inset-0 bg-gradient-to-r {{ $b1['bg_gradient'] ?? 'from-emerald-900 via-teal-900 to-slate-900' }}"></div>
+                @endif
+
+                @if($b1ShowText)
+                <div class="relative z-10 max-w-xl p-6 sm:p-10 space-y-4 {{ $b1HasImage ? 'bg-slate-950/40 backdrop-blur-[2px] rounded-2xl m-4 sm:m-6 border border-white/10' : '' }}">
+                    @if(!empty($b1['badge']))
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider" data-i18n="b1_badge">
+                        {{ $b1['badge'] }}
                     </span>
-                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight text-white">
-                        প্রকৃতির খাঁটি স্বাদ ও <span class="text-emerald-400">আধুনিক গ্যাজেটের</span> সেরা সমাহার!
+                    @endif
+
+                    @if(!empty($b1['title']))
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight text-white drop-shadow-md" data-i18n="b1_title">
+                        {{ $b1['title'] }}
                     </h1>
-                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md">
-                        সুন্দরবনের প্রাকৃতিক চাকের মধু, কাঠের ঘানি ভাঙা খাঁটি সরিষার তেল, স্মার্ট কিচেন চপার এবং ট্রেন্ডিং ইলেকট্রনিক্স গ্যাজেটস।
+                    @endif
+
+                    @if(!empty($b1['subtitle']))
+                    <p class="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-md drop-shadow" data-i18n="b1_subtitle">
+                        {{ $b1['subtitle'] }}
                     </p>
+                    @endif
+
                     <div class="pt-2 flex flex-wrap items-center gap-3">
-                        <a href="{{ route('products.index') }}" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all">
-                            সব পণ্য দেখুন 🛒
+                        @if(!empty($b1['btn1_text']))
+                        <a href="{{ $b1['btn1_link'] ?? route('products.index') }}" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all" data-i18n="b1_btn1">
+                            {{ $b1['btn1_text'] }}
                         </a>
-                        <a href="{{ route('products.index', ['category' => 'organic-products']) }}" class="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-xl backdrop-blur-sm border border-white/20 transition-colors">
-                            খাঁটি অর্গানিক ফুড →
+                        @endif
+
+                        @if(!empty($b1['btn2_text']))
+                        <a href="{{ $b1['btn2_link'] ?? route('products.index', ['category' => 'organic-products']) }}" class="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-xl backdrop-blur-sm border border-white/20 transition-colors" data-i18n="b1_btn2">
+                            {{ $b1['btn2_text'] }}
                         </a>
+                        @endif
                     </div>
                 </div>
-
-                <!-- Decorative overlay image -->
-                <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-25 lg:opacity-40 pointer-events-none">
-                    <img src="https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=80" alt="Honey" class="w-full h-full object-cover mix-blend-luminosity">
-                </div>
+                @endif
             </div>
+            @endif
 
-            <!-- Side Promotional Promo Cards -->
+            <!-- Side Promotional Promo Cards (Right 1/3) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
-                <!-- Promo 1: Kitchen Tools -->
-                <div class="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-br from-amber-700 to-orange-900 text-white p-6 flex flex-col justify-between min-h-[160px] sm:min-h-[195px] border border-orange-700/40">
-                    <div class="relative z-10">
-                        <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/30 text-amber-200">স্মার্ট হোম ও কিচেন</span>
-                        <h3 class="text-base sm:text-lg font-black mt-1 leading-snug">মাল্টিফাংশন ভেজিটেবল চপার ও কাটার</h3>
-                        <p class="text-xs text-amber-100/90 mt-1">রান্নার সময় বাঁচান নিমেষেই! মাত্র ৳ ৭৯০</p>
-                    </div>
-                    <div class="relative z-10 pt-2">
-                        <a href="{{ route('products.index', ['category' => 'home-kitchen']) }}" class="text-xs font-bold text-white hover:text-amber-200 flex items-center gap-1">
-                            অর্ডার করুন এখনই <span>→</span>
+                <!-- Promo Banner 2: Kitchen Tools / Top -->
+                @php
+                    $b2HasImage = !empty($b2['image']);
+                    $b2ShowText = !empty($b2['show_text']) || (!$b2HasImage && !empty($b2['title']));
+                @endphp
+                @if(!empty($b2['is_active']))
+                <div class="relative rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 min-h-[160px] sm:min-h-[195px] flex flex-col justify-between group">
+                    @if($b2HasImage)
+                        <!-- Full Banner 2 Image -->
+                        <a href="{{ $b2['link_url'] ?? route('products.index') }}" class="absolute inset-0 w-full h-full block z-0" title="{{ $b2['title'] ?? 'Banner 2' }}">
+                            <img src="{{ $b2['image'] }}" alt="{{ $b2['title'] ?? 'Banner 2' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </a>
-                    </div>
-                </div>
+                    @else
+                        <div class="absolute inset-0 bg-gradient-to-br {{ $b2['bg_gradient'] ?? 'from-amber-700 to-orange-900' }}"></div>
+                    @endif
 
-                <!-- Promo 2: Electronics Gadgets -->
-                <div class="relative rounded-2xl overflow-hidden shadow-md bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-6 flex flex-col justify-between min-h-[160px] sm:min-h-[195px] border border-blue-800/40">
-                    <div class="relative z-10">
-                        <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/30 text-blue-200">মেগা টেক ডিসকাউন্ট</span>
-                        <h3 class="text-base sm:text-lg font-black mt-1 leading-snug">T9 ভিন্টেজ হেয়ার ট্রিমার ও স্মার্ট ওয়াচ</h3>
-                        <p class="text-xs text-blue-100/90 mt-1">১ বছরের রিপ্লেসমেন্ট গ্যারান্টি সহ!</p>
+                    @if($b2ShowText)
+                    <div class="relative z-10 p-6 flex flex-col justify-between h-full {{ $b2HasImage ? 'bg-slate-950/40 backdrop-blur-[2px]' : '' }}">
+                        <div>
+                            @if(!empty($b2['badge']))
+                            <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/40 text-amber-200" data-i18n="b2_badge">{{ $b2['badge'] }}</span>
+                            @endif
+                            @if(!empty($b2['title']))
+                            <h3 class="text-base sm:text-lg font-black mt-1 leading-snug text-white drop-shadow" data-i18n="b2_title">{{ $b2['title'] }}</h3>
+                            @endif
+                            @if(!empty($b2['subtitle']))
+                            <p class="text-xs text-amber-100/90 mt-1 drop-shadow" data-i18n="b2_subtitle">{{ $b2['subtitle'] }}</p>
+                            @endif
+                        </div>
+                        <div class="pt-2">
+                            <a href="{{ $b2['link_url'] ?? route('products.index', ['category' => 'home-kitchen']) }}" class="text-xs font-bold text-white hover:text-amber-200 flex items-center gap-1 group-hover:translate-x-1 transition-transform drop-shadow">
+                                <span data-i18n="b2_link">{{ $b2['link_text'] ?? 'অর্ডার করুন এখনই →' }}</span>
+                            </a>
+                        </div>
                     </div>
-                    <div class="relative z-10 pt-2">
-                        <a href="{{ route('products.index', ['category' => 'electronics-gadgets']) }}" class="text-xs font-bold text-white hover:text-blue-200 flex items-center gap-1">
-                            অফার দেখুন <span>→</span>
-                        </a>
-                    </div>
+                    @endif
                 </div>
+                @endif
+
+                <!-- Promo Banner 3: Electronics Gadgets / Bottom -->
+                @php
+                    $b3HasImage = !empty($b3['image']);
+                    $b3ShowText = !empty($b3['show_text']) || (!$b3HasImage && !empty($b3['title']));
+                @endphp
+                @if(!empty($b3['is_active']))
+                <div class="relative rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 min-h-[160px] sm:min-h-[195px] flex flex-col justify-between group">
+                    @if($b3HasImage)
+                        <!-- Full Banner 3 Image -->
+                        <a href="{{ $b3['link_url'] ?? route('products.index') }}" class="absolute inset-0 w-full h-full block z-0" title="{{ $b3['title'] ?? 'Banner 3' }}">
+                            <img src="{{ $b3['image'] }}" alt="{{ $b3['title'] ?? 'Banner 3' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </a>
+                    @else
+                        <div class="absolute inset-0 bg-gradient-to-br {{ $b3['bg_gradient'] ?? 'from-blue-900 to-indigo-950' }}"></div>
+                    @endif
+
+                    @if($b3ShowText)
+                    <div class="relative z-10 p-6 flex flex-col justify-between h-full {{ $b3HasImage ? 'bg-slate-950/40 backdrop-blur-[2px]' : '' }}">
+                        <div>
+                            @if(!empty($b3['badge']))
+                            <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/40 text-blue-200" data-i18n="b3_badge">{{ $b3['badge'] }}</span>
+                            @endif
+                            @if(!empty($b3['title']))
+                            <h3 class="text-base sm:text-lg font-black mt-1 leading-snug text-white drop-shadow" data-i18n="b3_title">{{ $b3['title'] }}</h3>
+                            @endif
+                            @if(!empty($b3['subtitle']))
+                            <p class="text-xs text-blue-100/90 mt-1 drop-shadow" data-i18n="b3_subtitle">{{ $b3['subtitle'] }}</p>
+                            @endif
+                        </div>
+                        <div class="pt-2">
+                            <a href="{{ $b3['link_url'] ?? route('products.index', ['category' => 'electronics-gadgets']) }}" class="text-xs font-bold text-white hover:text-blue-200 flex items-center gap-1 group-hover:translate-x-1 transition-transform drop-shadow">
+                                <span data-i18n="b3_link">{{ $b3['link_text'] ?? 'অফার দেখুন →' }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @endif
             </div>
         </div>
     </section>
@@ -111,7 +204,7 @@
         </div>
     </section>
 
-    <!-- Category Showcase Grid -->
+    <!-- Category Showcase Carousel -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -120,29 +213,43 @@
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5" data-i18n="special_categories_desc">আপনার প্রয়োজনীয় পণ্য সহজে খুঁজে নিন</p>
             </div>
-            <a href="{{ route('products.index') }}" class="text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer" data-i18n="all_categories">
-                সব ক্যাটাগরি →
-            </a>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Carousel Nav Arrows -->
+                <button type="button" id="catPrevBtn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer" title="পূর্ববর্তী">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button type="button" id="catNextBtn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer" title="পরবর্তী">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                <a href="{{ route('products.index') }}" class="ml-1 text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer whitespace-nowrap" data-i18n="all_categories">
+                    সব ক্যাটাগরি →
+                </a>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-            @foreach($categories as $cat)
-            <a href="{{ route('products.index', ['category' => $cat->slug]) }}" 
-               class="group relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex items-center gap-4 overflow-hidden">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
-                    <img src="{{ $cat->image }}" alt="{{ $cat->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
-                        {{ $cat->name }}
-                    </h3>
-                    <p class="text-xs text-slate-500 mt-1 line-clamp-1">{{ $cat->description }}</p>
-                    <span class="inline-block mt-2 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                        {{ $cat->products_count }} টি পণ্য উপলব্ধ
-                    </span>
-                </div>
-            </a>
-            @endforeach
+        <!-- Carousel Container / Track -->
+        <div class="relative group/carousel">
+            <div id="categoryCarouselTrack" 
+                 class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-2 px-1 snap-x snap-mandatory no-scrollbar"
+                 style="scrollbar-width: none; -ms-overflow-style: none;">
+                @foreach($categories as $cat)
+                <a href="{{ route('products.index', ['category' => $cat->slug]) }}" 
+                   class="group relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex items-center gap-4 overflow-hidden snap-start flex-shrink-0 w-[270px] sm:w-[320px] md:w-[340px]">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
+                        <img src="{{ $cat->image }}" alt="{{ $cat->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
+                            {{ $cat->name }}
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1 line-clamp-1">{{ $cat->description }}</p>
+                        <span class="inline-block mt-2 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                            {{ $cat->products_count }} টি পণ্য উপলব্ধ
+                        </span>
+                    </div>
+                </a>
+                @endforeach
+            </div>
         </div>
     </section>
 
@@ -393,3 +500,70 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const track = document.getElementById('categoryCarouselTrack');
+        const prevBtn = document.getElementById('catPrevBtn');
+        const nextBtn = document.getElementById('catNextBtn');
+        
+        if (track && prevBtn && nextBtn) {
+            const scrollStep = 320;
+            let autoScrollInterval = null;
+
+            function slideNext() {
+                if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 10) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: scrollStep, behavior: 'smooth' });
+                }
+            }
+
+            function slidePrev() {
+                if (track.scrollLeft <= 10) {
+                    track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                slideNext();
+                resetAutoScroll();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                slidePrev();
+                resetAutoScroll();
+            });
+
+            function startAutoScroll() {
+                if (!autoScrollInterval) {
+                    autoScrollInterval = setInterval(slideNext, 3500);
+                }
+            }
+
+            function stopAutoScroll() {
+                if (autoScrollInterval) {
+                    clearInterval(autoScrollInterval);
+                    autoScrollInterval = null;
+                }
+            }
+
+            function resetAutoScroll() {
+                stopAutoScroll();
+                startAutoScroll();
+            }
+
+            // Pause on hover or touch
+            track.addEventListener('mouseenter', stopAutoScroll);
+            track.addEventListener('mouseleave', startAutoScroll);
+            track.addEventListener('touchstart', stopAutoScroll, { passive: true });
+            track.addEventListener('touchend', startAutoScroll);
+
+            startAutoScroll();
+        }
+    });
+</script>
+@endpush

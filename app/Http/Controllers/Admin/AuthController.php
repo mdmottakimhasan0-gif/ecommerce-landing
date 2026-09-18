@@ -13,8 +13,12 @@ class AuthController extends Controller
 {
     public function showLogin(): View|RedirectResponse
     {
-        if (Auth::check() && Auth::user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return redirect()->route('home');
         }
 
         $settings = Setting::all()->pluck('value', 'key')->toArray();
@@ -32,14 +36,13 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (! Auth::user()->isAdmin()) {
-                Auth::logout();
-
-                return back()->withErrors(['email' => 'আপনার এই এডমিন প্যানেল অ্যাক্সেস করার অনুমতি নেই।']);
+            if (Auth::user()->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', 'সফলভাবে এডমিন প্যানেলে লগইন হয়েছে।');
             }
 
-            return redirect()->intended(route('admin.dashboard'))
-                ->with('success', 'সফলভাবে এডমিন প্যানেলে লগইন হয়েছে।');
+            return redirect()->intended(route('home'))
+                ->with('success', 'স্বাগতম, '.Auth::user()->name.'! আপনি সফলভাবে লগইন হয়েছেন।');
         }
 
         return back()->withErrors([
@@ -49,10 +52,15 @@ class AuthController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
+        $wasAdmin = Auth::check() && Auth::user()->isAdmin();
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')->with('success', 'আপনি সফলভাবে লগআউট হয়েছেন।');
+        if ($wasAdmin) {
+            return redirect()->route('admin.login')->with('success', 'আপনি সফলভাবে লগআউট হয়েছেন।');
+        }
+
+        return redirect()->route('home')->with('success', 'আপনি সফলভাবে লগআউট হয়েছেন।');
     }
 }

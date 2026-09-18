@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\BannerController as AdminBannerController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CourierController as AdminCourierController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\LandingPageController as AdminLandingPageController;
+use App\Http\Controllers\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
@@ -33,6 +35,11 @@ Route::get('/order-success/{orderNumber}', [CheckoutController::class, 'success'
 // Order Tracking
 Route::get('/track-order', [OrderTrackingController::class, 'index'])->name('tracking.index');
 Route::post('/track-order', [OrderTrackingController::class, 'search'])->name('tracking.search');
+
+// Unified Customer & Admin Auth
+Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +95,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Pixel, GTM, TikTok & Store Settings
         Route::get('settings', [AdminSettingController::class, 'index'])->name('settings.index');
         Route::post('settings', [AdminSettingController::class, 'update'])->name('settings.update');
+
+        // Home Page Banners Management
+        Route::get('banners', [AdminBannerController::class, 'index'])->name('banners.index');
+        Route::post('banners', [AdminBannerController::class, 'update'])->name('banners.update');
+
+        // Header Navigation Menu & Announcement Bar
+        Route::get('menus', [AdminMenuController::class, 'index'])->name('menus.index');
+        Route::post('menus', [AdminMenuController::class, 'update'])->name('menus.update');
     });
 });
 

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -38,8 +39,11 @@ class ProductController extends Controller
             'regular_price' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'thumbnail' => 'required|string|max:500',
-            'gallery_input' => 'nullable|string',
+            'thumbnail' => $request->hasFile('thumbnail')
+                ? 'required|image|mimes:jpeg,png,jpg,webp,gif|max:5120'
+                : 'required',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'short_description' => 'nullable|string',
             'description' => 'nullable|string',
             'features_input' => 'nullable|string',
@@ -52,9 +56,25 @@ class ProductController extends Controller
             ? Str::slug($validated['slug'])
             : Str::slug($validated['name']).'-'.rand(100, 999);
 
-        // Parse gallery URLs (one per line)
+        // Upload main thumbnail file or fallback to string
+        $thumbnailUrl = '';
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $thumbnailUrl = Storage::url($path);
+        } elseif (is_string($request->thumbnail)) {
+            $thumbnailUrl = $request->thumbnail;
+        }
+
+        // Upload gallery image files
         $gallery = [];
-        if (! empty($request->gallery_input)) {
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $imageFile) {
+                if ($imageFile && $imageFile->isValid()) {
+                    $path = $imageFile->store('products/gallery', 'public');
+                    $gallery[] = Storage::url($path);
+                }
+            }
+        } elseif (! empty($request->gallery_input)) {
             $gallery = array_filter(array_map('trim', explode("\n", $request->gallery_input)));
         }
 
@@ -72,7 +92,7 @@ class ProductController extends Controller
             'regular_price' => $validated['regular_price'],
             'sale_price' => $validated['sale_price'],
             'stock' => $validated['stock'],
-            'thumbnail' => $validated['thumbnail'],
+            'thumbnail' => $thumbnailUrl,
             'gallery' => $gallery,
             'short_description' => $validated['short_description'] ?? null,
             'description' => $validated['description'] ?? null,
@@ -103,15 +123,38 @@ class ProductController extends Controller
             'regular_price' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'thumbnail' => 'required|string|max:500',
-            'gallery_input' => 'nullable|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'existing_gallery' => 'nullable|array',
             'short_description' => 'nullable|string',
             'description' => 'nullable|string',
             'features_input' => 'nullable|string',
         ]);
 
-        $gallery = [];
-        if (! empty($request->gallery_input)) {
+        $thumbnailUrl = $product->thumbnail;
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $thumbnailUrl = Storage::url($path);
+        } elseif ($request->boolean('remove_thumbnail')) {
+            $thumbnailUrl = null;
+        } elseif (is_string($request->thumbnail) && ! empty($request->thumbnail)) {
+            $thumbnailUrl = $request->thumbnail;
+        }
+
+        // Merge retained existing gallery + newly uploaded gallery images
+        $gallery = $request->input('existing_gallery', []);
+        if (! is_array($gallery)) {
+            $gallery = [];
+        }
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $imageFile) {
+                if ($imageFile && $imageFile->isValid()) {
+                    $path = $imageFile->store('products/gallery', 'public');
+                    $gallery[] = Storage::url($path);
+                }
+            }
+        } elseif (! empty($request->gallery_input)) {
             $gallery = array_filter(array_map('trim', explode("\n", $request->gallery_input)));
         }
 
@@ -128,7 +171,7 @@ class ProductController extends Controller
             'regular_price' => $validated['regular_price'],
             'sale_price' => $validated['sale_price'],
             'stock' => $validated['stock'],
-            'thumbnail' => $validated['thumbnail'],
+            'thumbnail' => $thumbnailUrl,
             'gallery' => $gallery,
             'short_description' => $validated['short_description'] ?? null,
             'description' => $validated['description'] ?? null,

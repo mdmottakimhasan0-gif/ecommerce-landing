@@ -27,7 +27,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.products.update', $product->id) }}" method="POST" class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+    <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
         @csrf
         @method('PUT')
 
@@ -68,22 +68,99 @@
                 </span>
             </div>
 
-            <div>
+            <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">স্টক পরিমাণ <span class="text-rose-500">*</span></label>
                 <input type="number" name="stock" value="{{ old('stock', $product->stock) }}" required 
                        class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">থাম্বনেইল ইমেজ URL <span class="text-rose-500">*</span></label>
-                <input type="url" name="thumbnail" value="{{ old('thumbnail', $product->thumbnail) }}" required 
-                       class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-            </div>
+            <!-- ========================================================= -->
+            <!-- PRODUCT MEDIA UPLOAD SECTION (MATCHING DEMANDHAT UI)      -->
+            <!-- ========================================================= -->
+            <div class="md:col-span-2 border-t border-slate-100 pt-6">
+                <h3 class="text-base font-bold text-slate-900 mb-4">Product Media</h3>
 
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">গ্যালারি ইমেজ URLs (প্রতি লাইনে ১টি লিঙ্ক)</label>
-                <textarea name="gallery_input" rows="3" 
-                          class="w-full px-4 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">{{ old('gallery_input', !empty($product->gallery) ? implode("\n", $product->gallery) : '') }}</textarea>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Main Thumbnail Column -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-semibold text-slate-700">
+                            Main Thumbnail <span class="text-rose-500">*</span>
+                        </label>
+                        
+                        <div id="thumbnailDropzone" 
+                             onclick="document.getElementById('thumbnailInput').click()"
+                             class="relative border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl h-52 flex flex-col items-center justify-center p-4 cursor-pointer transition-all bg-slate-50/50 hover:bg-emerald-50/20 group select-none">
+                            
+                            <input type="file" name="thumbnail" id="thumbnailInput" accept="image/*" class="hidden" onchange="handleThumbnailSelect(event)">
+                            <input type="hidden" name="remove_thumbnail" id="removeThumbnailFlag" value="0">
+
+                            <!-- Placeholder State -->
+                            <div id="thumbnailPlaceholder" class="{{ !empty($product->thumbnail) ? 'hidden' : '' }} flex flex-col items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors pointer-events-none">
+                                <svg class="w-12 h-12 stroke-current mb-2 stroke-[1.5]" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                                </svg>
+                                <span class="text-xs font-semibold text-slate-600 group-hover:text-emerald-700">ছবি আপলোড করতে ক্লিক করুন বা ড্র্যাগ করুন</span>
+                                <span class="text-[10px] text-slate-400 mt-1">PNG, JPG, WEBP (Max 5MB)</span>
+                            </div>
+
+                            <!-- Preview State -->
+                            <div id="thumbnailPreviewContainer" class="{{ !empty($product->thumbnail) ? '' : 'hidden' }} absolute inset-0 rounded-2xl overflow-hidden p-2 bg-white flex items-center justify-center group/preview">
+                                <img id="thumbnailPreviewImg" src="{{ $product->thumbnail ?? '' }}" alt="Thumbnail preview" class="w-full h-full object-contain rounded-xl">
+                                <div class="absolute inset-0 bg-slate-900/50 opacity-0 group-hover/preview:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-2">
+                                    <button type="button" onclick="event.stopPropagation(); document.getElementById('thumbnailInput').click();" class="px-3 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-bold shadow hover:bg-slate-100 cursor-pointer">
+                                        পরিবর্তন করুন
+                                    </button>
+                                    <button type="button" onclick="event.stopPropagation(); removeThumbnail();" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold shadow hover:bg-rose-700 cursor-pointer">
+                                        মুছে ফেলুন
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Images Column -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-semibold text-slate-700">
+                            Gallery Images
+                        </label>
+
+                        <div id="galleryDropzone"
+                             onclick="document.getElementById('galleryInput').click()"
+                             class="relative border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl min-h-[13rem] flex flex-col items-center justify-center p-4 cursor-pointer transition-all bg-slate-50/50 hover:bg-emerald-50/20 group select-none">
+                            
+                            <input type="file" name="gallery[]" id="galleryInput" multiple accept="image/*" class="hidden" onchange="handleGallerySelect(event)">
+
+                            @php
+                                $hasExistingGallery = !empty($product->gallery) && is_array($product->gallery) && count($product->gallery) > 0;
+                            @endphp
+
+                            <!-- Placeholder State -->
+                            <div id="galleryPlaceholder" class="{{ $hasExistingGallery ? 'hidden' : '' }} flex flex-col items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors pointer-events-none">
+                                <svg class="w-12 h-12 stroke-current mb-2 stroke-[1.5]" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                <span class="text-xs font-semibold text-slate-600 group-hover:text-emerald-700">গ্যালারির জন্য একাধিক ছবি যুক্ত করুন</span>
+                                <span class="text-[10px] text-slate-400 mt-1">ক্লিক বা ড্র্যাগ করে সিলেক্ট করুন</span>
+                            </div>
+
+                            <!-- Gallery Images Grid -->
+                            <div id="galleryGrid" class="{{ $hasExistingGallery ? '' : 'hidden' }} w-full grid grid-cols-3 gap-2.5 p-1" onclick="event.stopPropagation()">
+                                @if($hasExistingGallery)
+                                    @foreach($product->gallery as $gIndex => $gUrl)
+                                    <div class="existing-gallery-card relative group/card aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs flex items-center justify-center">
+                                        <img src="{{ $gUrl }}" class="w-full h-full object-cover">
+                                        <input type="hidden" name="existing_gallery[]" value="{{ $gUrl }}">
+                                        <button type="button" onclick="removeExistingGalleryItem(this)" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs font-bold shadow-md hover:bg-rose-700 transition-colors cursor-pointer">
+                                            ×
+                                        </button>
+                                    </div>
+                                    @endforeach
+                                @endif
+                                <!-- Dynamically filled with new previews + add button -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="md:col-span-2">
@@ -121,11 +198,228 @@
         </div>
 
         <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
-            <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors">
+            <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer">
                 পরিবর্তন সংরক্ষণ করুন
             </button>
         </div>
     </form>
 
 </div>
+
+<script>
+    // -------------------------------------------------------------
+    // 1. Thumbnail Upload & Preview
+    // -------------------------------------------------------------
+    const thumbInput = document.getElementById('thumbnailInput');
+    const thumbPlaceholder = document.getElementById('thumbnailPlaceholder');
+    const thumbPreviewContainer = document.getElementById('thumbnailPreviewContainer');
+    const thumbPreviewImg = document.getElementById('thumbnailPreviewImg');
+    const thumbDropzone = document.getElementById('thumbnailDropzone');
+    const removeThumbnailFlag = document.getElementById('removeThumbnailFlag');
+
+    function handleThumbnailSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            displayThumbnailFile(file);
+        }
+    }
+
+    function displayThumbnailFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            thumbPreviewImg.src = e.target.result;
+            thumbPlaceholder.classList.add('hidden');
+            thumbPreviewContainer.classList.remove('hidden');
+            if (removeThumbnailFlag) removeThumbnailFlag.value = '0';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeThumbnail() {
+        thumbInput.value = '';
+        thumbPreviewImg.src = '';
+        thumbPreviewContainer.classList.add('hidden');
+        thumbPlaceholder.classList.remove('hidden');
+        if (removeThumbnailFlag) removeThumbnailFlag.value = '1';
+    }
+
+    // Drag and Drop for Thumbnail
+    ['dragenter', 'dragover'].forEach(eventName => {
+        thumbDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            thumbDropzone.classList.add('border-emerald-500', 'bg-emerald-50/40');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        thumbDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            thumbDropzone.classList.remove('border-emerald-500', 'bg-emerald-50/40');
+        }, false);
+    });
+
+    thumbDropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const file = dt.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            thumbInput.files = dataTransfer.files;
+            displayThumbnailFile(file);
+        }
+    });
+
+    // -------------------------------------------------------------
+    // 2. Gallery Upload & Multi-Preview with DataTransfer
+    // -------------------------------------------------------------
+    const galleryInput = document.getElementById('galleryInput');
+    const galleryPlaceholder = document.getElementById('galleryPlaceholder');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const galleryDropzone = document.getElementById('galleryDropzone');
+
+    let galleryFiles = new DataTransfer();
+
+    function removeExistingGalleryItem(btn) {
+        const card = btn.closest('.existing-gallery-card');
+        if (card) {
+            card.remove();
+            checkEmptyGalleryState();
+        }
+    }
+
+    function checkEmptyGalleryState() {
+        const existingCount = document.querySelectorAll('.existing-gallery-card').length;
+        const newCount = galleryFiles.files.length;
+        if (existingCount === 0 && newCount === 0) {
+            galleryGrid.innerHTML = '';
+            galleryGrid.classList.add('hidden');
+            galleryPlaceholder.classList.remove('hidden');
+        } else {
+            galleryPlaceholder.classList.add('hidden');
+            galleryGrid.classList.remove('hidden');
+        }
+    }
+
+    function handleGallerySelect(event) {
+        const files = Array.from(event.target.files);
+        addFilesToGallery(files);
+    }
+
+    function addFilesToGallery(newFiles) {
+        newFiles.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                galleryFiles.items.add(file);
+            }
+        });
+        galleryInput.files = galleryFiles.files;
+        renderNewGalleryPreviews();
+    }
+
+    function removeNewGalleryItem(index) {
+        const dt = new DataTransfer();
+        const currentFiles = galleryFiles.files;
+        for (let i = 0; i < currentFiles.length; i++) {
+            if (i !== index) {
+                dt.items.add(currentFiles[i]);
+            }
+        }
+        galleryFiles = dt;
+        galleryInput.files = galleryFiles.files;
+        renderNewGalleryPreviews();
+    }
+
+    function renderNewGalleryPreviews() {
+        // Remove existing new preview cards and add button
+        document.querySelectorAll('.new-gallery-card, .gallery-add-card').forEach(el => el.remove());
+
+        const count = galleryFiles.files.length;
+        const existingCount = document.querySelectorAll('.existing-gallery-card').length;
+
+        if (count === 0 && existingCount === 0) {
+            galleryGrid.classList.add('hidden');
+            galleryPlaceholder.classList.remove('hidden');
+            return;
+        }
+
+        galleryPlaceholder.classList.add('hidden');
+        galleryGrid.classList.remove('hidden');
+
+        Array.from(galleryFiles.files).forEach((file, index) => {
+            const card = document.createElement('div');
+            card.className = 'new-gallery-card relative group/card aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs flex items-center justify-center';
+
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            const reader = new FileReader();
+            reader.onload = (e) => img.src = e.target.result;
+            reader.readAsDataURL(file);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.title = 'Remove Image';
+            removeBtn.className = 'absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs font-bold shadow-md hover:bg-rose-700 transition-colors opacity-90 hover:opacity-100 cursor-pointer';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                removeNewGalleryItem(index);
+            };
+
+            card.appendChild(img);
+            card.appendChild(removeBtn);
+            galleryGrid.appendChild(card);
+        });
+
+        // Append "+" Add More card
+        ensureAddMoreCard();
+    }
+
+    function ensureAddMoreCard() {
+        document.querySelectorAll('.gallery-add-card').forEach(el => el.remove());
+        const addMoreCard = document.createElement('div');
+        addMoreCard.className = 'gallery-add-card aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-emerald-500 flex flex-col items-center justify-center text-slate-400 hover:text-emerald-600 cursor-pointer transition-colors bg-white hover:bg-emerald-50/20';
+        addMoreCard.innerHTML = `
+            <svg class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span class="text-[10px] font-bold mt-0.5">Add</span>
+        `;
+        addMoreCard.onclick = (e) => {
+            e.stopPropagation();
+            galleryInput.click();
+        };
+        galleryGrid.appendChild(addMoreCard);
+    }
+
+    // Initialize Add More button if existing images are present
+    document.addEventListener('DOMContentLoaded', () => {
+        if (document.querySelectorAll('.existing-gallery-card').length > 0) {
+            ensureAddMoreCard();
+        }
+    });
+
+    // Drag and Drop for Gallery
+    ['dragenter', 'dragover'].forEach(eventName => {
+        galleryDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            galleryDropzone.classList.add('border-emerald-500', 'bg-emerald-50/40');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        galleryDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            galleryDropzone.classList.remove('border-emerald-500', 'bg-emerald-50/40');
+        }, false);
+    });
+
+    galleryDropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = Array.from(dt.files);
+        addFilesToGallery(files);
+    });
+</script>
 @endsection
