@@ -74,6 +74,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('landing-pages', [AdminLandingPageController::class, 'index'])->name('landing-pages.index');
         Route::get('landing-pages/create', [AdminLandingPageController::class, 'create'])->name('landing-pages.create');
         Route::post('landing-pages', [AdminLandingPageController::class, 'store'])->name('landing-pages.store');
+        Route::post('landing-pages/upload-image', [AdminLandingPageController::class, 'uploadImage'])->name('landing-pages.uploadImage');
         Route::get('landing-pages/{landingPage}/builder', [AdminLandingPageController::class, 'builder'])->name('landing-pages.builder');
         Route::match(['post', 'put'], 'landing-pages/{landingPage}/builder', [AdminLandingPageController::class, 'saveBuilder'])->name('landing-pages.builder.save');
         Route::post('landing-pages/{landingPage}/toggle-publish', [AdminLandingPageController::class, 'togglePublish'])->name('landing-pages.togglePublish');

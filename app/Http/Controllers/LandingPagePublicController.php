@@ -47,17 +47,36 @@ class LandingPagePublicController extends Controller
         $product = $landingPage->product;
         $settings = Setting::all()->pluck('value', 'key')->toArray();
 
-        // Decode content blocks
+        // Decode content blocks and theme
         $contentBlocks = [];
+        $pageTheme = [
+            'preset' => 'emerald',
+            'page_bg' => '#0f172a',
+            'card_bg' => '#1e293b',
+            'primary_color' => '#10b981',
+            'text_color' => '#ffffff',
+            'muted_color' => '#94a3b8',
+        ];
+
         if (! empty($landingPage->content)) {
             $decoded = json_decode($landingPage->content, true);
-            $contentBlocks = is_array($decoded) ? $decoded : [];
+            if (is_array($decoded)) {
+                if (isset($decoded['blocks']) && is_array($decoded['blocks'])) {
+                    $contentBlocks = $decoded['blocks'];
+                    if (isset($decoded['theme']) && is_array($decoded['theme'])) {
+                        $pageTheme = array_merge($pageTheme, $decoded['theme']);
+                    }
+                } else {
+                    $contentBlocks = $decoded;
+                }
+            }
         }
 
         return view('storefront.landing.show', compact(
             'landingPage',
             'product',
             'contentBlocks',
+            'pageTheme',
             'settings'
         ));
     }

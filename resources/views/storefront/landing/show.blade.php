@@ -70,265 +70,591 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 
+    <style>
+        :root {
+            --lp-bg: {{ $pageTheme['bg'] ?? '#0f172a' }};
+            --lp-card: {{ $pageTheme['card'] ?? '#1e293b' }};
+            --lp-primary: {{ $pageTheme['primary'] ?? '#10b981' }};
+            --lp-text: {{ $pageTheme['text'] ?? '#f8fafc' }};
+            --lp-muted: {{ $pageTheme['muted'] ?? '#94a3b8' }};
+        }
+        body.lp-themed {
+            background-color: var(--lp-bg) !important;
+            color: var(--lp-text) !important;
+        }
+        .lp-card {
+            background-color: var(--lp-card) !important;
+            color: var(--lp-text) !important;
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .lp-primary-btn {
+            background-color: var(--lp-primary) !important;
+            color: #ffffff !important;
+        }
+        .lp-primary-text {
+            color: var(--lp-primary) !important;
+        }
+        .lp-primary-border {
+            border-color: var(--lp-primary) !important;
+        }
+        .lp-muted-text {
+            color: var(--lp-muted) !important;
+        }
+        .lp-badge {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--lp-primary) !important;
+            border-color: var(--lp-primary) !important;
+        }
+    </style>
+
     @if(!empty($landingPage->custom_css))
     <style>
         {!! $landingPage->custom_css !!}
     </style>
     @endif
 </head>
-<body class="font-sans antialiased bg-slate-900 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white pb-24 lg:pb-12">
+<body class="font-sans antialiased lp-themed min-h-screen selection:bg-emerald-500 selection:text-white pb-24 lg:pb-12">
 
     <!-- Top Urgency Announcement Header -->
-    <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white py-2.5 px-4 text-center text-xs sm:text-sm font-bold shadow-md">
+    <div class="lp-primary-btn py-2.5 px-4 text-center text-xs sm:text-sm font-bold shadow-md">
         <div class="max-w-4xl mx-auto flex items-center justify-center gap-2">
             <span class="animate-ping w-2 h-2 rounded-full bg-amber-300"></span>
             <span>🔥 বিশেষ অফার! আর মাত্র <span class="text-amber-300 underline font-black">{{ $product->stock }} টি</span> স্টক বাকি আছে!</span>
         </div>
     </div>
 
+    @php
+        $hasOrderFormBlock = false;
+        if (!empty($contentBlocks)) {
+            foreach ($contentBlocks as $chk) {
+                if (($chk['type'] ?? '') === 'order_form') {
+                    $hasOrderFormBlock = true;
+                    break;
+                }
+            }
+        }
+    @endphp
+
     <!-- Main Container -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-12">
 
-        <!-- Brand / Offer Header -->
-        <div class="text-center space-y-3">
-            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs sm:text-sm font-bold">
-                <span>🌿</span> {{ $product->category->name }} • স্পেশাল অফার
-            </span>
-            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
-                {{ $product->name }}
-            </h1>
-            <p class="text-xs sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                {{ $product->short_description }}
-            </p>
-        </div>
+        @if(!empty($contentBlocks) && count($contentBlocks) > 0)
+            {{-- Dynamic Blocks Rendering --}}
+            @foreach($contentBlocks as $b)
+                @php $bType = $b['type'] ?? ''; @endphp
 
-        <!-- Product Hero Image & Pricing Highlight Card -->
-        <div class="bg-slate-800/90 rounded-3xl p-5 sm:p-8 border border-slate-700/80 shadow-2xl space-y-6">
-            <div class="relative rounded-2xl overflow-hidden aspect-video sm:aspect-[16/9] bg-slate-950 border border-slate-700">
-                <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
-                @if($product->discount_percentage > 0)
-                <div class="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-xl shadow-lg">
-                    -{{ $product->discount_percentage }}% ছাড়
-                </div>
-                @endif
-                <div class="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-amber-400 text-xs font-bold px-3 py-1 rounded-lg border border-amber-400/30">
-                    ✓ ১০০% আসল ও খাঁটি পণ্যের নিশ্চয়তা
-                </div>
-            </div>
+                @if($bType === 'product_hero')
+                    <div class="lp-card rounded-3xl p-5 sm:p-8 border shadow-2xl space-y-6">
+                        <div class="text-center space-y-3">
+                            @if(!empty($b['badge']))
+                            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold lp-badge border">
+                                <span>🌿</span> {{ $b['badge'] }}
+                            </span>
+                            @endif
+                            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight">
+                                {{ $b['title'] ?? $product->name }}
+                            </h1>
+                            @if(!empty($b['shortDesc']))
+                            <p class="text-xs sm:text-base lp-muted-text max-w-2xl mx-auto leading-relaxed">
+                                {{ $b['shortDesc'] }}
+                            </p>
+                            @endif
+                        </div>
 
-            <!-- Pricing Box -->
-            <div class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 sm:p-6 rounded-2xl border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-center sm:text-left">
-                    <span class="text-xs text-slate-400 block mb-1">অফার প্রাইজ (সীমিত সময়ের জন্য):</span>
-                    <div class="flex items-baseline gap-3">
-                        <span class="text-3xl sm:text-4xl font-black text-emerald-400">
-                            ৳ {{ number_format($product->sale_price) }}
-                        </span>
-                        @if($product->regular_price > $product->sale_price)
-                        <span class="text-sm sm:text-base text-slate-500 line-through">
-                            ৳ {{ number_format($product->regular_price) }}
-                        </span>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video sm:aspect-[16/9] bg-black/40 border border-white/10 shadow-inner">
+                            <img src="{{ $b['imageUrl'] ?? $product->thumbnail }}" alt="{{ $b['title'] ?? $product->name }}" class="w-full h-full object-cover">
+                            @if(!empty($b['discountText']))
+                            <div class="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-xl shadow-lg">
+                                {{ $b['discountText'] }}
+                            </div>
+                            @elseif($product->discount_percentage > 0)
+                            <div class="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-xl shadow-lg">
+                                -{{ $product->discount_percentage }}% ছাড়
+                            </div>
+                            @endif
+                            <div class="absolute bottom-4 right-4 bg-black/75 backdrop-blur-sm text-amber-400 text-xs font-bold px-3 py-1 rounded-lg border border-amber-400/30">
+                                ✓ ১০০% আসল ও খাঁটি পণ্যের নিশ্চয়তা
+                            </div>
+                        </div>
+                    </div>
+
+                @elseif($bType === 'product_price')
+                    <div class="lp-card p-5 sm:p-6 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                        <div class="text-center sm:text-left">
+                            <span class="text-xs lp-muted-text block mb-1">অফার প্রাইজ (সীমিত সময়ের জন্য):</span>
+                            <div class="flex items-baseline gap-3">
+                                <span class="text-3xl sm:text-4xl font-black lp-primary-text">
+                                    ৳ {{ number_format($b['salePrice'] ?? $product->sale_price) }}
+                                </span>
+                                @if(($b['regularPrice'] ?? $product->regular_price) > ($b['salePrice'] ?? $product->sale_price))
+                                <span class="text-sm sm:text-base lp-muted-text line-through opacity-70">
+                                    ৳ {{ number_format($b['regularPrice'] ?? $product->regular_price) }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <a href="#orderSection" class="w-full sm:w-auto px-8 py-4 lp-primary-btn font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all text-center flex items-center justify-center gap-2 hover:opacity-90 active:scale-95">
+                            <span>{{ $b['ctaText'] ?? 'এখনই অর্ডার করুন 🛒' }}</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                        </a>
+                    </div>
+
+                @elseif($bType === 'urgency')
+                    <div class="bg-gradient-to-r from-rose-900/80 via-slate-900 to-rose-900/80 p-5 sm:p-6 rounded-3xl border border-rose-700/50 text-center space-y-3 shadow-xl">
+                        <h3 class="text-sm sm:text-base font-black text-rose-300">
+                            {{ $b['title'] ?? '⏰ বিশেষ অফারটি শেষ হতে বাকি আছে:' }}
+                        </h3>
+                        <div class="flex items-center justify-center gap-2 font-mono">
+                            <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
+                                <span class="text-xl sm:text-2xl font-black text-white countdown-hours">{{ $b['hours'] ?? '04' }}</span>
+                                <span class="block text-[9px] text-rose-300 mt-0.5">ঘণ্টা</span>
+                            </div>
+                            <span class="text-xl font-bold text-rose-400">:</span>
+                            <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
+                                <span class="text-xl sm:text-2xl font-black text-white countdown-minutes">{{ $b['minutes'] ?? '28' }}</span>
+                                <span class="block text-[9px] text-rose-300 mt-0.5">মিনিট</span>
+                            </div>
+                            <span class="text-xl font-bold text-rose-400">:</span>
+                            <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
+                                <span class="text-xl sm:text-2xl font-black text-white countdown-seconds">{{ $b['seconds'] ?? '45' }}</span>
+                                <span class="block text-[9px] text-rose-300 mt-0.5">সেকেন্ড</span>
+                            </div>
+                        </div>
+                    </div>
+
+                @elseif($bType === 'features')
+                    <div class="lp-card rounded-3xl p-6 sm:p-8 border space-y-6 shadow-xl">
+                        <div class="text-center">
+                            <h3 class="text-lg sm:text-2xl font-black">{{ $b['title'] ?? 'কেন আমাদের কাছ থেকে কিনবেন?' }}</h3>
+                            @if(!empty($b['subtitle']))
+                            <p class="text-xs lp-muted-text mt-1">{{ $b['subtitle'] }}</p>
+                            @endif
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            @foreach($b['items'] ?? [] as $feat)
+                            <div class="bg-black/20 p-3.5 rounded-xl border border-white/10 flex items-center gap-3">
+                                <span class="w-6 h-6 rounded-full lp-badge border flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                                <span class="text-xs sm:text-sm font-medium">{{ $feat }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                {{-- MULTIPLE IMAGE GALLERY GRID --}}
+                @elseif($bType === 'gallery')
+                    <div class="lp-card rounded-3xl p-6 sm:p-8 border space-y-6 shadow-xl">
+                        <div class="text-center">
+                            <h3 class="text-lg sm:text-2xl font-black">{{ $b['title'] ?? 'আমাদের প্রডাক্ট গ্যালারি' }}</h3>
+                            @if(!empty($b['subtitle']))
+                            <p class="text-xs lp-muted-text mt-1">{{ $b['subtitle'] }}</p>
+                            @endif
+                        </div>
+
+                        @php
+                            $cols = (int)($b['columns'] ?? 3);
+                            $colClass = $cols === 2 ? 'grid-cols-1 sm:grid-cols-2' : ($cols === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3');
+                        @endphp
+                        <div class="grid {{ $colClass }} gap-3 sm:gap-4">
+                            @foreach($b['images'] ?? [] as $imgItem)
+                                @php
+                                    $imgUrl = is_array($imgItem) ? ($imgItem['url'] ?? '') : $imgItem;
+                                    $caption = is_array($imgItem) ? ($imgItem['caption'] ?? '') : '';
+                                @endphp
+                                @if(!empty($imgUrl))
+                                <div class="group relative rounded-2xl overflow-hidden border border-white/10 bg-black/40 aspect-square cursor-pointer hover:border-emerald-400 transition-all shadow-md"
+                                     onclick="openStorefrontLightbox('{{ $imgUrl }}', '{{ addslashes($caption) }}')">
+                                    <img src="{{ $imgUrl }}" alt="{{ $caption }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    @if(!empty($caption))
+                                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-2.5 text-center">
+                                        <span class="text-[11px] sm:text-xs font-semibold text-white drop-shadow">{{ $caption }}</span>
+                                    </div>
+                                    @endif
+                                    <div class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                                    </div>
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+
+                {{-- CAROUSEL / SLIDER WIDGET --}}
+                @elseif($bType === 'carousel')
+                    <div class="lp-card rounded-3xl p-6 sm:p-8 border space-y-6 shadow-xl storefront-carousel-container" 
+                         id="carousel-{{ $b['id'] ?? 'c1' }}"
+                         data-autoplay="{{ !empty($b['autoplay']) ? 'true' : 'false' }}"
+                         data-interval="{{ $b['interval'] ?? 4 }}">
+                        <div class="text-center">
+                            <h3 class="text-lg sm:text-2xl font-black">{{ $b['title'] ?? 'এক্সক্লুসিভ ফটো ও হাইলাইটস' }}</h3>
+                            @if(!empty($b['subtitle']))
+                            <p class="text-xs lp-muted-text mt-1">{{ $b['subtitle'] }}</p>
+                            @endif
+                        </div>
+
+                        @php
+                            $aspectRatio = $b['aspectRatio'] ?? '16/9';
+                            $aspectClass = $aspectRatio === '1/1' ? 'aspect-square' : ($aspectRatio === '4/3' ? 'aspect-[4/3]' : 'aspect-video sm:aspect-[16/9]');
+                            $slides = $b['slides'] ?? [];
+                        @endphp
+
+                        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-black/60 shadow-lg storefront-carousel {{ $aspectClass }}" data-active-index="0">
+                            <div class="carousel-track w-full h-full relative">
+                                @foreach($slides as $idx => $slide)
+                                <div class="carousel-slide absolute inset-0 transition-opacity duration-700 {{ $idx === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none' }}" data-slide-index="{{ $idx }}">
+                                    <img src="{{ $slide['image'] ?? '' }}" alt="{{ $slide['title'] ?? '' }}" class="w-full h-full object-cover">
+                                    @if(!empty($slide['title']) || !empty($slide['subtitle']))
+                                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-5 sm:p-6 text-white text-center sm:text-left">
+                                        @if(!empty($slide['title']))
+                                        <h4 class="text-base sm:text-xl font-black drop-shadow">{{ $slide['title'] }}</h4>
+                                        @endif
+                                        @if(!empty($slide['subtitle']))
+                                        <p class="text-xs sm:text-sm text-slate-200 mt-1 drop-shadow">{{ $slide['subtitle'] }}</p>
+                                        @endif
+                                    </div>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+
+                            @if(count($slides) > 1)
+                            <button type="button" class="carousel-prev absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-all shadow">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <button type="button" class="carousel-next absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-all shadow">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+
+                            <div class="carousel-dots absolute bottom-3 inset-x-0 z-20 flex items-center justify-center gap-2">
+                                @foreach($slides as $idx => $slide)
+                                <button type="button" class="carousel-dot w-2.5 h-2.5 rounded-full transition-all {{ $idx === 0 ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/80' }}" data-dot-index="{{ $idx }}"></button>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                {{-- CUSTOMER REVIEWS WITH AVATARS & PHOTO PROOFS --}}
+                @elseif($bType === 'reviews')
+                    <div class="lp-card rounded-3xl p-6 sm:p-8 border space-y-6 shadow-xl">
+                        <div class="text-center space-y-1">
+                            <h3 class="text-lg sm:text-2xl font-black">{{ $b['title'] ?? 'গ্রাহকদের মতামত ও বাস্তব অভিজ্ঞতা' }}</h3>
+                            @if(!empty($b['subtitle']))
+                            <p class="text-xs lp-muted-text">{{ $b['subtitle'] }}</p>
+                            @endif
+                            @if(!empty($b['ratingSummary']))
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 text-amber-400 border border-amber-400/30 text-xs font-bold mt-2">
+                                <span>⭐</span> {{ $b['ratingSummary'] }}
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach($b['items'] ?? [] as $rev)
+                            <div class="bg-black/20 p-4 sm:p-5 rounded-2xl border border-white/10 space-y-3 flex flex-col justify-between">
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2.5">
+                                            @if(!empty($rev['avatar']))
+                                            <img src="{{ $rev['avatar'] }}" alt="{{ $rev['name'] ?? '' }}" class="w-10 h-10 rounded-full object-cover border border-white/20">
+                                            @else
+                                            <div class="w-10 h-10 rounded-full lp-badge border flex items-center justify-center font-black text-sm">
+                                                {{ mb_substr($rev['name'] ?? 'গ্রা', 0, 1) }}
+                                            </div>
+                                            @endif
+                                            <div>
+                                                <h4 class="text-xs sm:text-sm font-bold">{{ $rev['name'] ?? 'সম্মানিত গ্রাহক' }}</h4>
+                                                <span class="text-[10px] lp-muted-text block">{{ $rev['location'] ?? 'ঢাকা' }} • {{ $rev['date'] ?? 'সম্প্রতি' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center text-amber-400 text-xs">
+                                            @for($s = 1; $s <= 5; $s++)
+                                                <span>{{ $s <= ($rev['rating'] ?? 5) ? '★' : '☆' }}</span>
+                                            @endfor
+                                        </div>
+                                    </div>
+
+                                    <p class="text-xs sm:text-sm leading-relaxed lp-muted-text">
+                                        "{{ $rev['comment'] ?? '' }}"
+                                    </p>
+                                </div>
+
+                                @if(!empty($rev['photoProof']))
+                                <div class="pt-3 border-t border-white/10">
+                                    <span class="text-[10px] lp-muted-text block mb-1.5 font-semibold">📸 গ্রাহকের পাঠানো ছবি:</span>
+                                    <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/40 cursor-pointer hover:opacity-90"
+                                         onclick="openStorefrontLightbox('{{ $rev['photoProof'] }}', '{{ addslashes($rev['name'] ?? 'গ্রাহকের রিভিউ ছবি') }}')">
+                                        <img src="{{ $rev['photoProof'] }}" alt="Review proof" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                @elseif($bType === 'guarantees')
+                    <div class="lp-card rounded-3xl p-5 sm:p-6 border shadow-xl">
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="p-2">
+                                <span class="text-2xl block mb-1">🛡️</span>
+                                <span class="font-bold block text-[11px] sm:text-xs">ক্যাশ অন ডেলিভারি</span>
+                            </div>
+                            <div class="p-2">
+                                <span class="text-2xl block mb-1">🚚</span>
+                                <span class="font-bold block text-[11px] sm:text-xs">দ্রুততম হোম ডেলিভারি</span>
+                            </div>
+                            <div class="p-2">
+                                <span class="text-2xl block mb-1">💯</span>
+                                <span class="font-bold block text-[11px] sm:text-xs">খাঁটি না হলে ফেরত</span>
+                            </div>
+                        </div>
+                    </div>
+
+                @elseif($bType === 'heading')
+                    <div class="text-{{ $b['align'] ?? 'center' }} my-4">
+                        <{{ $b['tag'] ?? 'h2' }} class="text-2xl sm:text-3xl font-black">
+                            {{ $b['text'] ?? '' }}
+                        </{{ $b['tag'] ?? 'h2' }}>
+                    </div>
+
+                @elseif($bType === 'text')
+                    <div class="prose max-w-none text-xs sm:text-base leading-relaxed lp-muted-text">
+                        {!! nl2br(e($b['content'] ?? '')) !!}
+                    </div>
+
+                @elseif($bType === 'image')
+                    @if(!empty($b['url']))
+                    <div class="rounded-2xl overflow-hidden border border-white/10 shadow-lg cursor-pointer" onclick="openStorefrontLightbox('{{ $b['url'] }}', '{{ addslashes($b['caption'] ?? '') }}')">
+                        <img src="{{ $b['url'] }}" alt="{{ $b['caption'] ?? '' }}" class="w-full h-auto object-cover">
+                        @if(!empty($b['caption']))
+                        <p class="text-xs text-center lp-muted-text p-2 bg-black/40">{{ $b['caption'] }}</p>
                         @endif
                     </div>
-                </div>
+                    @endif
 
-                <a href="#orderSection" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-emerald-500/25 transition-all text-center animate-pulse-subtle flex items-center justify-center gap-2">
-                    <span>এখনই অর্ডার করুন 🛒</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                </a>
-            </div>
-        </div>
-
-        <!-- Urgency Countdown Timer -->
-        <div class="bg-gradient-to-r from-rose-900/80 via-slate-900 to-rose-900/80 p-5 sm:p-6 rounded-3xl border border-rose-700/50 text-center space-y-3">
-            <h3 class="text-sm sm:text-base font-black text-rose-300">
-                ⏰ বিশেষ অফারটি শেষ হতে বাকি আছে:
-            </h3>
-            <div class="flex items-center justify-center gap-2 font-mono">
-                <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
-                    <span class="text-xl sm:text-2xl font-black text-white">04</span>
-                    <span class="block text-[9px] text-rose-300 mt-0.5">ঘণ্টা</span>
-                </div>
-                <span class="text-xl font-bold text-rose-400">:</span>
-                <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
-                    <span class="text-xl sm:text-2xl font-black text-white">28</span>
-                    <span class="block text-[9px] text-rose-300 mt-0.5">মিনিট</span>
-                </div>
-                <span class="text-xl font-bold text-rose-400">:</span>
-                <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
-                    <span class="text-xl sm:text-2xl font-black text-white">45</span>
-                    <span class="block text-[9px] text-rose-300 mt-0.5">সেকেন্ড</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Why Choose Us / Features -->
-        <div class="bg-slate-800/90 rounded-3xl p-6 sm:p-8 border border-slate-700/80 space-y-6">
-            <div class="text-center">
-                <h3 class="text-lg sm:text-2xl font-black text-white">কেন আমাদের কাছ থেকে কিনবেন?</h3>
-                <p class="text-xs text-slate-400 mt-1">আমরা নিশ্চিত করি শতভাগ খাঁটি মান ও বিশ্বস্ত সেবা</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                @if(!empty($product->features))
-                    @foreach($product->features as $feat)
-                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/60 flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
-                        <span class="text-xs sm:text-sm text-slate-200 font-medium">{{ $feat }}</span>
+                @elseif($bType === 'video')
+                    @if(!empty($b['embedUrl']))
+                    <div class="aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-lg">
+                        <iframe src="{{ $b['embedUrl'] }}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
                     </div>
-                    @endforeach
-                @else
-                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/60 flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
-                        <span class="text-xs sm:text-sm text-slate-200">১০০% প্রাকৃতিক ও খাঁটি মানের নিশ্চয়তা</span>
+                    @endif
+
+                @elseif($bType === 'button')
+                    <div class="text-center my-4">
+                        <a href="{{ $b['url'] ?? '#orderSection' }}" class="inline-flex items-center justify-center px-8 py-4 lp-primary-btn font-black text-sm sm:text-base rounded-2xl shadow-xl hover:opacity-90 active:scale-95 transition-all">
+                            {{ $b['text'] ?? 'অর্ডার করুন' }}
+                        </a>
                     </div>
-                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/60 flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
-                        <span class="text-xs sm:text-sm text-slate-200">কোনো প্রকার ক্ষতিকর কেমিক্যাল বা কৃত্রিম উপাদান মুক্ত</span>
+
+                @elseif($bType === 'divider')
+                    <hr class="border-t border-white/10 my-6">
+
+                @elseif($bType === 'faq')
+                    <div class="lp-card rounded-3xl p-6 sm:p-8 border space-y-4 shadow-xl">
+                        <h3 class="text-lg sm:text-2xl font-black text-center">{{ $b['title'] ?? 'সাধারণ জিজ্ঞাসা (FAQ)' }}</h3>
+                        <div class="space-y-3">
+                            @foreach($b['items'] ?? [] as $faq)
+                            <div class="bg-black/20 p-4 rounded-xl border border-white/10">
+                                <h4 class="text-xs sm:text-sm font-bold mb-1">❓ {{ $faq['q'] ?? '' }}</h4>
+                                <p class="text-xs lp-muted-text">{{ $faq['a'] ?? '' }}</p>
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
+
+                @elseif($bType === 'order_form')
+                    @include('storefront.landing._order_form_block', ['block' => $b])
                 @endif
-            </div>
+            @endforeach
 
-            <!-- Guarantees Bar -->
-            <div class="grid grid-cols-3 gap-2 pt-4 border-t border-slate-700/80 text-center text-xs">
-                <div class="p-2">
-                    <span class="text-2xl block mb-1">🛡️</span>
-                    <span class="font-bold text-slate-200 block text-[11px] sm:text-xs">ক্যাশ অন ডেলিভারি</span>
-                </div>
-                <div class="p-2">
-                    <span class="text-2xl block mb-1">🚚</span>
-                    <span class="font-bold text-slate-200 block text-[11px] sm:text-xs">দ্রুততম হোম ডেলিভারি</span>
-                </div>
-                <div class="p-2">
-                    <span class="text-2xl block mb-1">💯</span>
-                    <span class="font-bold text-slate-200 block text-[11px] sm:text-xs">খাঁটি না হলে ফেরত</span>
-                </div>
-            </div>
-        </div>
+            {{-- If order form was not explicitly added as a block, render it at the bottom --}}
+            @if(!$hasOrderFormBlock)
+                @include('storefront.landing._order_form_block', ['block' => []])
+            @endif
 
-        <!-- Embedded High-Converting Cash on Delivery Order Form -->
-        <div id="orderSection" class="bg-white text-slate-900 rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-emerald-500 space-y-6">
-            <div class="text-center space-y-2 border-b border-slate-200 pb-5">
-                <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-full uppercase tracking-wider">
-                    ১-মিনিটে অর্ডার করুন
+        @else
+            {{-- Default Classic Layout Fallback (when no blocks saved) --}}
+            <!-- Brand / Offer Header -->
+            <div class="text-center space-y-3">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full lp-badge border text-xs sm:text-sm font-bold">
+                    <span>🌿</span> {{ $product->category->name }} • স্পেশাল অফার
                 </span>
-                <h2 class="text-xl sm:text-3xl font-black text-slate-900">
-                    অর্ডার করতে আপনার সঠিক তথ্য দিন
-                </h2>
-                <p class="text-xs text-slate-500">
-                    পণ্য হাতে পেয়ে চেক করে ডেলিভারি ম্যানের কাছে মূল্য পরিশোধ করার সুবিধা (Cash On Delivery)
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight">
+                    {{ $product->name }}
+                </h1>
+                <p class="text-xs sm:text-base lp-muted-text max-w-2xl mx-auto leading-relaxed">
+                    {{ $product->short_description }}
                 </p>
             </div>
 
-            @if($errors->any())
-            <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
-                <ul class="list-disc list-inside">
-                    @foreach($errors->all() as $err)
-                    <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
+            <!-- Product Hero Image & Pricing Highlight Card -->
+            <div class="lp-card rounded-3xl p-5 sm:p-8 border shadow-2xl space-y-6">
+                <div class="relative rounded-2xl overflow-hidden aspect-video sm:aspect-[16/9] bg-black/40 border border-white/10">
+                    <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                    @if($product->discount_percentage > 0)
+                    <div class="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-xl shadow-lg">
+                        -{{ $product->discount_percentage }}% ছাড়
+                    </div>
+                    @endif
+                    <div class="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-amber-400 text-xs font-bold px-3 py-1 rounded-lg border border-amber-400/30">
+                        ✓ ১০০% আসল ও খাঁটি পণ্যের নিশ্চয়তা
+                    </div>
+                </div>
+
+                <!-- Pricing Box -->
+                <div class="lp-card p-5 sm:p-6 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-center sm:text-left">
+                        <span class="text-xs lp-muted-text block mb-1">অফার প্রাইজ (সীমিত সময়ের জন্য):</span>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-3xl sm:text-4xl font-black lp-primary-text">
+                                ৳ {{ number_format($product->sale_price) }}
+                            </span>
+                            @if($product->regular_price > $product->sale_price)
+                            <span class="text-sm sm:text-base lp-muted-text line-through opacity-70">
+                                ৳ {{ number_format($product->regular_price) }}
+                            </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <a href="#orderSection" class="w-full sm:w-auto px-8 py-4 lp-primary-btn font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all text-center flex items-center justify-center gap-2 hover:opacity-90 active:scale-95">
+                        <span>এখনই অর্ডার করুন 🛒</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                    </a>
+                </div>
             </div>
-            @endif
 
-            <form action="{{ route('landing.order', $landingPage->slug) }}" method="POST" class="space-y-4">
-                @csrf
-
-                <!-- Product Summary Badge in Form -->
-                <div class="flex items-center gap-3 p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
-                    <img src="{{ $product->thumbnail }}" class="w-14 h-14 object-cover rounded-xl border border-emerald-200" alt="{{ $product->name }}">
-                    <div class="flex-1 min-w-0">
-                        <h4 class="text-xs sm:text-sm font-bold text-slate-900 truncate">{{ $product->name }}</h4>
-                        <span class="text-sm font-black text-emerald-700">৳ {{ number_format($product->sale_price) }}</span>
+            <!-- Urgency Countdown Timer -->
+            <div class="bg-gradient-to-r from-rose-900/80 via-slate-900 to-rose-900/80 p-5 sm:p-6 rounded-3xl border border-rose-700/50 text-center space-y-3">
+                <h3 class="text-sm sm:text-base font-black text-rose-300">
+                    ⏰ বিশেষ অফারটি শেষ হতে বাকি আছে:
+                </h3>
+                <div class="flex items-center justify-center gap-2 font-mono">
+                    <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
+                        <span class="text-xl sm:text-2xl font-black text-white countdown-hours">04</span>
+                        <span class="block text-[9px] text-rose-300 mt-0.5">ঘণ্টা</span>
                     </div>
-
-                    <!-- Quantity Adjuster -->
-                    <div class="flex items-center border border-emerald-300 rounded-xl bg-white overflow-hidden text-xs">
-                        <button type="button" id="lpMinus" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 font-bold text-emerald-800">-</button>
-                        <input type="number" id="lpQty" name="quantity" value="1" min="1" max="20" class="w-8 text-center font-bold text-slate-800 border-x border-emerald-200 py-1" readonly>
-                        <button type="button" id="lpPlus" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 font-bold text-emerald-800">+</button>
+                    <span class="text-xl font-bold text-rose-400">:</span>
+                    <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
+                        <span class="text-xl sm:text-2xl font-black text-white countdown-minutes">28</span>
+                        <span class="block text-[9px] text-rose-300 mt-0.5">মিনিট</span>
                     </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">আপনার পূর্ণ নাম <span class="text-rose-500">*</span></label>
-                    <input type="text" name="customer_name" value="{{ old('customer_name') }}" required placeholder="উদাঃ মোঃ আনিসুর রহমান" 
-                           class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">সচল মোবাইল নম্বর <span class="text-rose-500">*</span></label>
-                    <input type="tel" name="phone" value="{{ old('phone') }}" required placeholder="017XXXXXXXX" pattern="^(?:\+?88)?01[3-9]\d{8}$"
-                           class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    <p class="text-[11px] text-slate-400 mt-1">অর্ডার নিশ্চিত করতে এই নম্বরে যোগাযোগ করা হবে।</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">সম্পূর্ণ ঠিকানা <span class="text-rose-500">*</span></label>
-                    <textarea name="address" rows="2" required placeholder="গ্রাম/রোড, বাসা/ফ্ল্যাট নং, থানা এবং জেলা" 
-                              class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">{{ old('address') }}</textarea>
-                </div>
-
-                <!-- Delivery Area Radio Selector -->
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">ডেলিভারি চার্জ নির্বাচন করুন <span class="text-rose-500">*</span></label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="flex items-center justify-between p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50">
-                            <div class="flex items-center gap-2">
-                                <input type="radio" name="delivery_area" value="inside_dhaka" checked class="text-emerald-600 focus:ring-emerald-500 lp-area-radio">
-                                <span class="text-xs font-bold text-slate-800">ঢাকা সিটিতে</span>
-                            </div>
-                            <span class="text-xs font-bold text-emerald-700">৳{{ $settings['delivery_inside_dhaka'] ?? 70 }}</span>
-                        </label>
-                        <label class="flex items-center justify-between p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50">
-                            <div class="flex items-center gap-2">
-                                <input type="radio" name="delivery_area" value="outside_dhaka" class="text-emerald-600 focus:ring-emerald-500 lp-area-radio">
-                                <span class="text-xs font-bold text-slate-800">ঢাকার বাইরে</span>
-                            </div>
-                            <span class="text-xs font-bold text-emerald-700">৳{{ $settings['delivery_outside_dhaka'] ?? 130 }}</span>
-                        </label>
+                    <span class="text-xl font-bold text-rose-400">:</span>
+                    <div class="bg-black/60 p-2.5 rounded-xl border border-rose-500/40 min-w-[54px]">
+                        <span class="text-xl sm:text-2xl font-black text-white countdown-seconds">45</span>
+                        <span class="block text-[9px] text-rose-300 mt-0.5">সেকেন্ড</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Total summary -->
-                <div class="bg-slate-100 p-4 rounded-2xl flex items-center justify-between">
-                    <span class="text-xs sm:text-sm text-slate-600 font-bold">সর্বমোট প্রদেয় টাকা (COD):</span>
-                    <span id="lpGrandTotal" class="text-xl sm:text-2xl font-black text-emerald-700">
-                        ৳ {{ number_format($product->sale_price + ($settings['delivery_inside_dhaka'] ?? 70)) }}
-                    </span>
+            <!-- Why Choose Us / Features -->
+            <div class="lp-card rounded-3xl p-6 sm:p-8 border space-y-6">
+                <div class="text-center">
+                    <h3 class="text-lg sm:text-2xl font-black">কেন আমাদের কাছ থেকে কিনবেন?</h3>
+                    <p class="text-xs lp-muted-text mt-1">আমরা নিশ্চিত করি শতভাগ খাঁটি মান ও বিশ্বস্ত সেবা</p>
                 </div>
 
-                <!-- Big CTA Submit Button -->
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl hover:shadow-emerald-500/25 transition-all text-center flex items-center justify-center gap-2 animate-pulse-subtle">
-                    <span>অর্ডার নিশ্চিত করুন (ক্যাশ অন ডেলিভারি) 🛒</span>
-                </button>
-
-                <div class="text-center text-[11px] text-slate-400">
-                    <span>🔒 অগ্রিম কোনো টাকা দিতে হবে না। প্রোডাক্ট চেক করে সম্পূর্ণ টাকা দিন।</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    @if(!empty($product->features))
+                        @foreach($product->features as $feat)
+                        <div class="bg-black/20 p-3.5 rounded-xl border border-white/10 flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full lp-badge border flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                            <span class="text-xs sm:text-sm font-medium">{{ $feat }}</span>
+                        </div>
+                        @endforeach
+                    @else
+                        <div class="bg-black/20 p-3.5 rounded-xl border border-white/10 flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full lp-badge border flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                            <span class="text-xs sm:text-sm font-medium">১০০% প্রাকৃতিক ও খাঁটি মানের নিশ্চয়তা</span>
+                        </div>
+                        <div class="bg-black/20 p-3.5 rounded-xl border border-white/10 flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full lp-badge border flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                            <span class="text-xs sm:text-sm font-medium">কোনো প্রকার ক্ষতিকর কেমিক্যাল বা কৃত্রিম উপাদান মুক্ত</span>
+                        </div>
+                    @endif
                 </div>
-            </form>
-        </div>
+
+                <!-- Guarantees Bar -->
+                <div class="grid grid-cols-3 gap-2 pt-4 border-t border-white/10 text-center text-xs">
+                    <div class="p-2">
+                        <span class="text-2xl block mb-1">🛡️</span>
+                        <span class="font-bold block text-[11px] sm:text-xs">ক্যাশ অন ডেলিভারি</span>
+                    </div>
+                    <div class="p-2">
+                        <span class="text-2xl block mb-1">🚚</span>
+                        <span class="font-bold block text-[11px] sm:text-xs">দ্রুততম হোম ডেলিভারি</span>
+                    </div>
+                    <div class="p-2">
+                        <span class="text-2xl block mb-1">💯</span>
+                        <span class="font-bold block text-[11px] sm:text-xs">খাঁটি না হলে ফেরত</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Embedded Cash on Delivery Order Form -->
+            @include('storefront.landing._order_form_block', ['block' => []])
+        @endif
 
         <!-- Footer hotline info -->
-        <div class="text-center space-y-2 text-xs text-slate-400 pt-6 border-t border-slate-800">
-            <p>যেকোনো প্রয়োজনে আমাদের কল করুন: <a href="tel:{{ $settings['store_phone'] ?? '01712-345678' }}" class="text-emerald-400 font-bold">{{ $settings['store_phone'] ?? '01712-345678' }}</a></p>
+        <div class="text-center space-y-2 text-xs lp-muted-text pt-6 border-t border-white/10">
+            <p>যেকোনো প্রয়োজনে আমাদের কল করুন: <a href="tel:{{ $settings['store_phone'] ?? '01712-345678' }}" class="lp-primary-text font-bold">{{ $settings['store_phone'] ?? '01712-345678' }}</a></p>
             <p>&copy; {{ date('Y') }} {{ $settings['store_name'] ?? 'DemandHat BD' }}. All Rights Reserved.</p>
         </div>
 
     </div>
 
     <!-- Mobile Fixed Bottom Sticky Order Bar -->
-    <div class="lg:hidden fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-700 p-3 z-40 flex items-center justify-between gap-4 shadow-2xl">
+    <div class="lg:hidden fixed bottom-0 inset-x-0 lp-card border-t p-3 z-40 flex items-center justify-between gap-4 shadow-2xl backdrop-blur-md">
         <div>
-            <span class="text-[10px] text-slate-400 block leading-none">অফার প্রাইজ:</span>
-            <span class="text-lg font-black text-emerald-400 leading-tight">৳ {{ number_format($product->sale_price) }}</span>
+            <span class="text-[10px] lp-muted-text block leading-none">অফার প্রাইজ:</span>
+            <span class="text-lg font-black lp-primary-text leading-tight">৳ {{ number_format($product->sale_price) }}</span>
         </div>
-        <a href="#orderSection" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-xs rounded-xl shadow-lg text-center">
+        <a href="#orderSection" class="flex-1 py-3 lp-primary-btn font-black text-xs rounded-xl shadow-lg text-center active:scale-95 transition-all">
             অর্ডার করুন 🛒
         </a>
     </div>
 
+    <!-- Storefront Lightbox Modal -->
+    <div id="storefrontLightbox" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-4 backdrop-blur-sm" onclick="closeStorefrontLightbox()">
+        <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
+            <button type="button" onclick="closeStorefrontLightbox()" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center font-black text-lg">
+                ✕
+            </button>
+            <img id="storefrontLightboxImg" src="" class="max-w-full max-h-[80vh] rounded-2xl object-contain border border-white/20 shadow-2xl">
+            <p id="storefrontLightboxCaption" class="text-xs sm:text-sm text-white/90 text-center mt-3 font-semibold"></p>
+        </div>
+    </div>
+
     <script>
+        // Lightbox helpers
+        function openStorefrontLightbox(url, caption = '') {
+            const modal = document.getElementById('storefrontLightbox');
+            const img = document.getElementById('storefrontLightboxImg');
+            const cap = document.getElementById('storefrontLightboxCaption');
+            if (!modal || !img) return;
+            img.src = url;
+            cap.textContent = caption || '';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeStorefrontLightbox() {
+            const modal = document.getElementById('storefrontLightbox');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeStorefrontLightbox();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
+            // COD Order Form dynamic calculations
             const qtyInput = document.getElementById('lpQty');
             const minusBtn = document.getElementById('lpMinus');
             const plusBtn = document.getElementById('lpPlus');
@@ -338,6 +664,7 @@
             const outsideRate = {{ $settings['delivery_outside_dhaka'] ?? 130 }};
 
             const recalc = () => {
+                if (!qtyInput) return;
                 const qty = parseInt(qtyInput.value) || 1;
                 const isOutside = document.querySelector('.lp-area-radio[value="outside_dhaka"]:checked') !== null;
                 const shipping = isOutside ? outsideRate : insideRate;
@@ -365,6 +692,82 @@
 
             document.querySelectorAll('.lp-area-radio').forEach(r => {
                 r.addEventListener('change', recalc);
+            });
+
+            // Carousel Init for all carousels on page
+            document.querySelectorAll('.storefront-carousel-container').forEach(container => {
+                const carousel = container.querySelector('.storefront-carousel');
+                if (!carousel) return;
+
+                const slides = carousel.querySelectorAll('.carousel-slide');
+                const dots = carousel.querySelectorAll('.carousel-dot');
+                const prevBtn = carousel.querySelector('.carousel-prev');
+                const nextBtn = carousel.querySelector('.carousel-next');
+                const isAutoplay = container.dataset.autoplay === 'true';
+                const intervalSec = parseFloat(container.dataset.interval) || 4;
+                let activeIdx = 0;
+                let timer = null;
+
+                const showSlide = (idx) => {
+                    if (slides.length <= 1) return;
+                    activeIdx = (idx + slides.length) % slides.length;
+                    slides.forEach((sl, i) => {
+                        if (i === activeIdx) {
+                            sl.classList.remove('opacity-0', 'z-0', 'pointer-events-none');
+                            sl.classList.add('opacity-100', 'z-10');
+                        } else {
+                            sl.classList.remove('opacity-100', 'z-10');
+                            sl.classList.add('opacity-0', 'z-0', 'pointer-events-none');
+                        }
+                    });
+
+                    dots.forEach((dot, i) => {
+                        if (i === activeIdx) {
+                            dot.classList.add('bg-white', 'w-6');
+                            dot.classList.remove('bg-white/50');
+                        } else {
+                            dot.classList.remove('bg-white', 'w-6');
+                            dot.classList.add('bg-white/50');
+                        }
+                    });
+                };
+
+                const startTimer = () => {
+                    if (!isAutoplay || slides.length <= 1) return;
+                    stopTimer();
+                    timer = setInterval(() => {
+                        showSlide(activeIdx + 1);
+                    }, intervalSec * 1000);
+                };
+
+                const stopTimer = () => {
+                    if (timer) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
+                };
+
+                prevBtn?.addEventListener('click', () => {
+                    showSlide(activeIdx - 1);
+                    startTimer();
+                });
+
+                nextBtn?.addEventListener('click', () => {
+                    showSlide(activeIdx + 1);
+                    startTimer();
+                });
+
+                dots.forEach((dot, i) => {
+                    dot.addEventListener('click', () => {
+                        showSlide(i);
+                        startTimer();
+                    });
+                });
+
+                carousel.addEventListener('mouseenter', stopTimer);
+                carousel.addEventListener('mouseleave', startTimer);
+
+                startTimer();
             });
         });
     </script>

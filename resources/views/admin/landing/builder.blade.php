@@ -96,6 +96,13 @@
                     class="w-8 h-8 rounded-lg bg-[#252730] hover:bg-[#2e313d] flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
             </button>
+
+            <!-- Color & Theme (Palette) -->
+            <button id="btnOpenTheme" title="ল্যান্ডিং পেজ কালার ও থিম ডিজাইন" 
+                    class="h-8 px-2.5 rounded-lg bg-emerald-700/80 hover:bg-emerald-600 text-white flex items-center gap-1.5 text-xs font-bold shadow transition-colors cursor-pointer">
+                <span>🎨</span>
+                <span class="hidden md:inline">কালার ও থিম</span>
+            </button>
         </div>
 
         <!-- Center Group: Brand, Page Title, Main/ThankYou Tabs, Live URL Slug -->
@@ -307,6 +314,13 @@
                                  onclick="addWidgetToCanvas('video')">
                                 <svg class="w-6 h-6 text-slate-300 group-hover:text-cyan-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span class="text-[11px] font-bold text-slate-300 group-hover:text-white">Video</span>
+                            </div>
+
+                            <!-- Carousel / Slider -->
+                            <div class="widget-card bg-[#252730] hover:bg-[#2e313d] hover:border-cyan-500/50 border border-[#2e313d] rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all group"
+                                 onclick="addWidgetToCanvas('carousel')">
+                                <span class="text-xl mb-1">🎠</span>
+                                <span class="text-[11px] font-bold text-slate-300 group-hover:text-white">ইমেজ ক্যারোসেল</span>
                             </div>
 
                             <!-- Button -->
@@ -562,6 +576,115 @@
         </div>
     </div>
 
+    <!-- Modal 4: Color & Theme Design Modal -->
+    <div id="modalTheme" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#18191c] border border-[#2b2d35] rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-[#2b2d35] flex items-center justify-between">
+                <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <span>🎨 ল্যান্ডিং পেজ কালার ও থিম ডিজাইন</span>
+                </h3>
+                <button onclick="closeModal('modalTheme')" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
+                <div>
+                    <label class="block font-bold text-slate-300 mb-2">রেডিমেড থিম প্রিসেট (One-Click Theme):</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <button type="button" onclick="selectThemePreset('emerald')" class="p-2.5 rounded-xl border border-[#2e313d] hover:border-emerald-500 bg-[#0f172a] text-left transition-all group">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                <span class="text-[11px] font-bold text-white">অর্গানিক এমারেল্ড</span>
+                            </div>
+                            <span class="text-[9px] text-slate-400">ডার্ক + গ্রিন অ্যাকসেন্ট</span>
+                        </button>
+                        <button type="button" onclick="selectThemePreset('amber')" class="p-2.5 rounded-xl border border-[#2e313d] hover:border-amber-500 bg-[#18120c] text-left transition-all group">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                <span class="text-[11px] font-bold text-amber-300">হানি অ্যাম্বার</span>
+                            </div>
+                            <span class="text-[9px] text-slate-400">মধু ও অর্গানিক গোল্ড</span>
+                        </button>
+                        <button type="button" onclick="selectThemePreset('light')" class="p-2.5 rounded-xl border border-[#2e313d] hover:border-emerald-500 bg-slate-100 text-left transition-all group">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+                                <span class="text-[11px] font-bold text-slate-900">ক্লিন লাইট মোড</span>
+                            </div>
+                            <span class="text-[9px] text-slate-600">হোয়াইট + ক্লিন ফ্রেশ</span>
+                        </button>
+                        <button type="button" onclick="selectThemePreset('midnight')" class="p-2.5 rounded-xl border border-[#2e313d] hover:border-purple-500 bg-[#07080d] text-left transition-all group">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                                <span class="text-[11px] font-bold text-purple-300">মিডনাইট লাক্সারি</span>
+                            </div>
+                            <span class="text-[9px] text-slate-400">ব্ল্যাক + রয়্যাল পার্পল</span>
+                        </button>
+                        <button type="button" onclick="selectThemePreset('crimson')" class="p-2.5 rounded-xl border border-[#2e313d] hover:border-rose-500 bg-[#14080a] text-left transition-all group">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                <span class="text-[11px] font-bold text-rose-300">হট ডিল ক্রিমসন</span>
+                            </div>
+                            <span class="text-[9px] text-slate-400">হাই কনভার্সন রেড</span>
+                        </button>
+                        <button type="button" onclick="selectThemePreset('blue')" class="p-2.5 rounded-xl border border-[#2e313d] hover:border-blue-500 bg-[#09111e] text-left transition-all group">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                                <span class="text-[11px] font-bold text-blue-300">রয়্যাল ব্লু</span>
+                            </div>
+                            <span class="text-[9px] text-slate-400">স্যাফায়ার এলিগেন্ট</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-[#2b2d35] space-y-3">
+                    <h4 class="font-black text-cyan-400 text-xs uppercase tracking-wider">কাস্টম কালার প্যালেট (Custom Palette)</h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-300 mb-1">পেজ ব্যাকগ্রাউন্ড (Page BG)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="themePageBg" class="w-9 h-9 rounded-lg border border-[#2e313d] bg-transparent cursor-pointer">
+                                <input type="text" id="themePageBgHex" class="flex-1 p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 font-mono text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 mb-1">কার্ড / সেকশন ব্যাকগ্রাউন্ড</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="themeCardBg" class="w-9 h-9 rounded-lg border border-[#2e313d] bg-transparent cursor-pointer">
+                                <input type="text" id="themeCardBgHex" class="flex-1 p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 font-mono text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 mb-1">প্রাইমারি বাটন / অ্যাকসেন্ট কালার</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="themePrimary" class="w-9 h-9 rounded-lg border border-[#2e313d] bg-transparent cursor-pointer">
+                                <input type="text" id="themePrimaryHex" class="flex-1 p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 font-mono text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 mb-1">মেইন টেক্সট কালার (Text Color)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="themeText" class="w-9 h-9 rounded-lg border border-[#2e313d] bg-transparent cursor-pointer">
+                                <input type="text" id="themeTextHex" class="flex-1 p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 font-mono text-xs">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-[#2b2d35] flex justify-end gap-2 bg-[#141518]">
+                <button onclick="closeModal('modalTheme')" class="px-4 py-2 bg-[#252730] hover:bg-[#2e313d] text-slate-300 text-xs font-bold rounded-xl">বাতিল</button>
+                <button onclick="applyThemeModal()" class="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl shadow">কালার সেভ ও প্রয়োগ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 5: Image Lightbox Zoom Modal -->
+    <div id="modalLightbox" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="closeModal('modalLightbox')">
+        <div class="relative max-w-3xl max-h-[85vh] p-2 flex flex-col items-center">
+            <button onclick="closeModal('modalLightbox')" class="absolute -top-10 right-0 text-white hover:text-rose-400 font-bold text-xl">✕ বন্ধ করুন</button>
+            <img id="lightboxImg" src="" class="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-slate-700">
+            <p id="lightboxCaption" class="text-xs text-slate-300 mt-2 text-center"></p>
+        </div>
+    </div>
+
     <!-- Live Injected Dynamic CSS Container -->
     <style id="liveInjectedCss">
         {!! $landingPage->custom_css !!}
@@ -581,13 +704,75 @@
             discountPct: {{ (int)$product->discount_percentage }},
             stock: {{ (int)$product->stock }},
             thumbnail: @json($product->thumbnail),
+            gallery: @json($product->gallery ?? []),
             shortDesc: @json($product->short_description ?? ''),
             features: @json($product->features ?? []),
+        };
+
+        // Theme Palettes
+        const THEME_PRESETS = {
+            emerald: {
+                preset: 'emerald',
+                page_bg: '#0f172a',
+                card_bg: '#1e293b',
+                primary_color: '#10b981',
+                text_color: '#ffffff',
+                muted_color: '#94a3b8'
+            },
+            amber: {
+                preset: 'amber',
+                page_bg: '#18120c',
+                card_bg: '#271c14',
+                primary_color: '#f59e0b',
+                text_color: '#fef3c7',
+                muted_color: '#d97706'
+            },
+            light: {
+                preset: 'light',
+                page_bg: '#f8fafc',
+                card_bg: '#ffffff',
+                primary_color: '#059669',
+                text_color: '#0f172a',
+                muted_color: '#64748b'
+            },
+            midnight: {
+                preset: 'midnight',
+                page_bg: '#07080d',
+                card_bg: '#13141f',
+                primary_color: '#8b5cf6',
+                text_color: '#ffffff',
+                muted_color: '#a78bfa'
+            },
+            crimson: {
+                preset: 'crimson',
+                page_bg: '#14080a',
+                card_bg: '#241215',
+                primary_color: '#e11d48',
+                text_color: '#ffffff',
+                muted_color: '#fda4af'
+            },
+            blue: {
+                preset: 'blue',
+                page_bg: '#09111e',
+                card_bg: '#132238',
+                primary_color: '#2563eb',
+                text_color: '#ffffff',
+                muted_color: '#93c5fd'
+            }
         };
 
         // Current Page State
         let currentPage = 'main'; // 'main' or 'thankyou'
         let blocks = @json($contentBlocks);
+        let pageTheme = Object.assign({
+            preset: 'emerald',
+            page_bg: '#0f172a',
+            card_bg: '#1e293b',
+            primary_color: '#10b981',
+            text_color: '#ffffff',
+            muted_color: '#94a3b8'
+        }, @json($pageTheme ?? []));
+
         let customCss = @json($landingPage->custom_css ?? '');
         let seoTitle = @json($landingPage->seo_title ?? '');
         let seoDesc = @json($landingPage->seo_description ?? '');
@@ -631,6 +816,30 @@
                     ]
                 },
                 {
+                    id: 'b_' + Date.now() + '_reviews',
+                    type: 'reviews',
+                    title: '⭐ সম্মানিত কাস্টমারদের রিভিউ ও মতামত',
+                    subtitle: 'সারা দেশের শত শত সন্তুষ্ট ক্রেতাদের অভিমত',
+                    items: [
+                        {
+                            name: 'মোঃ তানভীর হাসান',
+                            city: 'মিরপুর, ঢাকা',
+                            rating: 5,
+                            comment: 'অসাধারণ কোয়ালিটি! প্যাকেট খুলে চেক করে ডেলিভারি ম্যানকে টাকা দিয়েছি। মধুটা একদম খাঁটি, ঘ্রাণেই বোঝা যায়। ধন্যবাদ!',
+                            avatar: '',
+                            photo_proof: ''
+                        },
+                        {
+                            name: 'সাবরিনা সুলতানা',
+                            city: 'খুলনা',
+                            rating: 5,
+                            comment: 'মাত্র ২ দিনে ডেলিভারি পেয়েছি। প্রোডাক্টের প্যাকেজিং অসাধারণ ছিল। ১০০% আসল প্রোডাক্ট, নিশ্চিন্তে নিতে পারেন।',
+                            avatar: '',
+                            photo_proof: ''
+                        }
+                    ]
+                },
+                {
                     id: 'b_' + Date.now() + '_order',
                     type: 'order_form',
                     title: 'অর্ডার করতে আপনার সঠিক তথ্য দিন',
@@ -645,9 +854,299 @@
         const panelInspector = document.getElementById('panelInspector');
         const inspectorFields = document.getElementById('inspectorFields');
         const inspectorBlockType = document.getElementById('inspectorBlockType');
+        const canvasViewport = document.getElementById('canvasViewport');
 
-        // Initial Render
+        // Initial Theme Application & Render
+        applyThemeColors();
         renderBlocks();
+
+        // -------------------------------------------------------------------------
+        // THEME & COLOR ENGINE
+        // -------------------------------------------------------------------------
+        function applyThemeColors() {
+            if (!pageTheme || !canvasViewport) return;
+            const bg = pageTheme.page_bg || '#0f172a';
+            const card = pageTheme.card_bg || '#1e293b';
+            const primary = pageTheme.primary_color || '#10b981';
+            const text = pageTheme.text_color || '#ffffff';
+            const muted = pageTheme.muted_color || '#94a3b8';
+
+            canvasViewport.style.backgroundColor = bg;
+            canvasViewport.style.color = text;
+            canvasViewport.style.setProperty('--lp-bg', bg);
+            canvasViewport.style.setProperty('--lp-card', card);
+            canvasViewport.style.setProperty('--lp-primary', primary);
+            canvasViewport.style.setProperty('--lp-text', text);
+            canvasViewport.style.setProperty('--lp-muted', muted);
+        }
+
+        function openThemeModal() {
+            const syncInputs = () => {
+                const setVal = (id, hexId, val) => {
+                    const el = document.getElementById(id);
+                    const hexEl = document.getElementById(hexId);
+                    if (el) el.value = val;
+                    if (hexEl) hexEl.value = val;
+                };
+                setVal('themePageBg', 'themePageBgHex', pageTheme.page_bg || '#0f172a');
+                setVal('themeCardBg', 'themeCardBgHex', pageTheme.card_bg || '#1e293b');
+                setVal('themePrimary', 'themePrimaryHex', pageTheme.primary_color || '#10b981');
+                setVal('themeText', 'themeTextHex', pageTheme.text_color || '#ffffff');
+            };
+
+            const bindPair = (colorId, hexId, key) => {
+                const c = document.getElementById(colorId);
+                const h = document.getElementById(hexId);
+                if (c && h) {
+                    c.oninput = (e) => {
+                        h.value = e.target.value;
+                        pageTheme[key] = e.target.value;
+                        applyThemeColors();
+                        renderBlocks();
+                    };
+                    h.oninput = (e) => {
+                        if (e.target.value.startsWith('#') && e.target.value.length === 7) {
+                            c.value = e.target.value;
+                            pageTheme[key] = e.target.value;
+                            applyThemeColors();
+                            renderBlocks();
+                        }
+                    };
+                }
+            };
+
+            syncInputs();
+            bindPair('themePageBg', 'themePageBgHex', 'page_bg');
+            bindPair('themeCardBg', 'themeCardBgHex', 'card_bg');
+            bindPair('themePrimary', 'themePrimaryHex', 'primary_color');
+            bindPair('themeText', 'themeTextHex', 'text_color');
+
+            openModal('modalTheme');
+        }
+
+        function selectThemePreset(presetKey) {
+            const preset = THEME_PRESETS[presetKey];
+            if (!preset) return;
+            pageTheme = Object.assign({}, preset);
+            applyThemeColors();
+            renderBlocks();
+
+            // Sync inputs in modal
+            const setVal = (id, hexId, val) => {
+                const el = document.getElementById(id);
+                const hexEl = document.getElementById(hexId);
+                if (el) el.value = val;
+                if (hexEl) hexEl.value = val;
+            };
+            setVal('themePageBg', 'themePageBgHex', pageTheme.page_bg);
+            setVal('themeCardBg', 'themeCardBgHex', pageTheme.card_bg);
+            setVal('themePrimary', 'themePrimaryHex', pageTheme.primary_color);
+            setVal('themeText', 'themeTextHex', pageTheme.text_color);
+
+            showToast('প্রিসেট কার্যকর হয়েছে: ' + presetKey);
+        }
+
+        function applyThemeModal() {
+            applyThemeColors();
+            renderBlocks();
+            closeModal('modalTheme');
+            showToast('কালার ও থিম ডিজাইন প্রয়োগ করা হয়েছে! ✓');
+        }
+
+        // -------------------------------------------------------------------------
+        // IMAGE UPLOAD AJAX HELPERS
+        // -------------------------------------------------------------------------
+        async function uploadImageFile(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const response = await fetch("{{ route('admin.landing-pages.uploadImage') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'ছবি আপলোড ব্যর্থ হয়েছে');
+            }
+            return data.url;
+        }
+
+        async function uploadMultipleImageFiles(files) {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const response = await fetch("{{ route('admin.landing-pages.uploadImage') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'ছবি আপলোড ব্যর্থ হয়েছে');
+            }
+            return data.files || [];
+        }
+
+        // Reusable Single Image Picker Component with Upload & Quick Pick
+        function createImageUploadField(label, currentUrl, onUrlChange) {
+            const container = document.createElement('div');
+            container.className = 'space-y-2 p-3 bg-[#20222a] border border-[#2e313d] rounded-xl';
+            
+            let url = currentUrl || '';
+
+            const renderUi = () => {
+                container.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <label class="font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
+                        ${url ? `<button type="button" class="btn-clear text-[10px] text-rose-400 hover:underline">রিমুভ</button>` : ''}
+                    </div>
+
+                    ${url ? `
+                        <div class="relative rounded-lg overflow-hidden border border-slate-700 aspect-video bg-black/50 group">
+                            <img src="${escapeHtml(url)}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button type="button" class="btn-replace px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-[10px] font-bold">পরিবর্তন করুন</button>
+                                <button type="button" class="btn-zoom px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-[10px]" title="বড় করে দেখুন">🔍</button>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-lg p-3 text-center transition-colors cursor-pointer upload-dropzone">
+                            <svg class="w-6 h-6 text-slate-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span class="text-xs font-bold text-cyan-400 block">📁 ছবি আপলোড করুন</span>
+                            <span class="text-[10px] text-slate-500">বা ফাইল এখানে ড্রপ করুন</span>
+                        </div>
+                    `}
+
+                    <input type="file" accept="image/*" class="hidden file-input">
+
+                    <div class="pt-1 flex items-center gap-2">
+                        <input type="text" placeholder="বা সরাসরি ইমেজ ইউআরএল পেস্ট করুন..." value="${escapeHtml(url)}" 
+                               class="inp-url flex-1 p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-300 text-[10px] focus:border-cyan-500">
+                    </div>
+
+                    ${PRODUCT.thumbnail ? `
+                        <div class="flex items-center gap-1.5 pt-1 text-[10px] text-slate-400 flex-wrap">
+                            <span>প্রোডাক্ট ছবি:</span>
+                            <button type="button" class="btn-quick-prod px-2 py-0.5 bg-[#2b2d38] hover:bg-cyan-900 text-slate-300 hover:text-cyan-300 rounded truncate max-w-[130px]">
+                                🏷️ থাম্বনেইল
+                            </button>
+                            ${(PRODUCT.gallery || []).slice(0, 2).map((gUrl, gIdx) => `
+                                <button type="button" class="btn-quick-gal px-2 py-0.5 bg-[#2b2d38] hover:bg-cyan-900 text-slate-300 hover:text-cyan-300 rounded" data-url="${escapeHtml(gUrl)}">
+                                    🖼️ গ্যালারি ${gIdx + 1}
+                                </button>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+
+                const fileInput = container.querySelector('.file-input');
+                const dropzone = container.querySelector('.upload-dropzone');
+                const btnReplace = container.querySelector('.btn-replace');
+                const btnClear = container.querySelector('.btn-clear');
+                const btnZoom = container.querySelector('.btn-zoom');
+                const inpUrl = container.querySelector('.inp-url');
+                const btnQuick = container.querySelector('.btn-quick-prod');
+
+                const triggerFile = () => fileInput.click();
+                if (dropzone) dropzone.onclick = triggerFile;
+                if (btnReplace) btnReplace.onclick = triggerFile;
+                if (btnZoom) btnZoom.onclick = () => openImageLightbox(url, label);
+
+                fileInput.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    showToast('ছবি আপলোড হচ্ছে...');
+                    try {
+                        const uploadedUrl = await uploadImageFile(file);
+                        url = uploadedUrl;
+                        onUrlChange(url);
+                        renderUi();
+                        showToast('ছবি আপলোড সম্পন্ন হয়েছে! ✓');
+                    } catch (err) {
+                        alert('ত্রুটিঃ ' + err.message);
+                    }
+                };
+
+                if (btnClear) {
+                    btnClear.onclick = () => {
+                        url = '';
+                        onUrlChange('');
+                        renderUi();
+                    };
+                }
+
+                if (inpUrl) {
+                    inpUrl.onchange = (e) => {
+                        url = e.target.value;
+                        onUrlChange(url);
+                        renderUi();
+                    };
+                }
+
+                if (btnQuick) {
+                    btnQuick.onclick = () => {
+                        url = PRODUCT.thumbnail;
+                        onUrlChange(url);
+                        renderUi();
+                    };
+                }
+
+                container.querySelectorAll('.btn-quick-gal').forEach(b => {
+                    b.onclick = () => {
+                        url = b.getAttribute('data-url');
+                        onUrlChange(url);
+                        renderUi();
+                    };
+                });
+            };
+
+            renderUi();
+            return container;
+        }
+
+        // -------------------------------------------------------------------------
+        // CAROUSEL & LIGHTBOX CONTROLS
+        // -------------------------------------------------------------------------
+        window.stepCarousel = function(blockId, dir, e) {
+            if (e) e.stopPropagation();
+            const block = blocks.find(b => b.id === blockId);
+            if (!block || !block.slides || !block.slides.length) return;
+            const count = block.slides.length;
+            let idx = (block._currentSlide || 0) + dir;
+            if (idx < 0) idx = count - 1;
+            if (idx >= count) idx = 0;
+            block._currentSlide = idx;
+            renderBlocks();
+        };
+
+        window.jumpCarousel = function(blockId, idx, e) {
+            if (e) e.stopPropagation();
+            const block = blocks.find(b => b.id === blockId);
+            if (!block) return;
+            block._currentSlide = idx;
+            renderBlocks();
+        };
+
+        window.openImageLightbox = function(url, caption, e) {
+            if (e) e.stopPropagation();
+            if (!url) return;
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('lightboxCaption').textContent = caption || '';
+            openModal('modalLightbox');
+        };
 
         // -------------------------------------------------------------------------
         // RENDER BLOCKS IN LIVE CANVAS
@@ -697,21 +1196,24 @@
         // HTML GENERATOR FOR EACH WIDGET BLOCK
         // -------------------------------------------------------------------------
         function generateBlockHtml(b) {
+            const cardBgStyle = b.custom_bg ? `style="background-color: ${b.custom_bg};"` : `style="background-color: var(--lp-card, #1e293b);"`;
+
             switch(b.type) {
                 case 'product_hero':
                     return `
-                        <div class="text-center space-y-4 py-4">
-                            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
+                        <div class="text-center space-y-4 py-4" ${b.custom_bg ? `style="background-color: ${b.custom_bg}; border-radius: 1rem; padding: 1.5rem;"` : ''}>
+                            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold" 
+                                  style="background-color: rgba(16, 185, 129, 0.15); color: var(--lp-primary, #10b981); border: 1px solid var(--lp-primary, #10b981);">
                                 <span>🌿</span> ${escapeHtml(b.badge || 'স্পেশাল অফার!')}
                             </span>
-                            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
+                            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight" style="color: var(--lp-text, #ffffff);">
                                 ${escapeHtml(b.title || PRODUCT.name)}
                             </h1>
-                            <p class="text-xs sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                            <p class="text-xs sm:text-base max-w-2xl mx-auto leading-relaxed" style="color: var(--lp-muted, #94a3b8);">
                                 ${escapeHtml(b.subtitle || PRODUCT.shortDesc)}
                             </p>
                             <div class="relative rounded-2xl overflow-hidden aspect-video max-w-2xl mx-auto bg-slate-950 border border-slate-700 shadow-xl mt-4">
-                                <img src="${b.image || PRODUCT.thumbnail}" class="w-full h-full object-cover">
+                                <img src="${escapeHtml(b.image || PRODUCT.thumbnail)}" class="w-full h-full object-cover">
                                 ${PRODUCT.discountPct > 0 ? `<div class="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs px-3 py-1 rounded-xl shadow">-` + PRODUCT.discountPct + `% ছাড়</div>` : ''}
                             </div>
                         </div>
@@ -719,11 +1221,11 @@
 
                 case 'product_price':
                     return `
-                        <div class="bg-gradient-to-r from-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                        <div class="p-6 rounded-2xl border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl" ${cardBgStyle}>
                             <div class="text-center sm:text-left">
                                 <span class="text-xs text-slate-400 block mb-1">${escapeHtml(b.heading || 'অফার প্রাইজ (সীমিত সময়ের জন্য)')}:</span>
                                 <div class="flex items-baseline gap-3">
-                                    <span class="text-3xl sm:text-4xl font-black text-emerald-400">
+                                    <span class="text-3xl sm:text-4xl font-black" style="color: var(--lp-primary, #10b981);">
                                         ৳ ${numberFormat(PRODUCT.salePrice)}
                                     </span>
                                     ${PRODUCT.regularPrice > PRODUCT.salePrice ? `
@@ -733,7 +1235,8 @@
                                     ` : ''}
                                 </div>
                             </div>
-                            <a href="#orderFormPreview" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-sm rounded-xl shadow-xl animate-pulse-subtle flex items-center justify-center gap-2">
+                            <a href="#orderFormPreview" class="w-full sm:w-auto px-8 py-3.5 text-white font-black text-sm rounded-xl shadow-xl animate-pulse-subtle flex items-center justify-center gap-2 transition-all hover:scale-105"
+                               style="background-color: var(--lp-primary, #10b981);">
                                 <span>এখনই অর্ডার করুন 🛒</span>
                             </a>
                         </div>
@@ -741,7 +1244,7 @@
 
                 case 'urgency':
                     return `
-                        <div class="bg-gradient-to-r from-rose-950/80 via-slate-900 to-rose-950/80 p-5 rounded-2xl border border-rose-800/50 text-center space-y-3 shadow-lg">
+                        <div class="p-5 rounded-2xl border border-rose-800/50 text-center space-y-3 shadow-lg bg-gradient-to-r from-rose-950/80 via-slate-900 to-rose-950/80">
                             <h3 class="text-sm font-black text-rose-300">${escapeHtml(b.text || '⏰ অফারটি শেষ হতে বাকি আছে:')}</h3>
                             <div class="flex items-center justify-center gap-2 font-mono">
                                 <div class="bg-black/70 p-2.5 rounded-xl border border-rose-500/40 min-w-[50px]">
@@ -765,35 +1268,174 @@
                 case 'features':
                     const items = b.items || ['১০০% আসল ও খাঁটি', 'ক্যাশ অন ডেলিভারি', 'দ্রুততম ডেলিভারি'];
                     return `
-                        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700 space-y-4">
-                            <h3 class="text-lg font-black text-white text-center">${escapeHtml(b.title || 'কেন আমাদের পণ্যটি কিনবেন?')}</h3>
+                        <div class="p-6 rounded-2xl border border-slate-700/80 space-y-4" ${cardBgStyle}>
+                            <h3 class="text-lg font-black text-center" style="color: var(--lp-text, #ffffff);">${escapeHtml(b.title || 'কেন আমাদের পণ্যটি কিনবেন?')}</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 ${items.map(it => `
-                                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 flex items-center gap-2.5">
-                                        <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
-                                        <span class="text-xs text-slate-200 font-medium">${escapeHtml(it)}</span>
+                                    <div class="p-3 rounded-xl border border-slate-700/60 flex items-center gap-2.5 bg-black/20">
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" 
+                                              style="background-color: rgba(16, 185, 129, 0.2); color: var(--lp-primary, #10b981);">✓</span>
+                                        <span class="text-xs font-medium" style="color: var(--lp-text, #ffffff);">${escapeHtml(it)}</span>
                                     </div>
                                 `).join('')}
                             </div>
                         </div>
                     `;
 
+                case 'gallery':
+                    const gImages = (b.images && b.images.length) ? b.images : [
+                        { url: PRODUCT.thumbnail, caption: 'মূল পণ্য' }
+                    ];
+                    const cols = b.columns || 3;
+                    const colClass = cols == 2 ? 'grid-cols-2' : (cols == 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3');
+                    return `
+                        <div class="p-6 rounded-2xl border border-slate-700/80 space-y-4" ${cardBgStyle}>
+                            <div class="text-center space-y-1">
+                                <h3 class="text-lg sm:text-xl font-black" style="color: var(--lp-text, #ffffff);">${escapeHtml(b.title || '📸 প্রোডাক্টের আসল ছবিসমূহ')}</h3>
+                                ${b.subtitle ? `<p class="text-xs" style="color: var(--lp-muted, #94a3b8);">${escapeHtml(b.subtitle)}</p>` : ''}
+                            </div>
+                            <div class="grid ${colClass} gap-3">
+                                ${gImages.map((img, idx) => {
+                                    const u = img.url || img;
+                                    const cap = img.caption || '';
+                                    return `
+                                        <div class="group relative rounded-xl overflow-hidden aspect-square bg-black/40 border border-slate-700/60 shadow-md cursor-pointer"
+                                             onclick="openImageLightbox('${escapeHtml(u)}', '${escapeHtml(cap)}', event)">
+                                            <img src="${escapeHtml(u)}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" alt="Gallery ${idx + 1}">
+                                            ${cap ? `<div class="absolute bottom-0 inset-x-0 bg-black/75 backdrop-blur-xs p-1.5 text-center text-[10px] text-white font-medium truncate">${escapeHtml(cap)}</div>` : ''}
+                                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <span class="p-1.5 bg-black/60 rounded-full text-white text-xs">🔍</span>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                case 'carousel':
+                    const cSlides = (b.slides && b.slides.length) ? b.slides : [
+                        { url: PRODUCT.thumbnail, title: PRODUCT.name, subtitle: '১০০% অরিজিনাল কোয়ালিটি' }
+                    ];
+                    const activeIdx = b._currentSlide || 0;
+                    const curSlide = cSlides[activeIdx] || cSlides[0] || { url: PRODUCT.thumbnail };
+                    const ratio = b.aspect_ratio === 'square' ? 'aspect-square' : (b.aspect_ratio === '4:3' ? 'aspect-[4/3]' : 'aspect-video');
+                    return `
+                        <div class="p-4 sm:p-6 rounded-2xl border border-slate-700/80 space-y-3" ${cardBgStyle}>
+                            ${b.title ? `<h3 class="text-lg font-black text-center" style="color: var(--lp-text, #ffffff);">${escapeHtml(b.title)}</h3>` : ''}
+                            <div class="relative rounded-2xl overflow-hidden ${ratio} bg-black/50 border border-slate-700 shadow-xl group">
+                                <img src="${escapeHtml(curSlide.url || PRODUCT.thumbnail)}" class="w-full h-full object-cover">
+                                ${(curSlide.title || curSlide.subtitle) ? `
+                                    <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 sm:p-6 text-white space-y-1">
+                                        ${curSlide.title ? `<h4 class="text-sm sm:text-lg font-black">${escapeHtml(curSlide.title)}</h4>` : ''}
+                                        ${curSlide.subtitle ? `<p class="text-[11px] sm:text-xs text-slate-200">${escapeHtml(curSlide.subtitle)}</p>` : ''}
+                                    </div>
+                                ` : ''}
+                                <!-- Controls -->
+                                <button type="button" onclick="stepCarousel('${b.id}', -1, event)" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center text-sm font-bold shadow-lg transition-all">
+                                    ❮
+                                </button>
+                                <button type="button" onclick="stepCarousel('${b.id}', 1, event)" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center text-sm font-bold shadow-lg transition-all">
+                                    ❯
+                                </button>
+                                <!-- Indicators -->
+                                <div class="absolute bottom-2.5 inset-x-0 flex items-center justify-center gap-1.5 z-10">
+                                    ${cSlides.map((_, i) => `
+                                        <button type="button" onclick="jumpCarousel('${b.id}', ${i}, event)" class="w-2 h-2 rounded-full transition-all ${i === activeIdx ? 'w-5 bg-cyan-400' : 'bg-white/50 hover:bg-white'}"></button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                                <span>স্লাইড ${activeIdx + 1} / ${cSlides.length}</span>
+                                ${b.autoplay !== false ? '<span class="text-emerald-400 font-bold">● অটো-প্লে অন</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+
+                case 'reviews':
+                    const revs = (b.items && b.items.length) ? b.items : [
+                        {
+                            name: 'কামাল হোসেন',
+                            city: 'উত্তরা, ঢাকা',
+                            rating: 5,
+                            comment: 'পণ্য হাতে পেয়ে চেক করে টাকা দিয়েছি। মান খুবই ভালো এবং ডেলিভারি ছিল দ্রুত।',
+                            avatar: '',
+                            photo_proof: ''
+                        }
+                    ];
+                    return `
+                        <div class="p-6 rounded-2xl border border-slate-700/80 space-y-5" ${cardBgStyle}>
+                            <div class="text-center space-y-1">
+                                <h3 class="text-lg sm:text-xl font-black" style="color: var(--lp-text, #ffffff);">${escapeHtml(b.title || '⭐ কাস্টমারদের মূল্যবান রিভিউ')}</h3>
+                                ${b.subtitle ? `<p class="text-xs" style="color: var(--lp-muted, #94a3b8);">${escapeHtml(b.subtitle)}</p>` : ''}
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                ${revs.map((rev, rIdx) => {
+                                    const stars = '★'.repeat(rev.rating || 5) + '☆'.repeat(Math.max(0, 5 - (rev.rating || 5)));
+                                    const initial = (rev.name || 'ক')[0];
+                                    return `
+                                        <div class="p-4 rounded-xl border border-slate-700/80 space-y-2.5 bg-black/25 flex flex-col justify-between">
+                                            <div class="space-y-2">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <div class="flex items-center gap-2.5 min-w-0">
+                                                        ${rev.avatar ? `
+                                                            <img src="${escapeHtml(rev.avatar)}" class="w-9 h-9 rounded-full object-cover border border-emerald-500/50 flex-shrink-0">
+                                                        ` : `
+                                                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">
+                                                                ${escapeHtml(initial)}
+                                                            </div>
+                                                        `}
+                                                        <div class="min-w-0">
+                                                            <h4 class="font-bold text-xs truncate" style="color: var(--lp-text, #ffffff);">${escapeHtml(rev.name || 'সম্মানিত ক্রেতা')}</h4>
+                                                            <span class="text-[10px] block" style="color: var(--lp-muted, #94a3b8);">${escapeHtml(rev.city || 'বাংলাদেশ')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="px-2 py-0.5 bg-emerald-950/80 text-emerald-400 border border-emerald-700/50 text-[10px] font-bold rounded-full whitespace-nowrap">
+                                                        ✓ ভেরিফায়েড ক্রেতা
+                                                    </span>
+                                                </div>
+                                                <div class="text-amber-400 text-sm tracking-widest">${stars}</div>
+                                                <p class="text-[11px] sm:text-xs leading-relaxed" style="color: var(--lp-text, #ffffff);">
+                                                    "${escapeHtml(rev.comment || 'পণ্যটি খুব ভালো লেগেছে!')}"
+                                                </p>
+                                            </div>
+                                            ${rev.photo_proof ? `
+                                                <div class="pt-2 border-t border-slate-700/50">
+                                                    <span class="text-[10px] text-slate-400 block mb-1">📸 কাস্টমার রিভিউ স্ক্রিনশট / ফটো:</span>
+                                                    <div class="relative rounded-lg overflow-hidden h-24 bg-black/40 border border-slate-700 cursor-pointer group"
+                                                         onclick="openImageLightbox('${escapeHtml(rev.photo_proof)}', '${escapeHtml(rev.name)} এর রিভিউ প্রমাণ', event)">
+                                                        <img src="${escapeHtml(rev.photo_proof)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                            🔍 বড় করে দেখুন
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+
                 case 'order_form':
                     return `
-                        <div id="orderFormPreview" class="bg-white text-slate-900 rounded-2xl p-6 shadow-2xl border-4 border-emerald-500 space-y-5">
+                        <div id="orderFormPreview" class="bg-white text-slate-900 rounded-2xl p-6 shadow-2xl border-4 space-y-5" style="border-color: var(--lp-primary, #10b981);">
                             <div class="text-center space-y-1 border-b border-slate-200 pb-3">
-                                <span class="inline-block px-3 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[11px] rounded-full">১-মিনিটে অর্ডার করুন</span>
+                                <span class="inline-block px-3 py-0.5 font-bold text-[11px] rounded-full" style="background-color: rgba(16, 185, 129, 0.15); color: var(--lp-primary, #10b981);">
+                                    ১-মিনিটে অর্ডার করুন
+                                </span>
                                 <h2 class="text-xl font-black text-slate-900">${escapeHtml(b.title || 'অর্ডার করতে আপনার সঠিক তথ্য দিন')}</h2>
                                 <p class="text-xs text-slate-500">${escapeHtml(b.subtitle || 'পণ্য হাতে পেয়ে চেক করে মূল্য পরিশোধ করুন (ক্যাশ অন ডেলিভারি)')}</p>
                             </div>
                             <!-- Mock Product Row -->
-                            <div class="flex items-center gap-3 p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl">
-                                <img src="${PRODUCT.thumbnail}" class="w-12 h-12 object-cover rounded-lg border border-emerald-300">
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                                <img src="${PRODUCT.thumbnail}" class="w-12 h-12 object-cover rounded-lg border border-slate-300">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-xs font-bold text-slate-900 truncate">${PRODUCT.name}</h4>
-                                    <span class="text-sm font-black text-emerald-700">৳ ${numberFormat(PRODUCT.salePrice)}</span>
+                                    <span class="text-sm font-black" style="color: var(--lp-primary, #10b981);">৳ ${numberFormat(PRODUCT.salePrice)}</span>
                                 </div>
-                                <span class="text-xs font-bold px-2 py-1 bg-white border border-emerald-300 rounded-lg">পরিমাণ: ১</span>
+                                <span class="text-xs font-bold px-2 py-1 bg-white border border-slate-300 rounded-lg">পরিমাণ: ১</span>
                             </div>
                             <!-- Mock Form Fields -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -810,7 +1452,8 @@
                                     <input type="text" placeholder="বাসা/রোড নং, এলাকা, থানা ও জেলা" disabled class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg cursor-not-allowed">
                                 </div>
                             </div>
-                            <button disabled class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-sm rounded-xl shadow-lg cursor-not-allowed flex items-center justify-center gap-2">
+                            <button disabled class="w-full py-3.5 text-white font-black text-sm rounded-xl shadow-lg cursor-not-allowed flex items-center justify-center gap-2"
+                                    style="background-color: var(--lp-primary, #10b981);">
                                 <span>অর্ডার কনফার্ম করুন ৳ ${numberFormat(PRODUCT.salePrice + 70)} (ক্যাশ অন ডেলিভারি)</span>
                             </button>
                         </div>
@@ -819,13 +1462,13 @@
                 case 'heading':
                     return `
                         <div class="text-center py-2">
-                            <h2 class="text-2xl sm:text-3xl font-black text-white">${escapeHtml(b.text || 'আপনার আকর্ষণীয় হেডলাইন লিখুন')}</h2>
+                            <h2 class="text-2xl sm:text-3xl font-black" style="color: var(--lp-text, #ffffff);">${escapeHtml(b.text || 'আপনার আকর্ষণীয় হেডলাইন লিখুন')}</h2>
                         </div>
                     `;
 
                 case 'text':
                     return `
-                        <div class="text-slate-300 text-xs sm:text-sm leading-relaxed p-2">
+                        <div class="text-xs sm:text-sm leading-relaxed p-2" style="color: var(--lp-text, #ffffff);">
                             ${escapeHtml(b.text || 'এখানে আপনার বিস্তারিত বিবরণ, পণ্যের ব্যবহার বিধি অথবা অফার সম্পর্কিত নিয়মাবলী লিখুন।')}
                         </div>
                     `;
@@ -833,7 +1476,7 @@
                 case 'image':
                     return `
                         <div class="rounded-xl overflow-hidden max-w-xl mx-auto border border-slate-700 shadow-md">
-                            <img src="${b.url || PRODUCT.thumbnail}" class="w-full h-auto object-cover">
+                            <img src="${escapeHtml(b.url || PRODUCT.thumbnail)}" class="w-full h-auto object-cover">
                         </div>
                     `;
 
@@ -847,7 +1490,8 @@
                 case 'button':
                     return `
                         <div class="text-center py-3">
-                            <a href="#orderFormPreview" class="inline-block px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xs rounded-xl shadow-lg">
+                            <a href="#orderFormPreview" class="inline-block px-8 py-3 text-white font-black text-xs rounded-xl shadow-lg transition-transform hover:scale-105"
+                               style="background-color: var(--lp-primary, #10b981);">
                                 ${escapeHtml(b.text || 'এখনই কিনুন')}
                             </a>
                         </div>
@@ -856,61 +1500,38 @@
                 case 'divider':
                     return `
                         <div class="py-3 flex items-center justify-center">
-                            <div class="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent rounded"></div>
+                            <div class="w-24 h-1 rounded" style="background: linear-gradient(90deg, transparent, var(--lp-primary, #10b981), transparent);"></div>
                         </div>
                     `;
 
                 case 'guarantees':
                     return `
-                        <div class="grid grid-cols-3 gap-3 p-4 bg-slate-800/80 rounded-2xl border border-slate-700 text-center text-xs">
+                        <div class="grid grid-cols-3 gap-3 p-4 rounded-2xl border border-slate-700 text-center text-xs" ${cardBgStyle}>
                             <div class="p-2">
                                 <span class="text-2xl block mb-1">🛡️</span>
-                                <span class="font-bold text-slate-200">ক্যাশ অন ডেলিভারি</span>
+                                <span class="font-bold" style="color: var(--lp-text, #ffffff);">ক্যাশ অন ডেলিভারি</span>
                             </div>
                             <div class="p-2">
                                 <span class="text-2xl block mb-1">🚚</span>
-                                <span class="font-bold text-slate-200">দ্রুততম হোম ডেলিভারি</span>
+                                <span class="font-bold" style="color: var(--lp-text, #ffffff);">দ্রুততম হোম ডেলিভারি</span>
                             </div>
                             <div class="p-2">
                                 <span class="text-2xl block mb-1">💯</span>
-                                <span class="font-bold text-slate-200">১০০% খাঁটি ও আসল</span>
-                            </div>
-                        </div>
-                    `;
-
-                case 'reviews':
-                    return `
-                        <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 space-y-4">
-                            <h3 class="text-sm font-black text-white text-center">⭐ কাস্টমারদের মূল্যবান রিভিউ</h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                                <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-1.5">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-bold text-emerald-400">কামাল হোসেন (ঢাকা)</span>
-                                        <span class="text-amber-400 text-xs">★★★★★</span>
-                                    </div>
-                                    <p class="text-slate-300 text-[11px]">পণ্য হাতে পেয়ে চেক করে টাকা দিয়েছি। মান খুবই ভালো এবং ডেলিভারি ছিল দ্রুত।</p>
-                                </div>
-                                <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/80 space-y-1.5">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-bold text-emerald-400">তানিয়া আহমেদ (চট্টগ্রাম)</span>
-                                        <span class="text-amber-400 text-xs">★★★★★</span>
-                                    </div>
-                                    <p class="text-slate-300 text-[11px]">১০০% আসল প্রোডাক্ট! প্যাকেজিং অনেক সুন্দর ছিল। ধন্যবাদ ডিমান্ডহাট বিডি কে।</p>
-                                </div>
+                                <span class="font-bold" style="color: var(--lp-text, #ffffff);">১০০% খাঁটি ও আসল</span>
                             </div>
                         </div>
                     `;
 
                 case 'faq':
                     return `
-                        <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 space-y-3">
-                            <h3 class="text-sm font-black text-white text-center">❓ সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)</h3>
+                        <div class="p-5 rounded-2xl border border-slate-700 space-y-3" ${cardBgStyle}>
+                            <h3 class="text-sm font-black text-center" style="color: var(--lp-text, #ffffff);">❓ সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)</h3>
                             <div class="space-y-2 text-xs">
-                                <div class="p-3 bg-slate-900 rounded-xl border border-slate-700">
+                                <div class="p-3 bg-black/30 rounded-xl border border-slate-700">
                                     <div class="font-bold text-slate-200">কীভাবে পণ্য অর্ডার করব?</div>
-                                    <div class="text-[11px] text-slate-400 mt-1">উপরের ফর্মে আপনার নাম, মোবাইল নম্বর এবং সম্পূর্ণ ঠিকানা দিয়ে "অর্ডার কনফার্ম করুন" বাটনে ক্লিক করলেই অর্ডার কনফার্ম হবে।</div>
+                                    <div class="text-[11px] text-slate-400 mt-1">ফর্মটিতে আপনার নাম, মোবাইল নম্বর এবং সম্পূর্ণ ঠিকানা দিয়ে "অর্ডার কনফার্ম করুন" বাটনে ক্লিক করুন।</div>
                                 </div>
-                                <div class="p-3 bg-slate-900 rounded-xl border border-slate-700">
+                                <div class="p-3 bg-black/30 rounded-xl border border-slate-700">
                                     <div class="font-bold text-slate-200">ডেলিভারি চার্জ কত এবং কতদিনে পাব?</div>
                                     <div class="text-[11px] text-slate-400 mt-1">ঢাকার ভেতর ডেলিভারি চার্জ ৭০ টাকা (২৪-৪৮ ঘণ্টার মধ্যে), ঢাকার বাইরে ১৩০ টাকা (২-৩ দিনের মধ্যে)।</div>
                                 </div>
@@ -936,7 +1557,6 @@
                 type: type
             };
 
-            // Set default data by type
             switch(type) {
                 case 'heading':
                     newBlock.text = 'আপনার নতুন আকর্ষনীয় হেডলাইন';
@@ -946,6 +1566,53 @@
                     break;
                 case 'image':
                     newBlock.url = PRODUCT.thumbnail;
+                    break;
+                case 'gallery':
+                    newBlock.title = '📸 প্রোডাক্টের আসল ছবিসমূহ';
+                    newBlock.subtitle = 'আমাদের অরিজিনাল স্টক ও পণ্যের কিছু বাস্তব স্থিরচিত্র';
+                    newBlock.columns = 3;
+                    newBlock.images = [{ url: PRODUCT.thumbnail, caption: 'অরিজিনাল প্যাকেজিং' }];
+                    if (PRODUCT.gallery && PRODUCT.gallery.length) {
+                        PRODUCT.gallery.forEach(u => newBlock.images.push({ url: u, caption: '' }));
+                    }
+                    break;
+                case 'carousel':
+                    newBlock.title = '🎠 প্রোডাক্ট হাইলাইটস ও ফিচার ব্যানার';
+                    newBlock.autoplay = true;
+                    newBlock.speed = 4000;
+                    newBlock.aspect_ratio = '16:9';
+                    newBlock.slides = [
+                        { url: PRODUCT.thumbnail, title: PRODUCT.name, subtitle: '১০০% আসল ও খাঁটি পণ্যের নিশ্চয়তা' }
+                    ];
+                    if (PRODUCT.gallery && PRODUCT.gallery.length) {
+                        PRODUCT.gallery.forEach(u => newBlock.slides.push({
+                            url: u,
+                            title: 'সেরা কোয়ালিটি পণ্য',
+                            subtitle: 'ক্যাশ অন ডেলিভারিতে চেক করে মূল্য পরিশোধ'
+                        }));
+                    }
+                    break;
+                case 'reviews':
+                    newBlock.title = '⭐ কাস্টমারদের মূল্যবান রিভিউ ও মতামত';
+                    newBlock.subtitle = 'আমাদের সম্মানিত ক্রেতারা আমাদের পণ্য ও সেবা সম্পর্কে কী বলছেন';
+                    newBlock.items = [
+                        {
+                            name: 'মোঃ তানভীর হাসান',
+                            city: 'মিরপুর, ঢাকা',
+                            rating: 5,
+                            comment: 'অসাধারণ কোয়ালিটি! প্যাকেট খুলে চেক করে ডেলিভারি ম্যানকে টাকা দিয়েছি। মধুটা একদম খাঁটি, ঘ্রাণেই বোঝা যায়। ধন্যবাদ!',
+                            avatar: '',
+                            photo_proof: ''
+                        },
+                        {
+                            name: 'সাবরিনা সুলতানা',
+                            city: 'খুলনা',
+                            rating: 5,
+                            comment: 'মাত্র ২ দিনে ডেলিভারি পেয়েছি। প্রোডাক্টের প্যাকেজিং অসাধারণ ছিল। ১০০% আসল প্রোডাক্ট, নিশ্চিন্তে নিতে পারেন।',
+                            avatar: '',
+                            photo_proof: ''
+                        }
+                    ];
                     break;
                 case 'video':
                     newBlock.video_url = 'https://youtube.com/watch?v=example';
@@ -982,7 +1649,6 @@
             renderBlocks();
             selectBlock(newBlock.id);
 
-            // Scroll down to newly added block
             setTimeout(() => {
                 const el = document.querySelector(`[data-id="${newBlock.id}"]`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -997,17 +1663,14 @@
             const block = blocks.find(b => b.id === blockId);
             if (!block) return;
 
-            // Highlight in canvas
             document.querySelectorAll('.builder-block').forEach(el => {
                 el.classList.toggle('active-selected', el.getAttribute('data-id') === blockId);
             });
 
-            // Switch left sidebar to inspector
             panelElements.classList.add('hidden');
             panelInspector.classList.remove('hidden');
             inspectorBlockType.textContent = block.type.replace('_', ' ');
 
-            // Build inspector form fields based on block
             buildInspectorFields(block);
         }
 
@@ -1018,6 +1681,9 @@
             document.querySelectorAll('.builder-block').forEach(el => el.classList.remove('active-selected'));
         }
 
+        // -------------------------------------------------------------------------
+        // INSPECTOR FIELD BUILDERS (GALLERY, CAROUSEL, REVIEWS, IMAGE, HERO, ETC.)
+        // -------------------------------------------------------------------------
         function buildInspectorFields(block) {
             inspectorFields.innerHTML = '';
 
@@ -1025,7 +1691,7 @@
                 const div = document.createElement('div');
                 div.className = 'space-y-1';
                 div.innerHTML = `
-                    <label class="block font-bold text-slate-300 text-[11px]">${label}</label>
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
                     <input type="${type}" value="${escapeHtml(val || '')}" 
                            class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500 focus:ring-0">
                 `;
@@ -1041,7 +1707,7 @@
                 const div = document.createElement('div');
                 div.className = 'space-y-1';
                 div.innerHTML = `
-                    <label class="block font-bold text-slate-300 text-[11px]">${label}</label>
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
                     <textarea rows="3" class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500 focus:ring-0">${escapeHtml(val || '')}</textarea>
                 `;
                 const area = div.querySelector('textarea');
@@ -1052,12 +1718,32 @@
                 return div;
             };
 
-            if (block.type === 'heading') {
+            // Switch by type
+            if (block.type === 'gallery') {
+                inspectorFields.appendChild(renderGalleryInspector(block));
+            } else if (block.type === 'carousel') {
+                inspectorFields.appendChild(renderCarouselInspector(block));
+            } else if (block.type === 'reviews') {
+                inspectorFields.appendChild(renderReviewsInspector(block));
+            } else if (block.type === 'image') {
+                const imgUploader = createImageUploadField('ছবির ইমেজ আপলোড (Image)', block.url, (newUrl) => {
+                    block.url = newUrl;
+                    renderBlocks();
+                });
+                inspectorFields.appendChild(imgUploader);
+            } else if (block.type === 'product_hero') {
+                inspectorFields.appendChild(createInput('ব্যাজ টেক্সট', 'badge', block.badge));
+                inspectorFields.appendChild(createInput('টাইটেল', 'title', block.title));
+                inspectorFields.appendChild(createTextarea('সাবটাইটেল', 'subtitle', block.subtitle));
+                const heroImgUploader = createImageUploadField('হিরো সেকশন ছবি', block.image || PRODUCT.thumbnail, (newUrl) => {
+                    block.image = newUrl;
+                    renderBlocks();
+                });
+                inspectorFields.appendChild(heroImgUploader);
+            } else if (block.type === 'heading') {
                 inspectorFields.appendChild(createInput('হেডলাইন টেক্সট', 'text', block.text));
             } else if (block.type === 'text') {
                 inspectorFields.appendChild(createTextarea('টেক্সট কনটেন্ট', 'text', block.text));
-            } else if (block.type === 'image') {
-                inspectorFields.appendChild(createInput('ছবির ইউআরএল (Image URL)', 'url', block.url));
             } else if (block.type === 'button') {
                 inspectorFields.appendChild(createInput('বাটন টেক্সট', 'text', block.text));
             } else if (block.type === 'urgency') {
@@ -1065,11 +1751,6 @@
                 inspectorFields.appendChild(createInput('ঘণ্টা (Hours)', 'hours', block.hours));
                 inspectorFields.appendChild(createInput('মিনিট (Minutes)', 'minutes', block.minutes));
                 inspectorFields.appendChild(createInput('সেকেন্ড (Seconds)', 'seconds', block.seconds));
-            } else if (block.type === 'product_hero') {
-                inspectorFields.appendChild(createInput('ব্যাজ টেক্সট', 'badge', block.badge));
-                inspectorFields.appendChild(createInput('টাইটেল', 'title', block.title));
-                inspectorFields.appendChild(createTextarea('সাবটাইটেল', 'subtitle', block.subtitle));
-                inspectorFields.appendChild(createInput('ছবির ইউআরএল', 'image', block.image));
             } else if (block.type === 'order_form') {
                 inspectorFields.appendChild(createInput('ফর্ম শিরোনাম', 'title', block.title));
                 inspectorFields.appendChild(createTextarea('সাবটাইটেল', 'subtitle', block.subtitle));
@@ -1077,7 +1758,7 @@
                 inspectorFields.appendChild(createInput('সেকশন শিরোনাম', 'title', block.title));
                 const itemsDiv = document.createElement('div');
                 itemsDiv.className = 'space-y-1.5 pt-2 border-t border-[#2b2d35]';
-                itemsDiv.innerHTML = `<label class="block font-bold text-slate-300 text-[11px]">বৈশিষ্ট্য তালিকা (কমা দিয়ে আলাদা করুন):</label>`;
+                itemsDiv.innerHTML = `<label class="block font-bold text-slate-300 text-[11px]">বৈশিষ্ট্য তালিকা (প্রতি লাইনে একটি):</label>`;
                 const itemsInp = document.createElement('textarea');
                 itemsInp.rows = 4;
                 itemsInp.className = 'w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500 focus:ring-0';
@@ -1089,6 +1770,480 @@
                 itemsDiv.appendChild(itemsInp);
                 inspectorFields.appendChild(itemsDiv);
             }
+
+            // Universal Block Style Overrides (Section Custom Color)
+            const styleAccordion = document.createElement('div');
+            styleAccordion.className = 'pt-4 mt-4 border-t border-[#2b2d35] space-y-2';
+            styleAccordion.innerHTML = `
+                <label class="block font-bold text-cyan-400 text-xs uppercase tracking-wider">🎨 সেকশন কালার ওভাররাইড</label>
+                <div class="space-y-2 text-[11px]">
+                    <div>
+                        <label class="block text-slate-400 mb-1">কাস্টম ব্যাকগ্রাউন্ড কালার:</label>
+                        <div class="flex items-center gap-2">
+                            <input type="color" class="w-8 h-8 rounded border border-[#2e313d] bg-transparent cursor-pointer inp-custom-bg" value="${block.custom_bg || '#1e293b'}">
+                            <input type="text" placeholder="যেমন: #1e293b" value="${escapeHtml(block.custom_bg || '')}" class="flex-1 p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs inp-custom-bg-text">
+                            ${block.custom_bg ? `<button type="button" class="btn-clear-bg text-[10px] text-rose-400 hover:underline">রিসেট</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            const inpBg = styleAccordion.querySelector('.inp-custom-bg');
+            const inpBgText = styleAccordion.querySelector('.inp-custom-bg-text');
+            const btnClearBg = styleAccordion.querySelector('.btn-clear-bg');
+
+            if (inpBg && inpBgText) {
+                inpBg.oninput = (e) => {
+                    inpBgText.value = e.target.value;
+                    block.custom_bg = e.target.value;
+                    renderBlocks();
+                };
+                inpBgText.oninput = (e) => {
+                    block.custom_bg = e.target.value;
+                    renderBlocks();
+                };
+            }
+            if (btnClearBg) {
+                btnClearBg.onclick = () => {
+                    delete block.custom_bg;
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+            }
+            inspectorFields.appendChild(styleAccordion);
+        }
+
+        // Inspector: Multi-Image Gallery Grid Manager
+        function renderGalleryInspector(block) {
+            const div = document.createElement('div');
+            div.className = 'space-y-4';
+
+            const createInput = (label, key, val) => {
+                const d = document.createElement('div');
+                d.className = 'space-y-1';
+                d.innerHTML = `
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
+                    <input type="text" value="${escapeHtml(val || '')}" class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500">
+                `;
+                d.querySelector('input').oninput = (e) => {
+                    block[key] = e.target.value;
+                    renderBlocks();
+                };
+                return d;
+            };
+
+            div.appendChild(createInput('গ্যালারি শিরোনাম (Title)', 'title', block.title || ''));
+            div.appendChild(createInput('সাবটাইটেল (Subtitle)', 'subtitle', block.subtitle || ''));
+
+            // Column selector
+            const colDiv = document.createElement('div');
+            colDiv.className = 'space-y-1';
+            colDiv.innerHTML = `
+                <label class="block font-bold text-slate-300 text-[11px]">কলাম সংখ্যা (Grid Columns)</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" class="col-btn p-1.5 rounded-lg border text-xs font-bold ${block.columns == 2 ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-cols="2">২ কলাম</button>
+                    <button type="button" class="col-btn p-1.5 rounded-lg border text-xs font-bold ${(!block.columns || block.columns == 3) ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-cols="3">৩ কলাম</button>
+                    <button type="button" class="col-btn p-1.5 rounded-lg border text-xs font-bold ${block.columns == 4 ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-cols="4">৪ কলাম</button>
+                </div>
+            `;
+            colDiv.querySelectorAll('.col-btn').forEach(b => {
+                b.onclick = () => {
+                    block.columns = parseInt(b.getAttribute('data-cols'));
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+            });
+            div.appendChild(colDiv);
+
+            // Upload Box
+            const uploadBox = document.createElement('div');
+            uploadBox.className = 'p-3 bg-cyan-950/40 border border-cyan-700/50 rounded-xl space-y-2';
+            uploadBox.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-cyan-300">🖼️ ছবি যুক্ত করুন</span>
+                    <span class="text-[10px] text-slate-400">${(block.images || []).length} টি ছবি যুক্ত আছে</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button type="button" class="btn-bulk-upload w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow">
+                        <span>📁 একসাথে একাধিক ছবি আপলোড করুন</span>
+                    </button>
+                    <input type="file" multiple accept="image/*" class="hidden bulk-file-input">
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="btn-add-product-images flex-1 py-1.5 bg-[#252730] hover:bg-[#2e313d] text-slate-300 rounded text-[10px] font-bold border border-[#2e313d]">
+                            📦 প্রডাক্টের সব ছবি যোগ
+                        </button>
+                        <button type="button" class="btn-add-url flex-1 py-1.5 bg-[#252730] hover:bg-[#2e313d] text-slate-300 rounded text-[10px] font-bold border border-[#2e313d]">
+                            ➕ লিংক দিয়ে ছবি যোগ
+                        </button>
+                    </div>
+                </div>
+            `;
+            const bulkInput = uploadBox.querySelector('.bulk-file-input');
+            const btnBulk = uploadBox.querySelector('.btn-bulk-upload');
+            btnBulk.onclick = () => bulkInput.click();
+
+            bulkInput.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                if (!files.length) return;
+                showToast(files.length + ' টি ছবি আপলোড হচ্ছে...');
+                try {
+                    const uploadedFiles = await uploadMultipleImageFiles(files);
+                    block.images = block.images || [];
+                    uploadedFiles.forEach(f => {
+                        block.images.push({ url: f.url, caption: f.name || '' });
+                    });
+                    renderBlocks();
+                    buildInspectorFields(block);
+                    showToast(uploadedFiles.length + ' টি ছবি সফলভাবে যোগ হয়েছে! ✓');
+                } catch (err) {
+                    alert('ত্রুটিঃ ' + err.message);
+                }
+            };
+
+            uploadBox.querySelector('.btn-add-product-images').onclick = () => {
+                block.images = block.images || [];
+                if (PRODUCT.thumbnail && !block.images.some(img => (img.url || img) === PRODUCT.thumbnail)) {
+                    block.images.push({ url: PRODUCT.thumbnail, caption: PRODUCT.name });
+                }
+                if (PRODUCT.gallery && PRODUCT.gallery.length) {
+                    PRODUCT.gallery.forEach(u => {
+                        if (!block.images.some(img => (img.url || img) === u)) {
+                            block.images.push({ url: u, caption: '' });
+                        }
+                    });
+                }
+                renderBlocks();
+                buildInspectorFields(block);
+                showToast('প্রডাক্টের ছবিসমূহ গ্যালারিতে যোগ হয়েছে!');
+            };
+
+            uploadBox.querySelector('.btn-add-url').onclick = () => {
+                const url = prompt('ছবির সরাসরি ইমেজ ইউআরএল (URL) দিন:');
+                if (url && url.trim()) {
+                    block.images = block.images || [];
+                    block.images.push({ url: url.trim(), caption: '' });
+                    renderBlocks();
+                    buildInspectorFields(block);
+                }
+            };
+            div.appendChild(uploadBox);
+
+            // Existing images list
+            const itemsList = document.createElement('div');
+            itemsList.className = 'space-y-2 pt-2';
+            (block.images || []).forEach((img, idx) => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'p-2.5 bg-[#252730] border border-[#2e313d] rounded-xl flex items-center gap-2.5';
+                const imgUrl = img.url || img;
+                itemCard.innerHTML = `
+                    <img src="${escapeHtml(imgUrl)}" class="w-11 h-11 object-cover rounded-lg border border-slate-700 flex-shrink-0">
+                    <div class="flex-1 min-w-0 space-y-1">
+                        <input type="text" placeholder="ক্যাপশন (ঐচ্ছিক)" value="${escapeHtml(img.caption || '')}" 
+                               class="w-full p-1 bg-[#18191c] border border-[#2e313d] rounded text-[10px] text-slate-200">
+                        <span class="text-[9px] text-slate-400 block truncate">${escapeHtml(imgUrl)}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button type="button" class="btn-del p-1 text-rose-400 hover:bg-rose-950/60 rounded" title="মুছে ফেলুন">✕</button>
+                    </div>
+                `;
+                itemCard.querySelector('input').oninput = (e) => {
+                    if (typeof block.images[idx] === 'string') {
+                        block.images[idx] = { url: block.images[idx], caption: e.target.value };
+                    } else {
+                        block.images[idx].caption = e.target.value;
+                    }
+                    renderBlocks();
+                };
+                itemCard.querySelector('.btn-del').onclick = () => {
+                    block.images.splice(idx, 1);
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+                itemsList.appendChild(itemCard);
+            });
+            div.appendChild(itemsList);
+
+            return div;
+        }
+
+        // Inspector: Carousel Slider Manager
+        function renderCarouselInspector(block) {
+            const div = document.createElement('div');
+            div.className = 'space-y-4';
+
+            const createInput = (label, key, val) => {
+                const d = document.createElement('div');
+                d.className = 'space-y-1';
+                d.innerHTML = `
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
+                    <input type="text" value="${escapeHtml(val || '')}" class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500">
+                `;
+                d.querySelector('input').oninput = (e) => {
+                    block[key] = e.target.value;
+                    renderBlocks();
+                };
+                return d;
+            };
+
+            div.appendChild(createInput('ক্যারোসেল শিরোনাম (ঐচ্ছিক)', 'title', block.title || ''));
+
+            // Settings
+            const settingsDiv = document.createElement('div');
+            settingsDiv.className = 'grid grid-cols-2 gap-2 p-3 bg-[#20222a] border border-[#2e313d] rounded-xl text-[11px]';
+            settingsDiv.innerHTML = `
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1">অ্যাসপেক্ট রেশিও</label>
+                    <select class="sel-ratio w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs">
+                        <option value="16:9" ${block.aspect_ratio === '16:9' ? 'selected' : ''}>16:9 (ব্যানার)</option>
+                        <option value="4:3" ${block.aspect_ratio === '4:3' ? 'selected' : ''}>4:3 (স্ট্যান্ডার্ড)</option>
+                        <option value="square" ${block.aspect_ratio === 'square' ? 'selected' : ''}>1:1 (বর্গাকার)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1">অটো-প্লে (Autoplay)</label>
+                    <label class="flex items-center gap-2 mt-2 cursor-pointer">
+                        <input type="checkbox" class="chk-autoplay text-cyan-600 focus:ring-0 rounded" ${block.autoplay !== false ? 'checked' : ''}>
+                        <span class="text-slate-300 text-xs">অটো-স্লাইড চালু</span>
+                    </label>
+                </div>
+            `;
+            settingsDiv.querySelector('.sel-ratio').onchange = (e) => {
+                block.aspect_ratio = e.target.value;
+                renderBlocks();
+            };
+            settingsDiv.querySelector('.chk-autoplay').onchange = (e) => {
+                block.autoplay = e.target.checked;
+                renderBlocks();
+            };
+            div.appendChild(settingsDiv);
+
+            // Add Slide Button
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-bold shadow flex items-center justify-center gap-1.5';
+            addBtn.innerHTML = '<span>➕ নতুন স্লাইড যোগ করুন</span>';
+            addBtn.onclick = () => {
+                block.slides = block.slides || [];
+                block.slides.push({
+                    url: PRODUCT.thumbnail,
+                    title: 'নতুন স্লাইড শিরোনাম',
+                    subtitle: 'অফার বা পণ্যের বিশেষ বার্তা'
+                });
+                renderBlocks();
+                buildInspectorFields(block);
+            };
+            div.appendChild(addBtn);
+
+            // Slides List
+            const slidesContainer = document.createElement('div');
+            slidesContainer.className = 'space-y-3';
+            (block.slides || []).forEach((slide, idx) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 bg-[#252730] border border-[#2e313d] rounded-xl space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-[#2e313d] pb-1.5">
+                        <span class="font-bold text-cyan-400 text-xs">স্লাইড #${idx + 1}</span>
+                        <div class="flex items-center gap-1">
+                            <button type="button" class="btn-up text-slate-400 hover:text-white p-1 text-xs" title="উপরে">▲</button>
+                            <button type="button" class="btn-down text-slate-400 hover:text-white p-1 text-xs" title="নিচে">▼</button>
+                            <button type="button" class="btn-del text-rose-400 hover:text-rose-300 p-1 text-xs" title="মুছে ফেলুন">✕</button>
+                        </div>
+                    </div>
+                    <div class="slide-img-slot"></div>
+                    <div>
+                        <label class="block font-bold text-slate-300 text-[10px] mb-1">স্লাইড টাইটেল</label>
+                        <input type="text" class="inp-title w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(slide.title || '')}">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-300 text-[10px] mb-1">সাবটাইটেল</label>
+                        <input type="text" class="inp-sub w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(slide.subtitle || '')}">
+                    </div>
+                `;
+
+                const imgUploader = createImageUploadField('স্লাইড ছবি আপলোড', slide.url, (newUrl) => {
+                    slide.url = newUrl;
+                    renderBlocks();
+                });
+                card.querySelector('.slide-img-slot').appendChild(imgUploader);
+
+                card.querySelector('.inp-title').oninput = (e) => {
+                    slide.title = e.target.value;
+                    renderBlocks();
+                };
+                card.querySelector('.inp-sub').oninput = (e) => {
+                    slide.subtitle = e.target.value;
+                    renderBlocks();
+                };
+                card.querySelector('.btn-del').onclick = () => {
+                    block.slides.splice(idx, 1);
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+                card.querySelector('.btn-up').onclick = () => {
+                    if (idx > 0) {
+                        const tmp = block.slides[idx];
+                        block.slides[idx] = block.slides[idx - 1];
+                        block.slides[idx - 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+                card.querySelector('.btn-down').onclick = () => {
+                    if (idx < block.slides.length - 1) {
+                        const tmp = block.slides[idx];
+                        block.slides[idx] = block.slides[idx + 1];
+                        block.slides[idx + 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+
+                slidesContainer.appendChild(card);
+            });
+            div.appendChild(slidesContainer);
+
+            return div;
+        }
+
+        // Inspector: Customer Reviews Manager
+        function renderReviewsInspector(block) {
+            const div = document.createElement('div');
+            div.className = 'space-y-4';
+
+            const createInput = (label, key, val) => {
+                const d = document.createElement('div');
+                d.className = 'space-y-1';
+                d.innerHTML = `
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
+                    <input type="text" value="${escapeHtml(val || '')}" class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500">
+                `;
+                d.querySelector('input').oninput = (e) => {
+                    block[key] = e.target.value;
+                    renderBlocks();
+                };
+                return d;
+            };
+
+            div.appendChild(createInput('সেকশন শিরোনাম (Title)', 'title', block.title || '⭐ কাস্টমারদের মূল্যবান রিভিউ'));
+            div.appendChild(createInput('সাবটাইটেল (Subtitle)', 'subtitle', block.subtitle || ''));
+
+            // Add Review Button
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'w-full py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white rounded-xl text-xs font-bold shadow flex items-center justify-center gap-1.5';
+            addBtn.innerHTML = '<span>➕ নতুন রিভিউ যোগ করুন</span>';
+            addBtn.onclick = () => {
+                block.items = block.items || [];
+                block.items.push({
+                    name: 'নতুন ক্রেতা',
+                    city: 'ঢাকা',
+                    rating: 5,
+                    comment: 'পণ্যটি হাতে পেয়েছি। কোয়ালিটি অত্যন্ত ভালো লেগেছে। ধন্যবাদ!',
+                    avatar: '',
+                    photo_proof: ''
+                });
+                renderBlocks();
+                buildInspectorFields(block);
+            };
+            div.appendChild(addBtn);
+
+            // Reviews List
+            const reviewsContainer = document.createElement('div');
+            reviewsContainer.className = 'space-y-3';
+            (block.items || []).forEach((rev, idx) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 bg-[#252730] border border-[#2e313d] rounded-xl space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-[#2e313d] pb-1.5">
+                        <span class="font-bold text-amber-400 text-xs">রিভিউ #${idx + 1}: ${escapeHtml(rev.name || '')}</span>
+                        <div class="flex items-center gap-1">
+                            <button type="button" class="btn-up text-slate-400 hover:text-white p-1 text-xs" title="উপরে">▲</button>
+                            <button type="button" class="btn-down text-slate-400 hover:text-white p-1 text-xs" title="নিচে">▼</button>
+                            <button type="button" class="btn-del text-rose-400 hover:text-rose-300 p-1 text-xs" title="মুছে ফেলুন">✕</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">কাস্টমার নাম</label>
+                            <input type="text" class="inp-name w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(rev.name || '')}">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">শহর / জেলা</label>
+                            <input type="text" class="inp-city w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(rev.city || '')}">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-300 text-[10px] mb-1">স্টার রেটিং (Rating)</label>
+                        <select class="sel-rating w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-amber-400 font-bold text-xs">
+                            <option value="5" ${rev.rating == 5 ? 'selected' : ''}>★★★★★ (৫ স্টার)</option>
+                            <option value="4" ${rev.rating == 4 ? 'selected' : ''}>★★★★☆ (৪ স্টার)</option>
+                            <option value="3" ${rev.rating == 3 ? 'selected' : ''}>★★★☆☆ (৩ স্টার)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-300 text-[10px] mb-1">রিভিউ বার্তা (Comment)</label>
+                        <textarea rows="2" class="inp-comment w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs">${escapeHtml(rev.comment || '')}</textarea>
+                    </div>
+                    <div class="avatar-slot"></div>
+                    <div class="proof-slot"></div>
+                `;
+
+                const avatarUploader = createImageUploadField('কাস্টমার প্রোফাইল ছবি (Avatar)', rev.avatar, (newUrl) => {
+                    rev.avatar = newUrl;
+                    renderBlocks();
+                });
+                card.querySelector('.avatar-slot').appendChild(avatarUploader);
+
+                const proofUploader = createImageUploadField('রিভিউ স্ক্রিনশট / প্রোডাক্ট প্রুফ (Photo Proof)', rev.photo_proof, (newUrl) => {
+                    rev.photo_proof = newUrl;
+                    renderBlocks();
+                });
+                card.querySelector('.proof-slot').appendChild(proofUploader);
+
+                card.querySelector('.inp-name').oninput = (e) => {
+                    rev.name = e.target.value;
+                    renderBlocks();
+                };
+                card.querySelector('.inp-city').oninput = (e) => {
+                    rev.city = e.target.value;
+                    renderBlocks();
+                };
+                card.querySelector('.sel-rating').onchange = (e) => {
+                    rev.rating = parseInt(e.target.value);
+                    renderBlocks();
+                };
+                card.querySelector('.inp-comment').oninput = (e) => {
+                    rev.comment = e.target.value;
+                    renderBlocks();
+                };
+                card.querySelector('.btn-del').onclick = () => {
+                    block.items.splice(idx, 1);
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+                card.querySelector('.btn-up').onclick = () => {
+                    if (idx > 0) {
+                        const tmp = block.items[idx];
+                        block.items[idx] = block.items[idx - 1];
+                        block.items[idx - 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+                card.querySelector('.btn-down').onclick = () => {
+                    if (idx < block.items.length - 1) {
+                        const tmp = block.items[idx];
+                        block.items[idx] = block.items[idx + 1];
+                        block.items[idx + 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+
+                reviewsContainer.appendChild(card);
+            });
+            div.appendChild(reviewsContainer);
+
+            return div;
         }
 
         // -------------------------------------------------------------------------
@@ -1148,7 +2303,6 @@
         // -------------------------------------------------------------------------
         // RESPONSIVE PREVIEW & FULL-WIDTH SWITCHER
         // -------------------------------------------------------------------------
-        const canvasViewport = document.getElementById('canvasViewport');
         const btnWide = document.getElementById('btnViewWide');
         const btnDesktop = document.getElementById('btnViewDesktop');
         const btnTablet = document.getElementById('btnViewTablet');
@@ -1221,6 +2375,9 @@
         // -------------------------------------------------------------------------
         // MODAL TOGGLES
         // -------------------------------------------------------------------------
+        const btnOpenTheme = document.getElementById('btnOpenTheme');
+        if (btnOpenTheme) btnOpenTheme.addEventListener('click', openThemeModal);
+
         document.getElementById('btnOpenSettings').addEventListener('click', () => openModal('modalSettings'));
         document.getElementById('btnOpenCss').addEventListener('click', () => openModal('modalCss'));
         document.getElementById('btnHistory').addEventListener('click', () => openModal('modalHistory'));
@@ -1273,6 +2430,7 @@
                     },
                     body: JSON.stringify({
                         content: blocks,
+                        theme: pageTheme,
                         custom_css: customCss,
                         seo_title: seoTitle,
                         seo_description: seoDesc,

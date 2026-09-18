@@ -128,6 +128,46 @@ class LandingPageController extends Controller
             ->with('success', 'ল্যান্ডিং পেজ তৈরি সম্পন্ন হয়েছে! এখন বিল্ডার দিয়ে ডিজাইন কাস্টমাইজ করুন।');
     }
 
+    public function uploadImage(Request $request): JsonResponse
+    {
+        if ($request->hasFile('files')) {
+            $request->validate([
+                'files' => 'required|array',
+                'files.*' => 'required|image|mimes:jpeg,png,jpg,webp,gif,svg|max:10240',
+            ]);
+
+            $uploaded = [];
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('landing', 'public');
+                $uploaded[] = [
+                    'url' => asset('storage/'.$path),
+                    'path' => $path,
+                    'name' => $file->getClientOriginalName(),
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'files' => $uploaded,
+                'urls' => array_column($uploaded, 'url'),
+                'message' => count($uploaded).' টি ছবি সফলভাবে আপলোড হয়েছে!',
+            ]);
+        }
+
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif,svg|max:10240',
+        ]);
+
+        $path = $request->file('image')->store('landing', 'public');
+
+        return response()->json([
+            'success' => true,
+            'url' => asset('storage/'.$path),
+            'path' => $path,
+            'message' => 'ছবি সফলভাবে আপলোড হয়েছে!',
+        ]);
+    }
+
     public function builder(LandingPage $landingPage): View
     {
         $landingPage->load('product.category');
@@ -136,9 +176,27 @@ class LandingPageController extends Controller
         $settings = Setting::all()->pluck('value', 'key')->toArray();
 
         $contentBlocks = [];
+        $pageTheme = [
+            'preset' => 'emerald',
+            'page_bg' => '#0f172a',
+            'card_bg' => '#1e293b',
+            'primary_color' => '#10b981',
+            'text_color' => '#ffffff',
+            'muted_color' => '#94a3b8',
+        ];
+
         if (! empty($landingPage->content)) {
             $decoded = json_decode($landingPage->content, true);
-            $contentBlocks = is_array($decoded) ? $decoded : [];
+            if (is_array($decoded)) {
+                if (isset($decoded['blocks']) && is_array($decoded['blocks'])) {
+                    $contentBlocks = $decoded['blocks'];
+                    if (isset($decoded['theme']) && is_array($decoded['theme'])) {
+                        $pageTheme = array_merge($pageTheme, $decoded['theme']);
+                    }
+                } else {
+                    $contentBlocks = $decoded;
+                }
+            }
         }
 
         return view('admin.landing.builder', compact(
@@ -146,6 +204,7 @@ class LandingPageController extends Controller
             'product',
             'templates',
             'contentBlocks',
+            'pageTheme',
             'settings'
         ));
     }
@@ -154,6 +213,7 @@ class LandingPageController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required',
+            'theme' => 'nullable|array',
             'custom_css' => 'nullable|string',
             'custom_js' => 'nullable|string',
             'seo_title' => 'nullable|string|max:255',
@@ -163,9 +223,16 @@ class LandingPageController extends Controller
             'gtm_id' => 'nullable|string|max:100',
         ]);
 
-        $contentJson = is_array($request->content)
-            ? json_encode($request->content)
-            : (string) $request->content;
+        if ($request->has('theme') && is_array($request->content)) {
+            $contentJson = json_encode([
+                'blocks' => $request->content,
+                'theme' => $request->theme,
+            ]);
+        } else {
+            $contentJson = is_array($request->content)
+                ? json_encode($request->content)
+                : (string) $request->content;
+        }
 
         // Save revision
         LandingPageVersion::create([
