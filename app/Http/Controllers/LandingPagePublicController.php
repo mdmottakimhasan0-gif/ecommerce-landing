@@ -121,6 +121,7 @@ class LandingPagePublicController extends Controller
             $orderNumber = 'DH-'.date('ymd').'-'.strtoupper(Str::random(4));
 
             $order = Order::create([
+                'user_id' => auth()->id(),
                 'order_number' => $orderNumber,
                 'customer_name' => $validated['customer_name'],
                 'phone' => $cleanPhone,

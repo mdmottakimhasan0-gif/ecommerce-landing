@@ -146,31 +146,42 @@
                             </button>
 
                             <!-- Dropdown Menu -->
-                            <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 text-xs font-semibold">
+                            <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 text-xs font-semibold">
                                 <div class="px-4 py-2.5 border-b border-slate-100">
                                     <span class="block text-slate-900 font-bold text-sm truncate">{{ Auth::user()->name }}</span>
-                                    <span class="block text-slate-500 text-[11px] truncate">{{ Auth::user()->email }}</span>
+                                    <span class="block text-slate-500 text-[11px] truncate">
+                                        @if(!empty(Auth::user()->phone))
+                                            {{ Auth::user()->phone }}
+                                        @else
+                                            {{ Auth::user()->email }}
+                                        @endif
+                                    </span>
                                     @if(Auth::user()->isAdmin())
-                                        <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">এডমিন (Admin)</span>
+                                        <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Admin</span>
                                     @else
-                                        <span class="inline-block mt-1 px-2 py-0.5 bg-slate-100 text-slate-700 rounded font-bold text-[10px]">কাস্টমার (Customer)</span>
+                                        <span class="inline-block mt-1 px-2 py-0.5 bg-slate-100 text-slate-700 rounded font-bold text-[10px]">Customer</span>
                                     @endif
                                 </div>
 
                                 @if(Auth::user()->isAdmin())
-                                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-emerald-700 font-bold">
-                                    <span>🛠️</span> <span>এডমিন ড্যাশবোর্ড</span>
+                                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 text-emerald-700 font-bold">
+                                    <span>🛠️</span> <span>Admin Dashboard</span>
                                 </a>
                                 @endif
 
-                                <a href="{{ route('tracking.index') }}" class="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
-                                    <span>📦</span> <span>আমার অর্ডারসমূহ</span>
+                                <a href="{{ route('customer.orders') }}" class="flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 text-slate-700 font-bold">
+                                    <span>📦</span> <span>My Orders</span>
                                 </a>
+
+                                <button type="button" onclick="document.getElementById('cartDrawerBtn')?.click(); toggleUserDropdown();" 
+                                        class="w-full text-left flex items-center gap-2.5 px-4 py-2 hover:bg-slate-50 text-slate-700 cursor-pointer">
+                                    <span>🛒</span> <span>My Cart</span>
+                                </button>
 
                                 <form action="{{ route('logout') }}" method="POST" class="border-t border-slate-100 mt-1">
                                     @csrf
-                                    <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer">
-                                        <span>🚪</span> <span>লগআউট</span>
+                                    <button type="submit" class="w-full text-left flex items-center gap-2.5 px-4 py-2 hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer">
+                                        <span>🚪</span> <span>Logout</span>
                                     </button>
                                 </form>
                             </div>
@@ -178,7 +189,7 @@
                             <!-- Guest User Icon Button -> Opens Login Modal -->
                             <button type="button" onclick="openGlobalLoginModal()"
                                     class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all cursor-pointer border-2 border-emerald-400/50"
-                                    title="লগইন করুন (Customer / Admin Login)">
+                                    title="Sign In / Register">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </button>
                         @endauth
@@ -476,8 +487,8 @@
     </a>
     @endif
 
-    <!-- Global Unified Login Modal (Customer / Admin) -->
-    <div id="globalLoginModal" class="fixed inset-0 z-50 overflow-y-auto {{ ($errors->has('email') || session('error')) && !Auth::check() ? '' : 'hidden' }}" aria-labelledby="login-modal-title" role="dialog" aria-modal="true">
+    <!-- Global Unified Auth Modal (Customer / Admin - Sign In & Register) -->
+    <div id="globalLoginModal" class="fixed inset-0 z-50 overflow-y-auto {{ ($errors->any() || session('error')) && !Auth::check() ? '' : 'hidden' }}" aria-labelledby="login-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <!-- Modal Backdrop -->
             <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs transition-opacity" onclick="closeGlobalLoginModal()"></div>
@@ -490,33 +501,54 @@
                 </button>
 
                 <!-- Modal Header -->
-                <div class="text-center mb-6">
+                <div class="text-center mb-5">
                     <div class="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner mb-3">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </div>
-                    <h3 class="text-xl font-black text-slate-800" id="login-modal-title">লগইন করুন / Sign In</h3>
-                    <p class="text-xs text-slate-500 mt-1">কাস্টমার বা এডমিন যেকোনো অ্যাকাউন্ট থেকে লগইন করতে পারবেন।</p>
+                    <h3 class="text-xl font-black text-slate-800 tracking-tight" id="login-modal-title">Sign In</h3>
                 </div>
 
-                @if(($errors->has('email') || session('error')) && !Auth::check())
+                <!-- Auth Mode Switcher Tabs -->
+                <div class="flex items-center bg-slate-100 p-1 rounded-2xl mb-5 border border-slate-200/80">
+                    <button type="button" id="authTabLoginBtn" onclick="switchAuthTab('login')"
+                            class="flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer bg-white text-slate-900 shadow-sm">
+                        Sign In
+                    </button>
+                    <button type="button" id="authTabRegisterBtn" onclick="switchAuthTab('register')"
+                            class="flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer text-slate-500 hover:text-slate-900">
+                        Register
+                    </button>
+                </div>
+
+                @if($errors->any() && !Auth::check())
                 <div class="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium">
-                    {{ $errors->first('email') ?: session('error') }}
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
                 </div>
                 @endif
 
-                <!-- Login Form -->
-                <form action="{{ route('login') }}" method="POST" class="space-y-4">
+                @if(session('error') && !Auth::check())
+                <div class="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium">
+                    {{ session('error') }}
+                </div>
+                @endif
+
+                <!-- 1. Sign In Form -->
+                <form id="authLoginForm" action="{{ route('login') }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">ইমেইল বা ফোন নম্বর <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Email or Phone Number <span class="text-rose-500">*</span></label>
                         <input type="text" name="email" value="{{ old('email') }}" required autofocus
-                               placeholder="আপনার ইমেইল বা ফোন নম্বর দিন"
+                               placeholder="e.g. 017XXXXXXXX or email@domain.com"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-bold text-slate-700">পাসওয়ার্ড <span class="text-rose-500">*</span></label>
+                            <label class="block text-xs font-bold text-slate-700">Password <span class="text-rose-500">*</span></label>
                         </div>
                         <input type="password" name="password" required
                                placeholder="••••••••"
@@ -526,22 +558,70 @@
                     <div class="flex items-center justify-between text-xs pt-1">
                         <label class="flex items-center gap-2 text-slate-600 cursor-pointer">
                             <input type="checkbox" name="remember" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
-                            <span>আমাকে মনে রাখুন</span>
+                            <span>Remember Me</span>
                         </label>
                     </div>
 
                     <button type="submit" 
                             class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-emerald-600/30 transition-all cursor-pointer">
-                        লগইন করুন
+                        Sign In
                     </button>
+
+                    <div class="text-center pt-2">
+                        <button type="button" onclick="switchAuthTab('register')" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold hover:underline cursor-pointer">
+                            Don't have an account? Register now →
+                        </button>
+                    </div>
                 </form>
 
-                <div class="mt-5 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
-                    <p class="flex items-center justify-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50/70 p-2.5 rounded-xl">
-                        <span>🛡️</span>
-                        <span>এডমিন অ্যাকাউন্ট দিয়ে লগইন করলে সরাসরি এডমিন ড্যাশবোর্ডে নিয়ে যাবে।</span>
-                    </p>
-                </div>
+                <!-- 2. Customer Registration Form -->
+                <form id="authRegisterForm" action="{{ route('register') }}" method="POST" class="space-y-3.5 hidden">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
+                        <input type="text" name="name" value="{{ old('name') }}" required
+                               placeholder="e.g. John Doe"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number <span class="text-rose-500">*</span></label>
+                        <input type="text" name="phone" value="{{ old('phone') }}" required
+                               placeholder="017XXXXXXXX"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Email Address (Optional)</label>
+                        <input type="email" name="email" value="{{ old('email') }}"
+                               placeholder="your@email.com"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Password <span class="text-rose-500">*</span></label>
+                            <input type="password" name="password" required placeholder="Min 6 chars"
+                                   class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Confirm Password <span class="text-rose-500">*</span></label>
+                            <input type="password" name="password_confirmation" required placeholder="Confirm password"
+                                   class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-emerald-600/30 transition-all cursor-pointer mt-1">
+                        Create Account
+                    </button>
+
+                    <div class="text-center pt-2">
+                        <button type="button" onclick="switchAuthTab('login')" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold hover:underline cursor-pointer">
+                            Already have an account? Sign in →
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -580,6 +660,36 @@
                 document.body.classList.remove('overflow-hidden');
             }
         }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('authLoginForm');
+            const regForm = document.getElementById('authRegisterForm');
+            const loginBtn = document.getElementById('authTabLoginBtn');
+            const regBtn = document.getElementById('authTabRegisterBtn');
+            const titleEl = document.getElementById('login-modal-title');
+
+            if (tab === 'register') {
+                loginForm?.classList.add('hidden');
+                regForm?.classList.remove('hidden');
+                loginBtn?.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+                loginBtn?.classList.add('text-slate-500');
+                regBtn?.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                regBtn?.classList.remove('text-slate-500');
+                if (titleEl) titleEl.textContent = 'Create Account';
+            } else {
+                regForm?.classList.add('hidden');
+                loginForm?.classList.remove('hidden');
+                regBtn?.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+                regBtn?.classList.add('text-slate-500');
+                loginBtn?.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                loginBtn?.classList.remove('text-slate-500');
+                if (titleEl) titleEl.textContent = 'Sign In';
+            }
+        }
+
+        @if(($errors->has('name') || $errors->has('phone') || $errors->has('password_confirmation')) && !Auth::check())
+            document.addEventListener('DOMContentLoaded', () => switchAuthTab('register'));
+        @endif
 
         // Close dropdown / modal on outside click or ESC
         document.addEventListener('click', function(e) {
@@ -974,14 +1084,18 @@
             "ট্র্যাকিং আইডি:": "Tracking ID:",
             "কনসাইনমেন্ট আইডি:": "Consignment ID:",
 
-            // Login Modal
-            "লগইন করুন / Sign In": "Sign In / Login",
-            "কাস্টমার বা এডমিন যেকোনো অ্যাকাউন্ট থেকে লগইন করতে পারবেন।": "Customer or Admin can log in from any account.",
-            "ইমেইল বা ফোন নম্বর": "Email or Phone Number",
-            "পাসওয়ার্ড": "Password",
-            "আমাকে মনে রাখুন": "Remember Me",
-            "লগইন করুন": "Sign In",
-            "এডমিন অ্যাকাউন্ট দিয়ে লগইন করলে সরাসরি এডমিন ড্যাশবোর্ডে নিয়ে যাবে।": "Admin account login will redirect directly to Admin Dashboard."
+            // Auth & Account
+            "Sign In": "লগইন",
+            "Register": "রেজিস্ট্রেশন",
+            "Create Account": "অ্যাকাউন্ট তৈরি করুন",
+            "My Orders": "আমার অর্ডারসমূহ",
+            "My Cart": "আমার কার্ট",
+            "Logout": "লগআউট",
+            "Admin Dashboard": "এডমিন ড্যাশবোর্ড",
+            "Track Order": "অর্ডার ট্র্যাক করুন",
+            "Email or Phone Number": "ইমেইল বা ফোন নম্বর",
+            "Password": "পাসওয়ার্ড",
+            "Remember Me": "আমাকে মনে রাখুন",
         };
 
         const placeholderMap = {
@@ -1059,7 +1173,7 @@
             }
         }
 
-        let currentLang = localStorage.getItem('demandhat_lang') || 'bn';
+        let currentLang = localStorage.getItem('demandhat_lang') || 'en';
 
         function applyLanguage(lang) {
             currentLang = lang;

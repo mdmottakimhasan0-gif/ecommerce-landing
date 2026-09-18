@@ -1,20 +1,8 @@
 @extends('admin.layout')
 
-@section('title', 'অর্ডার ম্যানেজমেন্ট - এডমিন প্যানেল')
+@section('title', 'Order Management - Admin Panel')
 
 @section('top_actions')
-    <!-- Language Switcher Toggle (Persistent in localStorage) -->
-    <div class="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-xl shadow-2xs text-xs font-bold">
-        <button type="button" onclick="setLanguage('bn')" id="btnLangBn" class="px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer bg-slate-900 text-white shadow-xs">
-            <span>🇧🇩</span>
-            <span>বাংলা</span>
-        </button>
-        <button type="button" onclick="setLanguage('en')" id="btnLangEn" class="px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer text-slate-600 hover:text-slate-900">
-            <span>🇬🇧</span>
-            <span>English</span>
-        </button>
-    </div>
-
     <!-- Batch Courier Sync Button -->
     <form action="{{ route('admin.orders.syncAllCouriers') }}" method="POST" onsubmit="return confirm('সকল সক্রিয় কুরিয়ার পার্সেলের লাইভ স্ট্যাটাস আপডেট করতে চান?')">
         @csrf

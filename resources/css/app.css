@@ -47,3 +47,91 @@ button:active, .btn-quick-buy:active, .btn-add-to-cart:active {
 ::-webkit-scrollbar-thumb:hover {
     background: #64748b;
 }
+
+/* ==========================================================================
+   Admin Dark Mode Theme Overrides
+   ========================================================================== */
+html.dark, html.dark body {
+    background-color: #0b1120 !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark aside {
+    background-color: #030712 !important;
+    border-color: #1f2937 !important;
+}
+
+html.dark header.admin-top-header {
+    background-color: #0b1120 !important;
+    border-color: #1f2937 !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark .bg-white {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    color: #f9fafb !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/50,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-100 {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+    color: #f9fafb !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600 {
+    color: #d1d5db !important;
+}
+
+html.dark .text-slate-500 {
+    color: #9ca3af !important;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/90,
+html.dark .border-slate-100,
+html.dark .border-slate-300 {
+    border-color: #1f2937 !important;
+}
+
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1f2937 !important;
+}
+
+html.dark thead {
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f9fafb !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #6b7280 !important;
+}
+
+html.dark .bg-slate-900 {
+    background-color: #030712 !important;
+}
+
+html.dark .border-slate-800 {
+    border-color: #1f2937 !important;
+}
+

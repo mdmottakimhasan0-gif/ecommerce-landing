@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LandingPagePublicController;
 use App\Http\Controllers\OrderTrackingController;
@@ -39,7 +40,11 @@ Route::post('/track-order', [OrderTrackingController::class, 'search'])->name('t
 // Unified Customer & Admin Auth
 Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
+Route::post('/register', [AdminAuthController::class, 'register'])->name('register');
 Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+// Customer Protected Portal
+Route::get('/my-orders', [CustomerOrderController::class, 'index'])->middleware('auth')->name('customer.orders');
 
 /*
 |--------------------------------------------------------------------------
