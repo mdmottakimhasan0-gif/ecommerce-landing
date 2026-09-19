@@ -23,7 +23,7 @@
         $b3 = $homeBanners['banner3'];
     @endphp
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             <!-- Main Hero Carousel / Banner 1 (Left 2/3) -->
             @php
@@ -163,7 +163,7 @@
     </section>
 
     <!-- Trust Features Bar -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
             <div class="flex items-center gap-3 p-2">
                 <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl flex-shrink-0">
@@ -205,7 +205,7 @@
     </section>
 
     <!-- Category Showcase Carousel -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-lg sm:text-2xl font-black text-slate-900 flex items-center gap-2">
@@ -228,7 +228,7 @@
         </div>
 
         <!-- Carousel Container / Track -->
-        <div class="relative group/carousel">
+        <div class="relative group/carousel max-w-full overflow-hidden">
             <div id="categoryCarouselTrack" 
                  class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-2 px-1 snap-x snap-mandatory no-scrollbar"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
@@ -255,8 +255,8 @@
 
     <!-- Flash Deals Section with Countdown Urgency Timer -->
     @if($flashDeals->isNotEmpty())
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-gradient-to-r from-rose-600 via-rose-700 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-rose-600 via-rose-700 to-amber-700 rounded-3xl p-4 sm:p-8 text-white shadow-xl overflow-hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-rose-500/60">
                 <div>
                     <span class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-black/20 px-3 py-1 rounded-full text-rose-200 mb-1">
@@ -318,9 +318,9 @@
                                 @endif
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-2 gap-1.5 sm:gap-2">
                                 <button type="button" 
-                                        class="btn-quick-buy w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                        class="btn-quick-buy w-full py-2 px-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer truncate"
                                         data-id="{{ $product->id }}"
                                         data-name="{{ $product->name }}"
                                         data-price="{{ $product->sale_price }}"
@@ -328,7 +328,7 @@
                                     <span data-i18n="btn_order_now">⚡ অর্ডার করুন</span>
                                 </button>
                                 <button type="button" 
-                                        class="btn-add-to-cart w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                        class="btn-add-to-cart w-full py-2 px-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] sm:text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer truncate"
                                         data-id="{{ $product->id }}"
                                         data-name="{{ $product->name }}"
                                         data-slug="{{ $product->slug }}"
@@ -347,7 +347,7 @@
     @endif
 
     <!-- Featured Products Showcase -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-lg sm:text-2xl font-black text-slate-900 flex items-center gap-2">
@@ -396,7 +396,7 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                             <button type="button" 
-                                    class="btn-quick-buy w-full py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                    class="btn-quick-buy w-full py-1.5 sm:py-2 px-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer truncate"
                                     data-id="{{ $product->id }}"
                                     data-name="{{ $product->name }}"
                                     data-price="{{ $product->sale_price }}"
@@ -404,7 +404,7 @@
                                 <span data-i18n="order_now">অর্ডার করুন</span>
                             </button>
                             <button type="button" 
-                                    class="btn-add-to-cart w-full py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                    class="btn-add-to-cart w-full py-1.5 sm:py-2 px-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] sm:text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer truncate"
                                     data-id="{{ $product->id }}"
                                     data-name="{{ $product->name }}"
                                     data-slug="{{ $product->slug }}"
@@ -421,7 +421,7 @@
     </section>
 
     <!-- Customer Reviews & Social Proof -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-sm">
             <div class="text-center max-w-xl mx-auto mb-8">
                 <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full" data-i18n="reviews_badge">সম্মানিত গ্রাহকদের মতামত</span>
@@ -479,7 +479,7 @@
     </section>
 
     <!-- Support Hotline & Fast Order CTA Banner -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="bg-gradient-to-r from-emerald-800 via-slate-900 to-teal-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-emerald-700/50">
             <div class="space-y-2 text-center md:text-left">
                 <h3 class="text-xl sm:text-2xl font-black">যেকোনো প্রশ্ন বা ফোনে সরাসরি অর্ডার করতে চান?</h3>

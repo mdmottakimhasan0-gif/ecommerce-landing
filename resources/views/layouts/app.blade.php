@@ -68,7 +68,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+<body class="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white max-w-full overflow-x-hidden">
     @if(!empty($settings['gtm_id']))
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $settings['gtm_id'] }}"
@@ -90,16 +90,16 @@
 
     <!-- Main Navigation Header -->
     <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div class="flex items-center justify-between gap-3 sm:gap-4">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+            <div class="flex items-center justify-between gap-2 sm:gap-4">
                 
                 <!-- Logo -->
-                <a href="{{ route('home') }}" class="flex items-center gap-2.5 flex-shrink-0 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-105 transition-transform">
+                <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 group">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-md group-hover:scale-105 transition-transform flex-shrink-0">
                         D
                     </div>
                     <div>
-                        <span class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 block leading-tight">
+                        <span class="text-lg sm:text-2xl font-black tracking-tight text-slate-900 block leading-tight">
                             DEMAND<span class="text-emerald-600">HAT</span>
                         </span>
                         <span class="text-[10px] text-slate-500 tracking-wider uppercase font-semibold hidden sm:block">Smart eCommerce BD</span>
@@ -126,13 +126,13 @@
                 </div>
 
                 <!-- Right Actions: Track Order Button, User Profile Icon, Cart Trigger -->
-                <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
 
-                    <!-- Track Order Button (Replaces WhatsApp Order button) -->
+                    <!-- Track Order Button -->
                     <a href="{{ route('tracking.index') }}" 
-                       class="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs"
+                       class="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5 flex-shrink-0"
                        title="অর্ডার ট্র্যাক করুন">
-                        <span>📦</span>
+                        <span class="text-sm">📦</span>
                         <span class="hidden sm:inline" data-i18n="track_order">অর্ডার ট্র্যাক করুন</span>
                     </a>
 
@@ -140,9 +140,9 @@
                     <div class="relative flex-shrink-0" id="userAuthContainer">
                         @auth
                             <button type="button" id="userMenuBtn" onclick="toggleUserDropdown()"
-                                    class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all cursor-pointer border-2 border-emerald-400/50"
+                                    class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all cursor-pointer border-2 border-emerald-400/50 flex-shrink-0"
                                     title="{{ Auth::user()->name }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </button>
 
                             <!-- Dropdown Menu -->
@@ -188,34 +188,36 @@
                         @else
                             <!-- Guest User Icon Button -> Opens Login Modal -->
                             <button type="button" onclick="openGlobalLoginModal()"
-                                    class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all cursor-pointer border-2 border-emerald-400/50"
+                                    class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all cursor-pointer border-2 border-emerald-400/50 flex-shrink-0"
                                     title="Sign In / Register">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </button>
                         @endauth
                     </div>
 
-                    <!-- Cart Drawer Trigger Button -->
-                    <button id="cartDrawerBtn" type="button" class="relative flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <!-- Cart Drawer Trigger Button (Mobile Compact Icon Button + Absolute Badge) -->
+                    <button id="cartDrawerBtn" type="button" 
+                            class="relative w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 flex-shrink-0"
+                            title="Shopping Cart">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                         <span class="hidden sm:inline" data-i18n="cart">কার্ট</span>
-                        <span id="cartCountBadge" class="bg-amber-400 text-slate-950 text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">0</span>
+                        <span id="cartCountBadge" class="absolute -top-1.5 -right-1.5 sm:static bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-black min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-auto px-1 sm:px-1.5 py-0 sm:py-0.5 rounded-full flex items-center justify-center shadow-sm text-center">0</span>
                     </button>
                 </div>
             </div>
 
             <!-- Mobile Search Bar -->
-            <div class="mt-3 md:hidden flex items-center gap-2">
+            <div class="mt-2.5 md:hidden flex items-center gap-2">
                 <form action="{{ route('products.index') }}" method="GET" class="flex-1 relative">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="মধু, চপার বা গ্যাজেট খুঁজুন..." data-i18n-placeholder="search_placeholder"
-                           class="w-full pl-4 pr-10 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white">
+                           class="w-full pl-3.5 pr-9 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white">
                     <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-600 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </button>
                 </form>
 
                 <!-- Mobile Language Switcher Button -->
-                <button type="button" onclick="toggleLanguage()" class="px-2.5 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold text-slate-700">
+                <button type="button" onclick="toggleLanguage()" class="px-2.5 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 flex-shrink-0 cursor-pointer" title="Switch Language">
                     <span id="headerLangFlagMobile">🇧🇩</span>
                 </button>
             </div>
@@ -235,12 +237,12 @@
             $alignClass = $navAlignment === 'center' ? 'justify-center' : ($navAlignment === 'right' ? 'justify-end' : 'justify-start');
         @endphp
 
-        <nav class="bg-slate-100/90 border-t border-slate-200/80 px-4 sm:px-6 lg:px-8 overflow-x-auto whitespace-nowrap">
-            <div class="max-w-7xl mx-auto flex items-center gap-6 py-2.5 text-xs sm:text-sm font-medium text-slate-700 {{ $alignClass }}">
+        <nav class="bg-slate-100/90 border-t border-slate-200/80 px-3 sm:px-6 lg:px-8 overflow-x-auto whitespace-nowrap">
+            <div class="max-w-7xl mx-auto flex items-center gap-4 sm:gap-6 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-slate-700 justify-start sm:{{ $alignClass }}">
                 @foreach($headerNavItems as $navItem)
                     @if(!empty($navItem['is_active']))
                     <a href="{{ $navItem['url'] ?? '#' }}" 
-                       class="hover:text-emerald-600 flex items-center gap-1.5 transition-colors {{ request()->fullUrlIs(url($navItem['url'] ?? '#')) || request()->is(ltrim($navItem['url'] ?? '#', '/')) ? 'text-emerald-600 font-bold' : '' }}">
+                       class="hover:text-emerald-600 flex items-center gap-1.5 transition-colors flex-shrink-0 {{ request()->fullUrlIs(url($navItem['url'] ?? '#')) || request()->is(ltrim($navItem['url'] ?? '#', '/')) ? 'text-emerald-600 font-bold' : '' }}">
                         @if(!empty($navItem['icon']))
                             <span>{{ $navItem['icon'] }}</span>
                         @endif
@@ -251,6 +253,7 @@
             </div>
         </nav>
     </header>
+
 
     <!-- Main Content Area -->
     <main class="flex-grow">

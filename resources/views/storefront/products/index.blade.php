@@ -99,7 +99,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                         <button type="button" 
-                                class="btn-quick-buy w-full py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                class="btn-quick-buy w-full py-1.5 sm:py-2 px-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer truncate"
                                 data-id="{{ $product->id }}"
                                 data-name="{{ $product->name }}"
                                 data-price="{{ $product->sale_price }}"
@@ -107,7 +107,7 @@
                             <span data-i18n="order_now">অর্ডার করুন</span>
                         </button>
                         <button type="button" 
-                                class="btn-add-to-cart w-full py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+                                class="btn-add-to-cart w-full py-1.5 sm:py-2 px-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] sm:text-xs font-bold rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 text-center cursor-pointer truncate"
                                 data-id="{{ $product->id }}"
                                 data-name="{{ $product->name }}"
                                 data-slug="{{ $product->slug }}"
