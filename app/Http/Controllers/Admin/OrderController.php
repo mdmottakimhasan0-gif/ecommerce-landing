@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Services\CourierService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -43,14 +44,39 @@ class OrderController extends Controller
             'cancelled' => Order::where('status', 'cancelled')->count(),
         ];
 
-        return view('admin.orders.index', compact('orders', 'statusCounts'));
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+
+        return view('admin.orders.index', compact('orders', 'statusCounts', 'settings'));
     }
 
     public function show(Order $order): View
     {
         $order->load(['items.product', 'landingPage']);
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
 
-        return view('admin.orders.show', compact('order'));
+        return view('admin.orders.show', compact('order', 'settings'));
+    }
+
+    /**
+     * Printable Clean Invoice / Cash Memo (Print-optimized, no site chrome)
+     */
+    public function invoice(Order $order): View
+    {
+        $order->load(['items.product', 'landingPage']);
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+
+        return view('admin.orders.invoice', compact('order', 'settings'));
+    }
+
+    /**
+     * Printable Courier Parcel Delivery Sticker / Shipping Label (Thermal/Label format)
+     */
+    public function sticker(Order $order): View
+    {
+        $order->load(['items.product', 'landingPage']);
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+
+        return view('admin.orders.sticker', compact('order', 'settings'));
     }
 
     public function updateStatus(Request $request, Order $order): RedirectResponse
@@ -152,32 +178,38 @@ class OrderController extends Controller
             'phone' => 'required|string|max:30',
             'email' => 'nullable|string|max:255',
             'address' => 'required|string|max:500',
+            'delivery_area' => 'nullable|string|in:inside_dhaka,outside_dhaka',
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
             'payment_status' => 'required|in:pending,unpaid,paid',
             'subtotal' => 'required|numeric|min:0',
             'delivery_charge' => 'required|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         $subtotal = (float) $validated['subtotal'];
         $deliveryCharge = (float) $validated['delivery_charge'];
         $total = $subtotal + $deliveryCharge;
+        $deliveryArea = $validated['delivery_area'] ?? $order->delivery_area;
 
         $order->update([
             'customer_name' => $validated['customer_name'],
             'phone' => $validated['phone'],
-            'email' => $validated['email'],
+            'email' => $validated['email'] ?? $order->email,
             'address' => $validated['address'],
-            'status' => $validated['status'],
-            'payment_status' => $validated['payment_status'],
+            'delivery_area' => $deliveryArea,
+            'district' => $deliveryArea === 'inside_dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে',
+            'status' => $validated['status'] ?? $order->status,
+            'payment_status' => $validated['payment_status'] ?? $order->payment_status,
             'subtotal' => $subtotal,
             'delivery_charge' => $deliveryCharge,
             'total' => $total,
+            'notes' => array_key_exists('notes', $validated) ? $validated['notes'] : $order->notes,
         ]);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'অর্ডার সফলভাবে আপডেট করা হয়েছে!',
+                'message' => 'গ্রাহকের তথ্য ও ডেলিভারি এলাকা সফলভাবে আপডেট করা হয়েছে!',
                 'order' => [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
@@ -185,6 +217,7 @@ class OrderController extends Controller
                     'phone' => $order->phone,
                     'email' => $order->email,
                     'address' => $order->address,
+                    'delivery_area' => $order->delivery_area,
                     'status' => $order->status,
                     'payment_status' => $order->payment_status,
                     'subtotal' => $order->subtotal,
@@ -194,6 +227,6 @@ class OrderController extends Controller
             ]);
         }
 
-        return back()->with('success', 'অর্ডার সফলভাবে আপডেট করা হয়েছে!');
+        return back()->with('success', 'গ্রাহকের তথ্য ও ডেলিভারি এলাকা সফলভাবে আপডেট করা হয়েছে!');
     }
 }

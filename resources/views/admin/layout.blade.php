@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @if(app()->environment('production'))
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    @endif
     <title>@yield('title', 'Admin Panel - DemandHat BD')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +23,35 @@
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    <style>
+        @media print {
+            /* Hide dashboard chrome, top headers, sidebar, buttons, forms, floating elements */
+            aside,
+            header.admin-top-header,
+            .admin-top-header,
+            .no-print,
+            nav,
+            button,
+            form,
+            .modal,
+            [role="dialog"],
+            #adminLangToggleBtn,
+            #adminThemeToggleBtn {
+                display: none !important;
+            }
+
+            body, main, .max-w-7xl, .max-w-4xl {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
     @stack('styles')
 </head>
 <body class="font-sans antialiased bg-slate-100 text-slate-900 min-h-screen flex selection:bg-emerald-500 selection:text-white transition-colors duration-200">
@@ -103,6 +134,12 @@
                class="flex items-center gap-3 px-3 py-2 rounded-xl transition-colors {{ request()->routeIs('admin.couriers.*') ? 'bg-emerald-600 text-white shadow' : 'hover:bg-slate-800 hover:text-white' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
                 <span data-bn="কুরিয়ার ও শিপিং" data-en="Courier & Shipping">Courier & Shipping</span>
+            </a>
+
+            <a href="{{ route('admin.payments.index') }}" 
+               class="flex items-center gap-3 px-3 py-2 rounded-xl transition-colors {{ request()->routeIs('admin.payments.*') ? 'bg-emerald-600 text-white shadow' : 'hover:bg-slate-800 hover:text-white' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <span data-bn="পেমেন্ট ও হিস্ট্রি" data-en="Payments & History">Payments & History</span>
             </a>
 
             <a href="{{ route('admin.settings.index') }}" 

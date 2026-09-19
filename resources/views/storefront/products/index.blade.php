@@ -67,15 +67,17 @@
         @foreach($products as $product)
         <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
             <div class="relative rounded-xl overflow-hidden bg-slate-100 aspect-square mb-2 sm:mb-3">
-                <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                <a href="{{ route('products.show', $product->slug) }}" class="block w-full h-full">
+                    <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                </a>
                 @if($product->discount_percentage > 0)
-                <span class="absolute top-2 left-2 bg-rose-600 text-white font-black text-[10px] sm:text-xs px-2 py-0.5 rounded shadow">
+                <span class="absolute top-2 left-2 bg-rose-600 text-white font-black text-[10px] sm:text-xs px-2 py-0.5 rounded shadow pointer-events-none">
                     -{{ $product->discount_percentage }}%
                 </span>
                 @endif
                 @if($product->landingPages()->where('status', 'published')->exists())
                 <a href="{{ url('/' . $product->landingPages()->where('status', 'published')->first()->slug) }}" 
-                   class="absolute bottom-2 left-2 bg-emerald-600/95 hover:bg-emerald-700 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md flex items-center gap-1 backdrop-blur-sm">
+                   class="absolute bottom-2 left-2 bg-emerald-600/95 hover:bg-emerald-700 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md flex items-center gap-1 backdrop-blur-sm z-10">
                     <span>🚀 স্পেশাল অফার</span>
                 </a>
                 @endif

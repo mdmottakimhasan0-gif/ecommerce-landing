@@ -217,6 +217,7 @@
                                             'payment_status' => $order->payment_status,
                                             'subtotal' => (float) $order->subtotal,
                                             'delivery_charge' => (float) $order->delivery_charge,
+                                            'delivery_area' => $order->delivery_area ?: 'inside_dhaka',
                                             'total' => (float) $order->total,
                                         ]) }})" 
                                         data-title-bn="অর্ডার এডিট করুন"
@@ -227,6 +228,28 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                     </svg>
                                 </button>
+
+                                <!-- 5. Print Invoice (Clean Cash Memo) -->
+                                <a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank"
+                                   data-title-bn="ইনভয়েস প্রিন্ট"
+                                   data-title-en="Print Invoice"
+                                   title="ইনভয়েস প্রিন্ট"
+                                   class="w-7 h-7 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 flex items-center justify-center transition-colors active:scale-90">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </a>
+
+                                <!-- 6. Print Delivery Sticker (Thermal 4x6 Label) -->
+                                <a href="{{ route('admin.orders.sticker', $order->id) }}" target="_blank"
+                                   data-title-bn="ডেলিভারি স্টিকার"
+                                   data-title-en="Delivery Sticker"
+                                   title="ডেলিভারি স্টিকার"
+                                   class="w-7 h-7 rounded-lg text-purple-600 hover:text-purple-800 hover:bg-purple-50 flex items-center justify-center transition-colors active:scale-90">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                    </svg>
+                                </a>
                             </div>
                         </td>
                     </tr>
@@ -339,6 +362,36 @@
                             </div>
                         </div>
 
+                        <!-- Delivery Area Selector -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700">Delivery Area (ডেলিভারি এলাকা)</label>
+                                <span class="text-[10px] text-emerald-600 font-bold">সিলেক্টে চার্জ অটো সেট হবে</span>
+                            </div>
+                            @php
+                                $idxInsideFee = (float)($settings['delivery_inside_dhaka'] ?? 70);
+                                $idxOutsideFee = (float)($settings['delivery_outside_dhaka'] ?? 130);
+                            @endphp
+                            <div class="grid grid-cols-2 gap-2">
+                                <label id="idxAreaCardInside" class="flex items-center justify-between p-2.5 rounded-xl border-2 border-slate-200 cursor-pointer text-xs transition-all bg-slate-50">
+                                    <div class="flex items-center gap-2">
+                                        <input type="radio" name="edit_delivery_area" id="editAreaInside" value="inside_dhaka" 
+                                               onchange="onIndexAreaSelect('inside_dhaka', {{ $idxInsideFee }})" class="w-3.5 h-3.5 text-blue-600 cursor-pointer">
+                                        <span class="font-bold text-slate-800">Inside Dhaka</span>
+                                    </div>
+                                    <span class="text-[11px] font-black text-emerald-700">৳{{ number_format($idxInsideFee) }}</span>
+                                </label>
+                                <label id="idxAreaCardOutside" class="flex items-center justify-between p-2.5 rounded-xl border-2 border-slate-200 cursor-pointer text-xs transition-all bg-slate-50">
+                                    <div class="flex items-center gap-2">
+                                        <input type="radio" name="edit_delivery_area" id="editAreaOutside" value="outside_dhaka" 
+                                               onchange="onIndexAreaSelect('outside_dhaka', {{ $idxOutsideFee }})" class="w-3.5 h-3.5 text-blue-600 cursor-pointer">
+                                        <span class="font-bold text-slate-800">Outside Dhaka</span>
+                                    </div>
+                                    <span class="text-[11px] font-black text-blue-700">৳{{ number_format($idxOutsideFee) }}</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Subtotal & Delivery Fee -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
@@ -422,9 +475,43 @@
         document.getElementById('editSubtotal').value = parseFloat(order.subtotal || 0).toFixed(2);
         document.getElementById('editDeliveryFee').value = parseFloat(order.delivery_charge || 0).toFixed(2);
 
+        // Populate delivery area
+        const area = order.delivery_area || 'inside_dhaka';
+        const radioInside = document.getElementById('editAreaInside');
+        const radioOutside = document.getElementById('editAreaOutside');
+        if (area === 'inside_dhaka') {
+            if (radioInside) radioInside.checked = true;
+            if (radioOutside) radioOutside.checked = false;
+        } else {
+            if (radioOutside) radioOutside.checked = true;
+            if (radioInside) radioInside.checked = false;
+        }
+        updateIndexAreaCards(area);
+
         calculateEditGrandTotal();
 
         editModal.classList.remove('hidden');
+    }
+
+    function onIndexAreaSelect(area, fee) {
+        const feeInput = document.getElementById('editDeliveryFee');
+        if (feeInput) {
+            feeInput.value = parseFloat(fee).toFixed(2);
+        }
+        updateIndexAreaCards(area);
+        calculateEditGrandTotal();
+    }
+
+    function updateIndexAreaCards(area) {
+        const cardInside = document.getElementById('idxAreaCardInside');
+        const cardOutside = document.getElementById('idxAreaCardOutside');
+        if (area === 'inside_dhaka') {
+            if (cardInside) cardInside.className = 'flex items-center justify-between p-2.5 rounded-xl border-2 border-blue-500 bg-blue-50/60 cursor-pointer text-xs transition-all shadow-xs';
+            if (cardOutside) cardOutside.className = 'flex items-center justify-between p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 cursor-pointer text-xs transition-all';
+        } else {
+            if (cardOutside) cardOutside.className = 'flex items-center justify-between p-2.5 rounded-xl border-2 border-blue-500 bg-blue-50/60 cursor-pointer text-xs transition-all shadow-xs';
+            if (cardInside) cardInside.className = 'flex items-center justify-between p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 cursor-pointer text-xs transition-all';
+        }
     }
 
     function calculateEditGrandTotal() {
@@ -450,6 +537,7 @@
             email: document.getElementById('editCustomerEmail').value,
             phone: document.getElementById('editCustomerPhone').value,
             address: document.getElementById('editCustomerAddress').value,
+            delivery_area: document.querySelector('input[name="edit_delivery_area"]:checked')?.value || 'inside_dhaka',
             status: document.getElementById('editOrderStatus').value,
             payment_status: document.getElementById('editPaymentStatus').value,
             subtotal: parseFloat(document.getElementById('editSubtotal').value) || 0,
@@ -480,6 +568,12 @@
                     if (phoneEl) {
                         phoneEl.textContent = payload.phone;
                         phoneEl.href = `tel:${payload.phone}`;
+                    }
+
+                    const areaEl = row.querySelector('.order-delivery-area');
+                    if (areaEl) {
+                        const areaText = payload.delivery_area === 'inside_dhaka' ? 'ঢাকা সিটিতে' : 'ঢাকার বাইরে';
+                        areaEl.textContent = areaText;
                     }
 
                     const addrEl = row.querySelector('.order-address');

@@ -423,6 +423,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         recalcModalTotal();
         quickModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        // Reset payment selection to Cash on Delivery default
+        const codRadio = quickOrderForm?.querySelector('.quick-payment-radio[value="cash_on_delivery"]');
+        if (codRadio) codRadio.checked = true;
+        if (quickBkashAccordion) quickBkashAccordion.classList.add('hidden');
+        if (quickNagadAccordion) quickNagadAccordion.classList.add('hidden');
+        const dict = translations[window.currentLanguage] || translations.bn;
+        if (modalSubmitBtn) modalSubmitBtn.querySelector('span').textContent = dict.confirm_order || 'অর্ডার নিশ্চিত করুন (Cash on Delivery)';
+        const bSender = document.getElementById('quickBkashSender');
+        const bTrx = document.getElementById('quickBkashTrx');
+        const nSender = document.getElementById('quickNagadSender');
+        const nTrx = document.getElementById('quickNagadTrx');
+        if (bSender) bSender.value = '';
+        if (bTrx) bTrx.value = '';
+        if (nSender) nSender.value = '';
+        if (nTrx) nTrx.value = '';
 
         // Trigger InitiateCheckout event
         if (window.fbq) {
@@ -438,6 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeQuickModal = () => {
         if (quickModal) quickModal.classList.add('hidden');
         if (quickOrderError) quickOrderError.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
     };
 
     if (closeQuickModalBtn) closeQuickModalBtn.addEventListener('click', closeQuickModal);
@@ -462,7 +480,33 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // Quick payment method radio toggling
+    const quickBkashAccordion = document.getElementById('quickBkashAccordion');
+    const quickNagadAccordion = document.getElementById('quickNagadAccordion');
+
+    const handleQuickPaymentChange = () => {
+        const dict = translations[window.currentLanguage] || translations.bn;
+        const selected = quickOrderForm?.querySelector('.quick-payment-radio:checked')?.value || 'cash_on_delivery';
+        if (selected === 'bkash') {
+            quickBkashAccordion?.classList.remove('hidden');
+            quickNagadAccordion?.classList.add('hidden');
+            if (modalSubmitBtn) modalSubmitBtn.querySelector('span').textContent = 'বিকাশ পেমেন্ট ও অর্ডার নিশ্চিত করুন 🌸';
+        } else if (selected === 'nagad') {
+            quickNagadAccordion?.classList.remove('hidden');
+            quickBkashAccordion?.classList.add('hidden');
+            if (modalSubmitBtn) modalSubmitBtn.querySelector('span').textContent = 'নগদ পেমেন্ট ও অর্ডার নিশ্চিত করুন 🔶';
+        } else {
+            quickBkashAccordion?.classList.add('hidden');
+            quickNagadAccordion?.classList.add('hidden');
+            if (modalSubmitBtn) modalSubmitBtn.querySelector('span').textContent = dict.confirm_order || 'অর্ডার নিশ্চিত করুন (Cash on Delivery)';
+        }
+    };
+
     if (quickOrderForm) {
+        quickOrderForm.querySelectorAll('.quick-payment-radio').forEach(r => {
+            r.addEventListener('change', handleQuickPaymentChange);
+        });
+
         quickOrderForm.querySelectorAll('input[name="delivery_area"]').forEach(radio => {
             radio.addEventListener('change', recalcModalTotal);
         });
@@ -471,6 +515,44 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const dict = translations[window.currentLanguage] || translations.bn;
             if (quickOrderError) quickOrderError.classList.add('hidden');
+
+            const formData = new FormData(quickOrderForm);
+            const paymentMethod = formData.get('payment_method') || 'cash_on_delivery';
+            let senderNumber = '';
+            let trxId = '';
+
+            if (paymentMethod === 'bkash') {
+                senderNumber = formData.get('bkash_sender')?.trim();
+                trxId = formData.get('bkash_trx')?.trim();
+                if (!senderNumber) {
+                    quickOrderError.textContent = 'অনুগ্রহ করে আপনার বিকাশ মোবাইল নম্বরটি লিখুন।';
+                    quickOrderError.classList.remove('hidden');
+                    document.getElementById('quickBkashSender')?.focus();
+                    return;
+                }
+                if (!trxId) {
+                    quickOrderError.textContent = 'অনুগ্রহ করে বিকাশের Transaction ID (TrxID) টি লিখুন।';
+                    quickOrderError.classList.remove('hidden');
+                    document.getElementById('quickBkashTrx')?.focus();
+                    return;
+                }
+            } else if (paymentMethod === 'nagad') {
+                senderNumber = formData.get('nagad_sender')?.trim();
+                trxId = formData.get('nagad_trx')?.trim();
+                if (!senderNumber) {
+                    quickOrderError.textContent = 'অনুগ্রহ করে আপনার নগদ মোবাইল নম্বরটি লিখুন।';
+                    quickOrderError.classList.remove('hidden');
+                    document.getElementById('quickNagadSender')?.focus();
+                    return;
+                }
+                if (!trxId) {
+                    quickOrderError.textContent = 'অনুগ্রহ করে নগদের Transaction ID (TrxID) টি লিখুন।';
+                    quickOrderError.classList.remove('hidden');
+                    document.getElementById('quickNagadTrx')?.focus();
+                    return;
+                }
+            }
+
             modalSubmitBtn.disabled = true;
             modalSubmitBtn.innerHTML = `
                 <svg class="animate-spin h-5 w-5 text-white mr-2" fill="none" viewBox="0 0 24 24">
@@ -480,12 +562,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span>${dict.order_processing || 'অর্ডার তৈরি হচ্ছে...'}</span>
             `;
 
-            const formData = new FormData(quickOrderForm);
             const payload = {
                 customer_name: formData.get('customer_name'),
                 phone: formData.get('phone'),
                 address: formData.get('address'),
                 delivery_area: formData.get('delivery_area'),
+                payment_method: paymentMethod,
+                payment_sender_number: senderNumber || null,
+                transaction_id: trxId || null,
                 items: [
                     {
                         product_id: parseInt(formData.get('product_id')),
@@ -520,27 +604,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     quickOrderError.textContent = data.message || dict.order_failed;
                     quickOrderError.classList.remove('hidden');
                     modalSubmitBtn.disabled = false;
-                    modalSubmitBtn.innerHTML = `<span>${dict.confirm_order || 'অর্ডার নিশ্চিত করুন (Cash on Delivery)'}</span>`;
+                    handleQuickPaymentChange();
                 }
             } catch (err) {
                 quickOrderError.textContent = dict.server_error;
                 quickOrderError.classList.remove('hidden');
                 modalSubmitBtn.disabled = false;
-                modalSubmitBtn.innerHTML = `<span>${dict.confirm_order || 'অর্ডার নিশ্চিত করুন (Cash on Delivery)'}</span>`;
+                handleQuickPaymentChange();
             }
         });
     }
+
+    // Expose openQuickModal globally
+    window.openQuickModal = openQuickModal;
 
     // Attach quick buy button clicks across the site
     document.querySelectorAll('.btn-quick-buy').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+            const qtyInput = document.getElementById('productQty');
+            const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : (parseInt(btn.dataset.quantity) || 1);
             const product = {
                 id: parseInt(btn.dataset.id),
                 name: btn.dataset.name,
                 price: parseFloat(btn.dataset.price),
                 thumbnail: btn.dataset.thumbnail,
-                quantity: 1
+                quantity: qty
             };
             openQuickModal(product);
         });

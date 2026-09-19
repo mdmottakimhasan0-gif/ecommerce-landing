@@ -107,4 +107,26 @@ class OrderManagementTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['customer_name', 'status', 'subtotal', 'address', 'delivery_charge', 'payment_status', 'phone']);
     }
+
+    public function test_admin_can_view_printable_invoice(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.orders.invoice', $this->order->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.orders.invoice');
+        $response->assertSee($this->order->order_number);
+        $response->assertSee($this->order->customer_name);
+        $response->assertSee('INVOICE');
+    }
+
+    public function test_admin_can_view_printable_delivery_sticker(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.orders.sticker', $this->order->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.orders.sticker');
+        $response->assertSee($this->order->order_number);
+        $response->assertSee($this->order->phone);
+        $response->assertSee('COD');
+    }
 }

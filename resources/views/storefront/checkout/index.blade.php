@@ -87,22 +87,152 @@
                 </div>
             </div>
 
-            <!-- Payment Method: Cash on Delivery -->
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-black">২</span>
-                    <span>পেমেন্ট পদ্ধতি</span>
+            <!-- Payment Method: Cash on Delivery, bKash, Nagad -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-base font-bold text-slate-900 flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-black">২</span>
+                        <span>পেমেন্ট পদ্ধতি</span>
+                    </div>
+                    <span class="text-xs text-slate-400 font-normal">ক্যাশ অন ডেলিভারি অথবা মোবাইল ব্যাংকিং</span>
                 </h3>
-                <div class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">💵</span>
-                        <div>
-                            <span class="text-xs sm:text-sm font-bold text-slate-900 block">ক্যাশ অন ডেলিভারি (Cash on Delivery)</span>
-                            <span class="text-[11px] text-slate-600">পণ্য রিসিভ করার পর চেক করে ডেলিভারি ম্যানকে সম্পূর্ণ টাকা দিন।</span>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Cash on Delivery (Default) -->
+                    <label class="relative flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:p-4 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/70 transition-all text-center group">
+                        <div class="flex sm:flex-col items-center gap-2 sm:gap-1">
+                            <input type="radio" name="payment_method" value="cash_on_delivery" checked class="checkout-payment-radio sr-only">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">🚚</span>
+                            <div>
+                                <span class="text-xs font-black text-slate-800 block">Cash on Delivery</span>
+                                <span class="text-[10px] text-emerald-700 font-bold">হাতে পেয়ে দিন</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-black text-emerald-700 bg-white px-2 py-0.5 rounded-full border border-emerald-300 sm:hidden">ডিফল্ট</span>
+                    </label>
+
+                    <!-- bKash -->
+                    <label class="relative flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:p-4 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-[#E2136E] has-[:checked]:border-[#E2136E] has-[:checked]:bg-pink-50/70 transition-all text-center group">
+                        <div class="flex sm:flex-col items-center gap-2 sm:gap-1">
+                            <input type="radio" name="payment_method" value="bkash" class="checkout-payment-radio sr-only">
+                            <div class="w-7 h-7 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                    <rect width="100" height="100" rx="20" fill="#E2136E"/>
+                                    <path d="M72.2 46.8L51.8 19.3L34.1 36.5L47.5 49.3L27.6 62.4L51.8 77.2L55.4 57.5L72.2 46.8Z" fill="white"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-xs font-black text-slate-800 block">bKash</span>
+                                <span class="text-[10px] text-pink-700 font-bold">বিকাশ পেমেন্ট</span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Nagad -->
+                    <label class="relative flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:p-4 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-[#E31A22] has-[:checked]:border-[#E31A22] has-[:checked]:bg-red-50/70 transition-all text-center group">
+                        <div class="flex sm:flex-col items-center gap-2 sm:gap-1">
+                            <input type="radio" name="payment_method" value="nagad" class="checkout-payment-radio sr-only">
+                            <div class="w-7 h-7 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                    <rect width="100" height="100" rx="20" fill="#E31A22"/>
+                                    <circle cx="50" cy="50" r="28" fill="#F8981D"/>
+                                    <path d="M50 25C36.2 25 25 36.2 25 50C25 63.8 36.2 75 50 75C63.8 75 75 63.8 75 50" stroke="white" stroke-width="8" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-xs font-black text-slate-800 block">Nagad</span>
+                                <span class="text-[10px] text-red-700 font-bold">নগদ পেমেন্ট</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- bKash Accordion (Full page checkout) -->
+                <div id="checkoutBkashAccordion" class="hidden rounded-2xl border-2 border-[#E2136E]/40 bg-white overflow-hidden shadow-md">
+                    <div class="bg-[#E2136E] text-white p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow">
+                                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                    <path d="M72.2 46.8L51.8 19.3L34.1 36.5L47.5 49.3L27.6 62.4L51.8 77.2L55.4 57.5L72.2 46.8Z" fill="#E2136E"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-xs uppercase tracking-wider font-bold text-pink-200 block">{{ $settings['store_name'] ?? 'DemandHat BD' }}</span>
+                                <h5 class="text-sm sm:text-base font-mono font-black">{{ $settings['bkash_number'] ?? '01734107157' }}-{{ $settings['bkash_type'] ?? 'Send Money / Cash In' }}</h5>
+                            </div>
+                        </div>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ $settings['bkash_number'] ?? '01734107157' }}'); alert('বিকাশ নম্বর কপি করা হয়েছে!');"
+                                class="px-3 py-1.5 rounded-xl bg-white text-[#E2136E] text-xs font-black hover:bg-pink-100 transition-colors shadow flex items-center gap-1 cursor-pointer">
+                            <span>কপি নম্বর</span>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-3 bg-pink-50/40">
+                        <p class="text-xs text-pink-950 font-medium">
+                            {{ $settings['bkash_instructions'] ?? 'উক্ত বিকাশ নম্বরে মোট টাকা Send Money করে নিচের ঘরে আপনার বিকাশ নম্বর ও Transaction ID দিন।' }}
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">আপনার বিকাশ নম্বর <span class="text-rose-500">*</span></label>
+                                <input type="tel" id="checkoutBkashSender" placeholder="e.g. 01XXXXXXXXX"
+                                       class="w-full px-3.5 py-2.5 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E2136E] focus:outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Transaction ID (TrxID) <span class="text-rose-500">*</span></label>
+                                <input type="text" id="checkoutBkashTrx" placeholder="e.g. 9J4K8L7M2"
+                                       class="w-full px-3.5 py-2.5 text-xs font-mono uppercase font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E2136E] focus:outline-none bg-white">
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 text-center pt-1 border-t border-pink-100">
+                            Confirm and Process, terms & conditions • © 2025 bKash
                         </div>
                     </div>
-                    <span class="text-xs font-black text-emerald-700 bg-white px-2.5 py-1 rounded-full border border-emerald-300">ডিফল্ট</span>
                 </div>
+
+                <!-- Nagad Accordion (Full page checkout) -->
+                <div id="checkoutNagadAccordion" class="hidden rounded-2xl border-2 border-[#E31A22]/40 bg-white overflow-hidden shadow-md">
+                    <div class="bg-[#E31A22] text-white p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shadow">
+                                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                    <circle cx="50" cy="50" r="30" fill="#F8981D"/>
+                                    <path d="M50 25C36.2 25 25 36.2 25 50C25 63.8 36.2 75 50 75C63.8 75 75 63.8 75 50" stroke="#E31A22" stroke-width="12" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-xs uppercase tracking-wider font-bold text-red-200 block">{{ $settings['store_name'] ?? 'DemandHat BD' }}</span>
+                                <h5 class="text-sm sm:text-base font-mono font-black">{{ $settings['nagad_number'] ?? '01734107157' }}-{{ $settings['nagad_type'] ?? 'Send Money / Cash In' }}</h5>
+                            </div>
+                        </div>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ $settings['nagad_number'] ?? '01734107157' }}'); alert('নগদ নম্বর কপি করা হয়েছে!');"
+                                class="px-3 py-1.5 rounded-xl bg-white text-[#E31A22] text-xs font-black hover:bg-red-100 transition-colors shadow flex items-center gap-1 cursor-pointer">
+                            <span>কপি নম্বর</span>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-3 bg-red-50/40">
+                        <p class="text-xs text-red-950 font-medium">
+                            {{ $settings['nagad_instructions'] ?? 'উক্ত নগদ নম্বরে মোট টাকা Send Money করে নিচের ঘরে আপনার নগদ নম্বর ও Transaction ID দিন।' }}
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">আপনার নগদ নম্বর <span class="text-rose-500">*</span></label>
+                                <input type="tel" id="checkoutNagadSender" placeholder="e.g. 01XXXXXXXXX"
+                                       class="w-full px-3.5 py-2.5 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E31A22] focus:outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Transaction ID (TrxID) <span class="text-rose-500">*</span></label>
+                                <input type="text" id="checkoutNagadTrx" placeholder="e.g. 9J4K8L7M2"
+                                       class="w-full px-3.5 py-2.5 text-xs font-mono uppercase font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E31A22] focus:outline-none bg-white">
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 text-center pt-1 border-t border-red-100">
+                            Confirm and Process, terms & conditions • © 2025 Nagad
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden inputs for full form sync -->
+                <input type="hidden" name="payment_sender_number" id="finalPaymentSenderNumber" value="">
+                <input type="hidden" name="transaction_id" id="finalPaymentTransactionId" value="">
             </div>
         </div>
 
@@ -254,7 +384,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    form.addEventListener('submit', () => {
+    // Payment method accordion toggling
+    const paymentRadios = document.querySelectorAll('.checkout-payment-radio');
+    const bkashAccordion = document.getElementById('checkoutBkashAccordion');
+    const nagadAccordion = document.getElementById('checkoutNagadAccordion');
+    const submitBtn = document.getElementById('submitOrderBtn');
+    const finalSender = document.getElementById('finalPaymentSenderNumber');
+    const finalTrx = document.getElementById('finalPaymentTransactionId');
+
+    const handlePaymentChange = () => {
+        const selected = document.querySelector('.checkout-payment-radio:checked')?.value || 'cash_on_delivery';
+        if (selected === 'bkash') {
+            bkashAccordion?.classList.remove('hidden');
+            nagadAccordion?.classList.add('hidden');
+            if (submitBtn) submitBtn.querySelector('span').textContent = 'বিকাশ পেমেন্ট ও অর্ডার নিশ্চিত করুন 🌸';
+        } else if (selected === 'nagad') {
+            nagadAccordion?.classList.remove('hidden');
+            bkashAccordion?.classList.add('hidden');
+            if (submitBtn) submitBtn.querySelector('span').textContent = 'নগদ পেমেন্ট ও অর্ডার নিশ্চিত করুন 🔶';
+        } else {
+            bkashAccordion?.classList.add('hidden');
+            nagadAccordion?.classList.add('hidden');
+            if (submitBtn) submitBtn.querySelector('span').textContent = 'অর্ডার নিশ্চিত করুন (ক্যাশ অন ডেলিভারি)';
+        }
+    };
+
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', handlePaymentChange);
+    });
+
+    form.addEventListener('submit', (e) => {
+        const selectedMethod = document.querySelector('.checkout-payment-radio:checked')?.value || 'cash_on_delivery';
+        if (selectedMethod === 'bkash') {
+            const sender = document.getElementById('checkoutBkashSender')?.value.trim();
+            const trx = document.getElementById('checkoutBkashTrx')?.value.trim();
+            if (!sender) {
+                alert('অনুগ্রহ করে আপনার বিকাশ মোবাইল নম্বরটি লিখুন।');
+                document.getElementById('checkoutBkashSender')?.focus();
+                e.preventDefault();
+                return;
+            }
+            if (!trx) {
+                alert('অনুগ্রহ করে বিকাশের Transaction ID (TrxID) টি লিখুন।');
+                document.getElementById('checkoutBkashTrx')?.focus();
+                e.preventDefault();
+                return;
+            }
+            finalSender.value = sender;
+            finalTrx.value = trx;
+        } else if (selectedMethod === 'nagad') {
+            const sender = document.getElementById('checkoutNagadSender')?.value.trim();
+            const trx = document.getElementById('checkoutNagadTrx')?.value.trim();
+            if (!sender) {
+                alert('অনুগ্রহ করে আপনার নগদ মোবাইল নম্বরটি লিখুন।');
+                document.getElementById('checkoutNagadSender')?.focus();
+                e.preventDefault();
+                return;
+            }
+            if (!trx) {
+                alert('অনুগ্রহ করে নগদের Transaction ID (TrxID) টি লিখুন।');
+                document.getElementById('checkoutNagadTrx')?.focus();
+                e.preventDefault();
+                return;
+            }
+            finalSender.value = sender;
+            finalTrx.value = trx;
+        }
+
         // Clear local storage cart upon order submission
         if (!isBuyNow && window.cartStore) {
             window.cartStore.clear();

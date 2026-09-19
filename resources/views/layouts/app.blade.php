@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @if(app()->environment('production'))
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    @endif
     <title>@yield('title', ($settings['store_name'] ?? 'DemandHat BD') . ' - ' . ($settings['store_tagline'] ?? 'সেরা অনলাইন শপ'))</title>
     <meta name="description" content="@yield('meta_description', 'DemandHat BD - খাঁটি অর্গানিক ফুড, হোম ও কিচেন গ্যাজেট এবং ট্রেন্ডিং ইলেকট্রনিক্স পণ্যের বিশ্বস্ত অনলাইন শপ। সারাদেশে ক্যাশ অন ডেলিভারি।')">
 
@@ -458,6 +460,133 @@
                                 </div>
                                 <span class="text-xs font-black text-emerald-700">৳{{ $settings['delivery_outside_dhaka'] ?? 130 }}</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selector with Inline Accordion -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                            <span>পেমেন্ট পদ্ধতি নির্বাচন করুন <span class="text-rose-500">*</span></span>
+                            <span class="text-[10px] text-slate-400 font-normal">ক্যাশ অন ডেলিভারি অথবা মোবাইল ব্যাংকিং</span>
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <!-- Cash on Delivery (Default) -->
+                            <label class="relative flex flex-col items-center justify-center p-2.5 sm:p-3 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/70 transition-all text-center group">
+                                <input type="radio" name="payment_method" value="cash_on_delivery" checked class="sr-only quick-payment-radio">
+                                <span class="text-xl mb-1 group-hover:scale-110 transition-transform">🚚</span>
+                                <span class="text-[11px] sm:text-xs font-black text-slate-800 leading-tight">Cash on Delivery</span>
+                                <span class="text-[9px] text-emerald-700 mt-0.5 font-bold">হাতে পেয়ে দিন</span>
+                            </label>
+
+                            <!-- bKash -->
+                            <label class="relative flex flex-col items-center justify-center p-2.5 sm:p-3 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-[#E2136E] has-[:checked]:border-[#E2136E] has-[:checked]:bg-pink-50/70 transition-all text-center group">
+                                <input type="radio" name="payment_method" value="bkash" class="sr-only quick-payment-radio">
+                                <div class="w-6 h-6 mb-1 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                    <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                        <rect width="100" height="100" rx="20" fill="#E2136E"/>
+                                        <path d="M72.2 46.8L51.8 19.3L34.1 36.5L47.5 49.3L27.6 62.4L51.8 77.2L55.4 57.5L72.2 46.8Z" fill="white"/>
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-black text-slate-800 leading-tight">bKash</span>
+                                <span class="text-[9px] text-pink-700 mt-0.5 font-bold">বিকাশ পেমেন্ট</span>
+                            </label>
+
+                            <!-- Nagad -->
+                            <label class="relative flex flex-col items-center justify-center p-2.5 sm:p-3 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-[#E31A22] has-[:checked]:border-[#E31A22] has-[:checked]:bg-red-50/70 transition-all text-center group">
+                                <input type="radio" name="payment_method" value="nagad" class="sr-only quick-payment-radio">
+                                <div class="w-6 h-6 mb-1 group-hover:scale-110 transition-transform flex items-center justify-center">
+                                    <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                        <rect width="100" height="100" rx="20" fill="#E31A22"/>
+                                        <circle cx="50" cy="50" r="28" fill="#F8981D"/>
+                                        <path d="M50 25C36.2 25 25 36.2 25 50C25 63.8 36.2 75 50 75C63.8 75 75 63.8 75 50" stroke="white" stroke-width="8" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] sm:text-xs font-black text-slate-800 leading-tight">Nagad</span>
+                                <span class="text-[9px] text-red-700 mt-0.5 font-bold">নগদ পেমেন্ট</span>
+                            </label>
+                        </div>
+
+                        <!-- bKash Inline Accordion -->
+                        <div id="quickBkashAccordion" class="hidden mt-3 rounded-2xl border-2 border-[#E2136E]/30 bg-white overflow-hidden shadow-md">
+                            <div class="bg-[#E2136E] text-white p-3 sm:p-3.5 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center p-1 shadow">
+                                        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                            <path d="M72.2 46.8L51.8 19.3L34.1 36.5L47.5 49.3L27.6 62.4L51.8 77.2L55.4 57.5L72.2 46.8Z" fill="#E2136E"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-[11px] uppercase tracking-wider font-bold text-pink-200 block">{{ $settings['store_name'] ?? 'DemandHat BD' }}</span>
+                                        <h5 class="text-xs sm:text-sm font-mono font-black">{{ $settings['bkash_number'] ?? '01734107157' }}-{{ $settings['bkash_type'] ?? 'Send Money / Cash In' }}</h5>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $settings['bkash_number'] ?? '01734107157' }}'); alert('বিকাশ নম্বর কপি করা হয়েছে!');"
+                                        class="px-2.5 py-1 rounded-lg bg-white text-[#E2136E] text-[10px] font-black hover:bg-pink-100 transition-colors shadow flex items-center gap-1 cursor-pointer">
+                                    <span>কপি নম্বর</span>
+                                </button>
+                            </div>
+                            <div class="p-3.5 space-y-2.5 bg-pink-50/40">
+                                <p class="text-[11px] text-pink-950 font-medium">
+                                    {{ $settings['bkash_instructions'] ?? 'উক্ত বিকাশ নম্বরে মোট টাকা Send Money করে নিচের ঘরে আপনার বিকাশ নম্বর ও Transaction ID দিন।' }}
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">আপনার বিকাশ নম্বর <span class="text-rose-500">*</span></label>
+                                        <input type="tel" id="quickBkashSender" name="bkash_sender" placeholder="e.g. 01XXXXXXXXX"
+                                               class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E2136E] focus:outline-none bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Transaction ID (TrxID) <span class="text-rose-500">*</span></label>
+                                        <input type="text" id="quickBkashTrx" name="bkash_trx" placeholder="e.g. 9J4K8L7M2"
+                                               class="w-full px-3 py-2 text-xs font-mono uppercase font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E2136E] focus:outline-none bg-white">
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 text-center pt-1 border-t border-pink-100">
+                                    Confirm and Process, terms & conditions • © 2025 bKash
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nagad Inline Accordion -->
+                        <div id="quickNagadAccordion" class="hidden mt-3 rounded-2xl border-2 border-[#E31A22]/30 bg-white overflow-hidden shadow-md">
+                            <div class="bg-[#E31A22] text-white p-3 sm:p-3.5 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center p-1 shadow">
+                                        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none">
+                                            <circle cx="50" cy="50" r="30" fill="#F8981D"/>
+                                            <path d="M50 25C36.2 25 25 36.2 25 50C25 63.8 36.2 75 50 75" stroke="#E31A22" stroke-width="12" stroke-linecap="round"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-[11px] uppercase tracking-wider font-bold text-red-200 block">{{ $settings['store_name'] ?? 'DemandHat BD' }}</span>
+                                        <h5 class="text-xs sm:text-sm font-mono font-black">{{ $settings['nagad_number'] ?? '01734107157' }}-{{ $settings['nagad_type'] ?? 'Send Money / Cash In' }}</h5>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $settings['nagad_number'] ?? '01734107157' }}'); alert('নগদ নম্বর কপি করা হয়েছে!');"
+                                        class="px-2.5 py-1 rounded-lg bg-white text-[#E31A22] text-[10px] font-black hover:bg-red-100 transition-colors shadow flex items-center gap-1 cursor-pointer">
+                                    <span>কপি নম্বর</span>
+                                </button>
+                            </div>
+                            <div class="p-3.5 space-y-2.5 bg-red-50/40">
+                                <p class="text-[11px] text-red-950 font-medium">
+                                    {{ $settings['nagad_instructions'] ?? 'উক্ত নগদ নম্বরে মোট টাকা Send Money করে নিচের ঘরে আপনার নগদ নম্বর ও Transaction ID দিন।' }}
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">আপনার নগদ নম্বর <span class="text-rose-500">*</span></label>
+                                        <input type="tel" id="quickNagadSender" name="nagad_sender" placeholder="e.g. 01XXXXXXXXX"
+                                               class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E31A22] focus:outline-none bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Transaction ID (TrxID) <span class="text-rose-500">*</span></label>
+                                        <input type="text" id="quickNagadTrx" name="nagad_trx" placeholder="e.g. 9J4K8L7M2"
+                                               class="w-full px-3 py-2 text-xs font-mono uppercase font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#E31A22] focus:outline-none bg-white">
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 text-center pt-1 border-t border-red-100">
+                                    Confirm and Process, terms & conditions • © 2025 Nagad
+                                </div>
+                            </div>
                         </div>
                     </div>
 

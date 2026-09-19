@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\LandingPageController as AdminLandingPageController;
 use App\Http\Controllers\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
@@ -70,12 +71,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Orders & Fraud Check
         Route::get('orders/fraud-check', [AdminOrderController::class, 'fraudCheck'])->name('orders.fraudCheck');
+        Route::get('orders/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
+        Route::get('orders/{order}/sticker', [AdminOrderController::class, 'sticker'])->name('orders.sticker');
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update', 'destroy']);
         Route::match(['post', 'put'], 'orders/{order}/update-details', [AdminOrderController::class, 'updateDetails'])->name('orders.updateDetails');
         Route::post('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
         Route::post('orders/{order}/book-courier', [AdminOrderController::class, 'bookCourier'])->name('orders.bookCourier');
         Route::post('orders/{order}/sync-courier-status', [AdminOrderController::class, 'syncCourierStatus'])->name('orders.syncCourierStatus');
         Route::post('orders/sync-all-couriers', [AdminOrderController::class, 'syncAllCourierStatuses'])->name('orders.syncAllCouriers');
+
+        // Payment Gateways & Transaction History
+        Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+        Route::post('payments', [AdminPaymentController::class, 'updateSettings'])->name('payments.update');
+        Route::post('payments/{order}/status', [AdminPaymentController::class, 'updateStatus'])->name('payments.status');
 
         // Courier & Shipping Management (BD Courier, Steadfast, Pathao, RedX, Carrybee, etc.)
         Route::get('couriers', [AdminCourierController::class, 'index'])->name('couriers.index');

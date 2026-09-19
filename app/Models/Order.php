@@ -26,6 +26,8 @@ class Order extends Model
         'status',
         'payment_method',
         'payment_status',
+        'payment_sender_number',
+        'transaction_id',
         'landing_page_id',
         'notes',
         'courier_name',

@@ -6,7 +6,7 @@
 <div class="max-w-4xl mx-auto space-y-6 pb-20">
 
     <!-- Header Actions -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <div>
             <div class="flex items-center gap-3">
                 <h1 class="text-2xl font-black text-slate-900 font-mono">{{ $order->order_number }}</h1>
@@ -25,26 +25,38 @@
             <p class="text-xs text-slate-500 mt-1">অর্ডার তৈরির তারিখ: {{ $order->created_at->format('d M, Y - h:i A') }}</p>
         </div>
 
-        <div class="flex items-center gap-2">
-            <button onclick="window.print()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                <span>প্রিন্ট চালান</span>
-            </button>
-            <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 transition-colors">
+        <div class="flex items-center gap-2 flex-wrap">
+            <!-- 1. Dedicated Print Invoice (No headers, clean cash memo) -->
+            <a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank" 
+               class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+               title="ক্লিন ইনভয়েস / ক্যাশ মেমো প্রিন্ট করুন">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>ইনভয়েস প্রিন্ট</span>
+            </a>
+
+            <!-- 2. Dedicated Print Courier Sticker (Standard thermal 4x6 parcel label) -->
+            <a href="{{ route('admin.orders.sticker', $order->id) }}" target="_blank" 
+               class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+               title="কুরিয়ার পার্সেল ডেলিভারি স্টিকার প্রিন্ট করুন">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                <span>ডেলিভারি স্টিকার</span>
+            </a>
+
+            <a href="{{ route('admin.orders.index') }}" class="px-3.5 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 transition-colors">
                 ← সব অর্ডার
             </a>
         </div>
     </div>
 
     @if(session('success'))
-    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-sm">
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-sm no-print">
         <span class="text-base">✓</span>
         <span>{{ session('success') }}</span>
     </div>
     @endif
 
     <!-- Quick Status Update Card -->
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <div>
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">ডেলিভারি স্ট্যাটাস পরিবর্তন করুন</h3>
             <p class="text-xs text-slate-500 mt-0.5">কুরিয়ারে দেওয়া হলে বা ডেলিভারি সম্পন্ন হলে স্ট্যাটাস পরিবর্তন করুন</p>
@@ -67,9 +79,19 @@
 
     <!-- Details Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Customer Info with One-Click Call Button and Fraud Checker -->
+        <!-- Customer Info with One-Click Call Button, Fraud Checker, and Edit Info/Area Button -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-            <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">গ্রাহকের তথ্য</h3>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>👤</span> গ্রাহকের তথ্য
+                </h3>
+                <button type="button" onclick="openCustomerEditModal()" 
+                        class="no-print inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
+                        title="গ্রাহকের নাম, ফোন, ঠিকানা ও ডেলিভারি এলাকা পরিবর্তন করুন">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <span>তথ্য ও এলাকা এডিট</span>
+                </button>
+            </div>
             <div class="text-xs space-y-2.5">
                 <div>
                     <span class="text-slate-500 block">নাম:</span>
@@ -86,7 +108,7 @@
 
                         <!-- Direct Call Button -->
                         <a href="tel:{{ $order->phone }}" 
-                           class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                           class="no-print inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
                            title="গ্রাহককে সরাসরি ফোন কল করুন">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                             <span>কল করুন</span>
@@ -94,7 +116,7 @@
 
                         <!-- BD Courier Fraud Checker Button -->
                         <button type="button" onclick="openFraudChecker('{{ $order->phone }}')" 
-                                class="inline-flex items-center gap-1 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                                class="no-print inline-flex items-center gap-1 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
                                 title="বিডি কুরিয়ার ফ্রড ইন্টেলিজেন্স ও ডেলিভারি হিস্ট্রি চেক করুন">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                             <span>ফ্রড চেকার</span>
@@ -107,8 +129,26 @@
                     <span class="text-slate-800 leading-relaxed block">{{ $order->address }}</span>
                 </div>
                 <div>
-                    <span class="text-slate-500 block">ডেলিভারি এলাকা:</span>
-                    <strong class="text-slate-900">{{ $order->delivery_area === 'inside_dhaka' ? 'ঢাকা সিটিতে' : 'ঢাকার বাইরে' }}</strong>
+                    <span class="text-slate-500 block">ডেলিভারি এলাকা ও চার্জ:</span>
+                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                        @if($order->delivery_area === 'inside_dhaka')
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            ঢাকা সিটি (চার্জ: ৳{{ number_format($order->delivery_charge) }})
+                        </span>
+                        @else
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            ঢাকার বাইরে (চার্জ: ৳{{ number_format($order->delivery_charge) }})
+                        </span>
+                        @endif
+
+                        <button type="button" onclick="openCustomerEditModal()" 
+                                class="no-print inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 underline cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <span>এলাকা পরিবর্তন</span>
+                        </button>
+                    </div>
                 </div>
                 @if($order->notes)
                 <div class="pt-2 border-t border-slate-100">
@@ -121,14 +161,81 @@
 
         <!-- Order Source & Payment Info -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-            <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">পেমেন্ট ও অর্ডারের উৎস</h3>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-sm font-bold text-slate-900">পেমেন্ট ও অর্ডারের উৎস</h3>
+                @if($order->payment_status === 'paid')
+                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
+                    ✓ Paid
+                </span>
+                @else
+                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black uppercase">
+                    ⏳ Payment Pending
+                </span>
+                @endif
+            </div>
+
             <div class="text-xs space-y-3">
                 <div>
-                    <span class="text-slate-500 block">পেমেন্ট পদ্ধতি:</span>
-                    <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg font-bold">
-                        ক্যাশ অন ডেলিভারি (Cash on Delivery)
+                    <span class="text-slate-500 block mb-1">পেমেন্ট পদ্ধতি:</span>
+                    @if($order->payment_method === 'bkash')
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 text-[#E2136E] border border-pink-200 rounded-xl font-black text-xs">
+                        <span>🌸</span> বিকাশ পেমেন্ট (bKash)
                     </span>
+                    @elseif($order->payment_method === 'nagad')
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-[#E31A22] border border-red-200 rounded-xl font-black text-xs">
+                        <span>🔶</span> নগদ পেমেন্ট (Nagad)
+                    </span>
+                    @else
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold text-xs">
+                        <span>🚚</span> ক্যাশ অন ডেলিভারি (Cash on Delivery)
+                    </span>
+                    @endif
                 </div>
+
+                @if($order->payment_sender_number || $order->transaction_id)
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    @if($order->payment_sender_number)
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500">গ্রাহকের প্রেরক নম্বর:</span>
+                        <a href="tel:{{ $order->payment_sender_number }}" class="font-mono font-bold text-slate-900 hover:text-emerald-600">
+                            {{ $order->payment_sender_number }}
+                        </a>
+                    </div>
+                    @endif
+
+                    @if($order->transaction_id)
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500">Transaction ID (TrxID):</span>
+                        <div class="inline-flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-300 font-mono font-black text-slate-900 text-xs">
+                            <span>{{ $order->transaction_id }}</span>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ $order->transaction_id }}'); alert('TrxID কপি করা হয়েছে: {{ $order->transaction_id }}');" 
+                                    class="text-slate-400 hover:text-emerald-600 cursor-pointer ml-1" title="কপি করুন">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+                        <span class="text-slate-500">পেমেন্ট ভেরিফিকেশন:</span>
+                        <form action="{{ route('admin.payments.status', $order->id) }}" method="POST">
+                            @csrf
+                            @if($order->payment_status !== 'paid')
+                            <input type="hidden" name="payment_status" value="paid">
+                            <button type="submit" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all cursor-pointer">
+                                Mark as Paid ✓
+                            </button>
+                            @else
+                            <input type="hidden" name="payment_status" value="pending">
+                            <button type="submit" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer">
+                                Revert to Pending
+                            </button>
+                            @endif
+                        </form>
+                    </div>
+                </div>
+                @endif
+
                 <div>
                     <span class="text-slate-500 block">অর্ডারের উৎস (Source):</span>
                     @if($order->landingPage)
@@ -149,7 +256,7 @@
     <!-- ========================================================================= -->
     <!-- COURIER PARCEL BOOKING SECTION (Steadfast, Pathao, RedX, Carrybee)         -->
     <!-- ========================================================================= -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4 no-print">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
                 <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
@@ -328,11 +435,245 @@
 
 </div>
 
+<!-- Customer Info & Delivery Area Edit Modal -->
+<div id="customerEditModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Backdrop with blur -->
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="closeCustomerEditModal()"></div>
+
+    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 z-10">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </span>
+                    <div>
+                        <h3 class="text-sm font-black tracking-wide" id="modal-title">গ্রাহকের তথ্য ও ডেলিভারি এলাকা এডিট</h3>
+                        <p class="text-[11px] text-slate-300">এলাকা পরিবর্তনের সাথে সাথে ডেলিভারি চার্জ ও মোট মূল্য স্বয়ংক্রিয়ভাবে হিসাব হবে</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCustomerEditModal()" class="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-700/50 cursor-pointer transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Modal Form -->
+            <form action="{{ route('admin.orders.updateDetails', $order->id) }}" method="POST" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" name="status" value="{{ $order->status }}">
+                <input type="hidden" name="payment_status" value="{{ $order->payment_status }}">
+                <input type="hidden" name="subtotal" id="modal_subtotal" value="{{ $order->subtotal }}">
+
+                <!-- Customer Name -->
+                <div>
+                    <label for="edit_customer_name" class="block text-xs font-bold text-slate-700 mb-1">
+                        গ্রাহকের নাম <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" name="customer_name" id="edit_customer_name" value="{{ $order->customer_name }}" required
+                           class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:bg-white transition-all">
+                </div>
+
+                <!-- Customer Phone -->
+                <div>
+                    <label for="edit_phone" class="block text-xs font-bold text-slate-700 mb-1">
+                        মোবাইল নম্বর <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" name="phone" id="edit_phone" value="{{ $order->phone }}" required
+                           class="w-full text-xs font-mono font-bold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:bg-white transition-all">
+                </div>
+
+                <!-- Customer Address -->
+                <div>
+                    <label for="edit_address" class="block text-xs font-bold text-slate-700 mb-1">
+                        সম্পূর্ণ ডেলিভারি ঠিকানা <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="address" id="edit_address" rows="2" required
+                              class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:bg-white transition-all leading-relaxed">{{ $order->address }}</textarea>
+                </div>
+
+                <!-- Delivery Area Selection (Matches user's screenshot) -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-xs font-bold text-slate-700">
+                            ডেলিভারি এলাকা <span class="text-rose-500">*</span>
+                        </label>
+                        <span class="text-[11px] text-emerald-600 font-bold">সিলেক্ট করলে চার্জ অটো সেট হবে</span>
+                    </div>
+
+                    @php
+                        $insideDhakaFee = (float)($settings['delivery_inside_dhaka'] ?? 70);
+                        $outsideDhakaFee = (float)($settings['delivery_outside_dhaka'] ?? 130);
+                        $currentArea = $order->delivery_area ?: 'inside_dhaka';
+                    @endphp
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Inside Dhaka -->
+                        <label id="areaCardInside" 
+                               class="relative flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-all {{ $currentArea === 'inside_dhaka' ? 'border-emerald-500 bg-emerald-50/60 shadow-xs ring-1 ring-emerald-500/30' : 'border-slate-200 bg-slate-50/60 hover:border-slate-300' }}">
+                            <div class="flex items-center gap-2.5">
+                                <input type="radio" name="delivery_area" value="inside_dhaka" 
+                                       {{ $currentArea === 'inside_dhaka' ? 'checked' : '' }}
+                                       onchange="onDeliveryAreaSelect('inside_dhaka', {{ $insideDhakaFee }})"
+                                       class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                <div>
+                                    <div class="text-xs font-black text-slate-900">Inside Dhaka City</div>
+                                    <div class="text-[10px] text-slate-500">ঢাকা সিটিতে</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800">৳{{ number_format($insideDhakaFee) }}</span>
+                        </label>
+
+                        <!-- Outside Dhaka -->
+                        <label id="areaCardOutside" 
+                               class="relative flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-all {{ $currentArea === 'outside_dhaka' ? 'border-emerald-500 bg-emerald-50/60 shadow-xs ring-1 ring-emerald-500/30' : 'border-slate-200 bg-slate-50/60 hover:border-slate-300' }}">
+                            <div class="flex items-center gap-2.5">
+                                <input type="radio" name="delivery_area" value="outside_dhaka" 
+                                       {{ $currentArea === 'outside_dhaka' ? 'checked' : '' }}
+                                       onchange="onDeliveryAreaSelect('outside_dhaka', {{ $outsideDhakaFee }})"
+                                       class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                <div>
+                                    <div class="text-xs font-black text-slate-900">Outside Dhaka</div>
+                                    <div class="text-[10px] text-slate-500">ঢাকার বাইরে সারাদেশে</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black px-2 py-0.5 rounded-lg bg-blue-100 text-blue-800">৳{{ number_format($outsideDhakaFee) }}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Delivery Charge Editable Input -->
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="edit_delivery_charge" class="text-xs font-bold text-slate-700">
+                            ডেলিভারি চার্জ (টাকা) <span class="text-rose-500">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400">প্রয়োজনে কাস্টম ডেলিভারি চার্জ লিখতে পারেন</span>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-3.5 top-2.5 text-slate-400 font-bold text-xs">৳</span>
+                        <input type="number" name="delivery_charge" id="edit_delivery_charge" 
+                               value="{{ (int)$order->delivery_charge }}" 
+                               oninput="updateModalTotals()"
+                               step="1" min="0" required
+                               class="w-full pl-8 pr-3 text-xs font-mono font-bold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:bg-white transition-all">
+                    </div>
+                </div>
+
+                <!-- Optional Order Notes -->
+                <div>
+                    <label for="edit_notes" class="block text-xs font-bold text-slate-700 mb-1">অর্ডার নোট (ঐচ্ছিক)</label>
+                    <input type="text" name="notes" id="edit_notes" value="{{ $order->notes }}" 
+                           placeholder="যেমন: দ্রুত ডেলিভারি দিতে হবে"
+                           class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:bg-white transition-all">
+                </div>
+
+                <!-- Real-time Bill Calculation Breakdown -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 text-xs">
+                    <div class="flex items-center justify-between text-slate-600">
+                        <span>পণ্য সাবটোটাল:</span>
+                        <span class="font-mono font-bold text-slate-800">৳ {{ number_format($order->subtotal) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-600">
+                        <span>ডেলিভারি চার্জ:</span>
+                        <span class="font-mono font-bold text-slate-800" id="modalCalcChargeText">(+) ৳ {{ number_format($order->delivery_charge) }}</span>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200 flex items-center justify-between font-black text-sm">
+                        <span class="text-slate-900">সর্বমোট প্রদেয় বিল (Total):</span>
+                        <span class="text-emerald-700 font-mono text-base" id="modalCalcTotalText">৳ {{ number_format($order->total) }}</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeCustomerEditModal()" 
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+                        বাতিল
+                    </button>
+                    <button type="submit" 
+                            class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>আপডেট সংরক্ষণ করুন</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Reusable Fraud Detection Intelligence Modal -->
 @include('admin.orders._fraud_modal')
 
 @push('scripts')
 <script>
+    // Customer Info & Delivery Area Modal Functions
+    function openCustomerEditModal() {
+        const modal = document.getElementById('customerEditModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            updateModalTotals();
+        }
+    }
+
+    function closeCustomerEditModal() {
+        const modal = document.getElementById('customerEditModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    function onDeliveryAreaSelect(area, fee) {
+        const chargeInput = document.getElementById('edit_delivery_charge');
+        if (chargeInput) {
+            chargeInput.value = fee;
+        }
+
+        const cardInside = document.getElementById('areaCardInside');
+        const cardOutside = document.getElementById('areaCardOutside');
+
+        if (area === 'inside_dhaka') {
+            if (cardInside) {
+                cardInside.className = 'relative flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-all border-emerald-500 bg-emerald-50/60 shadow-xs ring-1 ring-emerald-500/30';
+            }
+            if (cardOutside) {
+                cardOutside.className = 'relative flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-all border-slate-200 bg-slate-50/60 hover:border-slate-300';
+            }
+        } else {
+            if (cardOutside) {
+                cardOutside.className = 'relative flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-all border-emerald-500 bg-emerald-50/60 shadow-xs ring-1 ring-emerald-500/30';
+            }
+            if (cardInside) {
+                cardInside.className = 'relative flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-all border-slate-200 bg-slate-50/60 hover:border-slate-300';
+            }
+        }
+
+        updateModalTotals();
+    }
+
+    function updateModalTotals() {
+        const subtotal = parseFloat(document.getElementById('modal_subtotal')?.value || 0);
+        const charge = parseFloat(document.getElementById('edit_delivery_charge')?.value || 0);
+        const total = subtotal + charge;
+
+        const chargeText = document.getElementById('modalCalcChargeText');
+        const totalText = document.getElementById('modalCalcTotalText');
+
+        if (chargeText) {
+            chargeText.textContent = `(+) ৳ ${charge.toLocaleString('en-US')}`;
+        }
+        if (totalText) {
+            totalText.textContent = `৳ ${total.toLocaleString('en-US')}`;
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeCustomerEditModal();
+        }
+    });
 
     async function syncLiveCourierStatus(orderId) {
         const btn = document.getElementById('btnSyncCourier');

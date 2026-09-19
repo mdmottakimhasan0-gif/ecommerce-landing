@@ -43,6 +43,9 @@ class CheckoutController extends Controller
             'items.*.quantity' => 'required|integer|min:1|max:50',
             'landing_page_id' => 'nullable|exists:landing_pages,id',
             'notes' => 'nullable|string|max:500',
+            'payment_method' => 'nullable|string|in:cash_on_delivery,bkash,nagad,rocket',
+            'payment_sender_number' => 'nullable|string|max:30',
+            'transaction_id' => 'nullable|string|max:100',
         ], [
             'customer_name.required' => 'আপনার নাম প্রদান করুন।',
             'phone.required' => 'আপনার সঠিক মোবাইল নম্বর প্রদান করুন।',
@@ -51,6 +54,17 @@ class CheckoutController extends Controller
             'delivery_area.required' => 'ডেলিভারি এলাকা নির্বাচন করুন।',
             'items.required' => 'অর্ডারের পণ্য পাওয়া যায়নি।',
         ]);
+
+        $paymentMethod = $request->input('payment_method', 'cash_on_delivery') ?: 'cash_on_delivery';
+        if (in_array($paymentMethod, ['bkash', 'nagad', 'rocket'])) {
+            $request->validate([
+                'payment_sender_number' => 'required|string|max:30',
+                'transaction_id' => 'required|string|max:100',
+            ], [
+                'payment_sender_number.required' => 'অনুগ্রহ করে আপনার প্রেরক মোবাইল নম্বর প্রদান করুন।',
+                'transaction_id.required' => 'অনুগ্রহ করে পেমেন্টের সঠিক Transaction ID (TrxID) প্রদান করুন।',
+            ]);
+        }
 
         // Clean phone number (remove +88 or leading spaces)
         $cleanPhone = preg_replace('/^(?:\+?88)/', '', trim($validated['phone']));
@@ -61,7 +75,7 @@ class CheckoutController extends Controller
 
         $district = $validated['district'] ?? ($validated['delivery_area'] === 'inside_dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে');
 
-        return DB::transaction(function () use ($validated, $cleanPhone, $deliveryCharge, $district, $request) {
+        return DB::transaction(function () use ($validated, $cleanPhone, $deliveryCharge, $district, $paymentMethod, $request) {
             $subtotal = 0.00;
             $orderItemsData = [];
 
@@ -104,8 +118,10 @@ class CheckoutController extends Controller
                 'subtotal' => $subtotal,
                 'total' => $grandTotal,
                 'status' => 'pending',
-                'payment_method' => 'cash_on_delivery',
+                'payment_method' => $paymentMethod,
                 'payment_status' => 'pending',
+                'payment_sender_number' => $request->input('payment_sender_number'),
+                'transaction_id' => $request->input('transaction_id'),
                 'landing_page_id' => $validated['landing_page_id'] ?? null,
                 'notes' => $validated['notes'] ?? null,
             ]);
