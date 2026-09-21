@@ -263,6 +263,51 @@
                     @endif
                 </div>
 
+                <!-- Special Offer Promo Badges -->
+                <div class="p-3 bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/40 dark:to-emerald-950/40 rounded-2xl border border-amber-200/80 dark:border-amber-700/60 space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1">
+                            <span>🎉</span> <span>স্পেশাল অফার কুপন:</span>
+                        </span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button type="button" onclick="applyCheckoutPromo('SAVE100')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 font-mono font-black text-[11px] rounded-lg border border-emerald-300 dark:border-emerald-700 shadow-2xs transition-all cursor-pointer">SAVE100 (-৳100)</button>
+                        <button type="button" onclick="applyCheckoutPromo('OFFER50')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-amber-100 text-amber-700 dark:text-amber-400 font-mono font-black text-[11px] rounded-lg border border-amber-300 dark:border-amber-700 shadow-2xs transition-all cursor-pointer">OFFER50 (-৳50)</button>
+                        <button type="button" onclick="applyCheckoutPromo('DEMAND10')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-purple-100 text-purple-700 dark:text-purple-400 font-mono font-black text-[11px] rounded-lg border border-purple-300 dark:border-purple-700 shadow-2xs transition-all cursor-pointer">DEMAND10 (-10%)</button>
+                        <button type="button" onclick="applyCheckoutPromo('FREESHIP')" class="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-blue-100 text-blue-700 dark:text-blue-400 font-mono font-black text-[11px] rounded-lg border border-blue-300 dark:border-blue-700 shadow-2xs transition-all cursor-pointer">FREESHIP (ফ্রি ডেলিভারি)</button>
+                    </div>
+                </div>
+
+                <!-- Promo Code / Voucher Box -->
+                <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
+                        <span class="flex items-center gap-1.5">
+                            <span>🎟️</span>
+                            <span>প্রোমো কোড / কুপন</span>
+                        </span>
+                        <span id="checkoutPromoStatus" class="text-[11px] font-bold hidden"></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="checkoutPromoInput" placeholder="যেমন: SAVE100" 
+                               class="flex-1 px-3.5 py-2 text-xs font-mono uppercase font-bold border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white dark:bg-slate-900 dark:text-white">
+                        <button type="button" onclick="handleCheckoutPromoApply()" 
+                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-2xs transition-all cursor-pointer">
+                            প্রয়োগ
+                        </button>
+                    </div>
+                    <div id="checkoutPromoAppliedBadge" class="hidden flex items-center justify-between bg-emerald-100/70 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 px-3 py-1.5 rounded-xl text-xs">
+                        <div class="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-200">
+                            <span>✓</span>
+                            <strong id="checkoutPromoAppliedCode" class="font-mono font-black"></strong>
+                            <span id="checkoutPromoAppliedDiscountText" class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400"></span>
+                        </div>
+                        <button type="button" onclick="removeCheckoutPromo()" class="text-rose-600 hover:text-rose-700 font-bold text-xs cursor-pointer">✕ সরান</button>
+                    </div>
+                </div>
+
+                <input type="hidden" name="promo_code" id="finalPromoCode" value="">
+                <input type="hidden" name="discount_amount" id="finalDiscountAmount" value="0">
+
                 <!-- Price Calculations -->
                 <div class="space-y-2.5 pt-4 border-t border-slate-100 text-xs sm:text-sm">
                     <div class="flex justify-between text-slate-600">
@@ -278,6 +323,10 @@
                     <div class="flex justify-between text-slate-600">
                         <span>ডেলিভারি চার্জ:</span>
                         <span id="checkoutDelivery" class="font-bold text-slate-900">৳ {{ $settings['delivery_inside_dhaka'] ?? 70 }}</span>
+                    </div>
+                    <div id="checkoutDiscountRow" class="hidden flex justify-between text-emerald-700 font-bold">
+                        <span>প্রোমো ছাড়:</span>
+                        <span id="checkoutDiscountAmountDisplay">- ৳ 0</span>
                     </div>
                     <div class="flex justify-between text-base sm:text-lg font-black text-slate-900 pt-3 border-t border-slate-200">
                         <span>সর্বমোট প্রদেয়:</span>
@@ -324,17 +373,117 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutGrandTotal = document.getElementById('checkoutGrandTotal');
     const form = document.getElementById('checkoutForm');
 
+    let currentPromoCode = '';
+    let currentDiscount = 0;
+    let currentSubtotal = isBuyNow ? (buyNowPrice * buyNowQty) : 0;
+
     const getShippingFee = () => {
         const isOutside = document.querySelector('.delivery-area-radio[value="outside_dhaka"]:checked') !== null;
         return isOutside ? outsideCharge : insideCharge;
     };
 
     const updateTotals = (subtotal) => {
+        currentSubtotal = subtotal;
         const shipping = getShippingFee();
-        const total = subtotal + shipping;
+        
+        // Calculate promo discount
+        let discount = 0;
+        if (currentPromoCode === 'SAVE100') {
+            discount = Math.min(100, subtotal);
+        } else if (currentPromoCode === 'OFFER50') {
+            discount = Math.min(50, subtotal);
+        } else if (currentPromoCode === 'DEMAND10') {
+            discount = Math.round(subtotal * 0.10);
+        } else if (currentPromoCode === 'FREESHIP') {
+            discount = shipping;
+        }
+        currentDiscount = discount;
+
+        const grandTotal = Math.max(0, (subtotal + shipping) - discount);
+
         if (checkoutSubtotal) checkoutSubtotal.textContent = `৳ ${subtotal.toLocaleString('en-US')}`;
         if (checkoutDelivery) checkoutDelivery.textContent = `৳ ${shipping.toLocaleString('en-US')}`;
-        if (checkoutGrandTotal) checkoutGrandTotal.textContent = `৳ ${total.toLocaleString('en-US')}`;
+        
+        const discRow = document.getElementById('checkoutDiscountRow');
+        const discDisplay = document.getElementById('checkoutDiscountAmountDisplay');
+        const finalPromo = document.getElementById('finalPromoCode');
+        const finalDisc = document.getElementById('finalDiscountAmount');
+
+        if (discRow && discDisplay) {
+            if (discount > 0) {
+                discRow.classList.remove('hidden');
+                discDisplay.textContent = `- ৳ ${discount.toLocaleString('en-US')}`;
+            } else {
+                discRow.classList.add('hidden');
+            }
+        }
+
+        if (finalPromo) finalPromo.value = currentPromoCode;
+        if (finalDisc) finalDisc.value = currentDiscount;
+
+        if (checkoutGrandTotal) checkoutGrandTotal.textContent = `৳ ${grandTotal.toLocaleString('en-US')}`;
+    };
+
+    window.applyCheckoutPromo = (code) => {
+        const input = document.getElementById('checkoutPromoInput');
+        if (input) input.value = code;
+        window.handleCheckoutPromoApply();
+    };
+
+    window.handleCheckoutPromoApply = () => {
+        const input = document.getElementById('checkoutPromoInput');
+        const status = document.getElementById('checkoutPromoStatus');
+        const badge = document.getElementById('checkoutPromoAppliedBadge');
+        const codeEl = document.getElementById('checkoutPromoAppliedCode');
+        const textEl = document.getElementById('checkoutPromoAppliedDiscountText');
+
+        const code = input?.value.trim().toUpperCase();
+        if (!code) {
+            if (status) {
+                status.textContent = 'কুপন কোড লিখুন';
+                status.className = 'text-[11px] font-bold text-rose-500';
+                status.classList.remove('hidden');
+            }
+            return;
+        }
+
+        const valid = {
+            'SAVE100': '৳১০০ ছাড়',
+            'OFFER50': '৳৫০ ছাড়',
+            'DEMAND10': '১০% ছাড়',
+            'FREESHIP': 'ফ্রি ডেলিভারি'
+        };
+
+        if (valid[code]) {
+            currentPromoCode = code;
+            if (badge) badge.classList.remove('hidden');
+            if (codeEl) codeEl.textContent = code;
+            if (textEl) textEl.textContent = `(${valid[code]})`;
+            if (status) {
+                status.textContent = 'সফলভাবে প্রয়োগ হয়েছে!';
+                status.className = 'text-[11px] font-bold text-emerald-600';
+                status.classList.remove('hidden');
+            }
+            updateTotals(currentSubtotal);
+        } else {
+            if (status) {
+                status.textContent = 'অকার্যকর প্রোমো কোড!';
+                status.className = 'text-[11px] font-bold text-rose-500';
+                status.classList.remove('hidden');
+            }
+        }
+    };
+
+    window.removeCheckoutPromo = () => {
+        currentPromoCode = '';
+        currentDiscount = 0;
+        const input = document.getElementById('checkoutPromoInput');
+        const status = document.getElementById('checkoutPromoStatus');
+        const badge = document.getElementById('checkoutPromoAppliedBadge');
+        if (input) input.value = '';
+        if (badge) badge.classList.add('hidden');
+        if (status) status.classList.add('hidden');
+        updateTotals(currentSubtotal);
     };
 
     if (isBuyNow) {

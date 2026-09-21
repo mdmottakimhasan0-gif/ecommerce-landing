@@ -375,6 +375,20 @@
                                 <span class="text-xs font-black text-emerald-400 mb-1">🖼️ Gallery</span>
                                 <span class="text-[11px] font-bold text-slate-300 group-hover:text-white">Gallery Grid</span>
                             </div>
+
+                            <!-- Website-Style Product Cards Widget -->
+                            <div class="widget-card bg-emerald-950/40 hover:bg-emerald-900/60 hover:border-emerald-500 border border-emerald-800/60 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all group col-span-2"
+                                 onclick="addWidgetToCanvas('product_cards')">
+                                <span class="text-xs font-black text-emerald-400 mb-1">🛍️ Product Cards Grid</span>
+                                <span class="text-[11px] font-bold text-slate-200 group-hover:text-white">ওয়েবসাইটের মতো প্রোডাক্ট কার্ড</span>
+                            </div>
+
+                            <!-- Multi-Image Showcase Widget -->
+                            <div class="widget-card bg-cyan-950/30 hover:bg-cyan-900/50 hover:border-cyan-500 border border-cyan-800/60 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all group col-span-2"
+                                 onclick="addWidgetToCanvas('image_showcase')">
+                                <span class="text-xs font-black text-cyan-400 mb-1">📸 Multi-Image Showcase</span>
+                                <span class="text-[11px] font-bold text-slate-200 group-hover:text-white">থাম্বনেইল সহ মাল্টি-ইমেজ শোকেস</span>
+                            </div>
                         </div>
                     </div>
 
@@ -1148,9 +1162,70 @@
             openModal('modalLightbox');
         };
 
+        window.switchShowcaseImage = function(blockId, idx, e) {
+            if (e) e.stopPropagation();
+            const block = blocks.find(b => b.id === blockId);
+            if (!block) return;
+            block.active_index = idx;
+            renderBlocks();
+        };
+
         // -------------------------------------------------------------------------
         // RENDER BLOCKS IN LIVE CANVAS
         // -------------------------------------------------------------------------
+        function applyBlockStyles(el, b) {
+            if (!el || !b) return;
+            el.style.maxWidth = b.box_max_width || '';
+            if (b.box_max_width && b.box_max_width !== '100%') {
+                el.style.marginLeft = 'auto';
+                el.style.marginRight = 'auto';
+            } else {
+                el.style.marginLeft = '';
+                el.style.marginRight = '';
+            }
+            el.style.padding = b.box_padding || '';
+            el.style.marginTop = b.box_margin_y || '';
+            el.style.marginBottom = b.box_margin_y || '';
+
+            if (b.border_width && b.border_width !== '0px') {
+                el.style.borderWidth = b.border_width;
+                el.style.borderStyle = b.border_style || 'solid';
+                el.style.borderColor = b.border_color || '#334155';
+            } else {
+                el.style.borderWidth = '';
+                el.style.borderStyle = '';
+                el.style.borderColor = '';
+            }
+
+            el.style.borderRadius = b.border_radius || '';
+
+            if (b.box_shadow) {
+                const shadows = {
+                    'none': 'none',
+                    'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                    'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)',
+                    'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.15)',
+                    'glow': '0 0 25px -5px rgba(16, 185, 129, 0.4)'
+                };
+                el.style.boxShadow = shadows[b.box_shadow] || '';
+            } else {
+                el.style.boxShadow = '';
+            }
+
+            if (b.custom_bg) {
+                el.style.backgroundColor = b.custom_bg;
+            } else {
+                el.style.backgroundColor = '';
+            }
+
+            if (b.text_align) {
+                el.style.textAlign = b.text_align;
+            } else {
+                el.style.textAlign = '';
+            }
+        }
+
         function renderBlocks() {
             blocksContainer.innerHTML = '';
 
@@ -1183,8 +1258,10 @@
                 `;
                 blockEl.appendChild(toolbar);
 
-                // Block Content View
+                // Block Content View (with Universal Box Sizing & Fluid Text Protection)
                 const contentEl = document.createElement('div');
+                contentEl.className = 'w-full max-w-full overflow-hidden break-words transition-all duration-200';
+                applyBlockStyles(contentEl, block);
                 contentEl.innerHTML = generateBlockHtml(block);
                 blockEl.appendChild(contentEl);
 
@@ -1539,6 +1616,124 @@
                         </div>
                     `;
 
+                case 'product_cards':
+                    const pCards = (b.cards && b.cards.length) ? b.cards : [
+                        {
+                            name: PRODUCT.name,
+                            image: PRODUCT.thumbnail,
+                            sale_price: PRODUCT.salePrice,
+                            regular_price: PRODUCT.regularPrice,
+                            discount_badge: PRODUCT.discountPct > 0 ? `-${PRODUCT.discountPct}%` : '🔥 হট অফার',
+                            rating: 5,
+                            reviews_count: 56,
+                            category: PRODUCT.category || 'প্রিমিয়াম কালেকশন',
+                            btn_text: 'অর্ডার করুন 🛒'
+                        },
+                        {
+                            name: 'সুন্দরবনের খাঁটি প্রাকৃতিক মধু (১ কেজি)',
+                            image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&auto=format&fit=crop&q=80',
+                            sale_price: 950,
+                            regular_price: 1250,
+                            discount_badge: '-২৪% ছাড়',
+                            rating: 5,
+                            reviews_count: 84,
+                            category: 'অর্গানিক ফুড',
+                            btn_text: 'অর্ডার করুন 🛒'
+                        }
+                    ];
+                    const gridCols = b.columns == 1 ? 'grid-cols-1' : (b.columns == 3 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : (b.columns == 4 ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2'));
+                    return `
+                        <div class="space-y-5 p-4 rounded-2xl border border-slate-700/80" ${cardBgStyle}>
+                            ${(b.title || b.subtitle) ? `
+                                <div class="text-center space-y-1">
+                                    ${b.title ? `<h3 class="text-xl sm:text-2xl font-black" style="color: var(--lp-text, #ffffff);">${escapeHtml(b.title)}</h3>` : ''}
+                                    ${b.subtitle ? `<p class="text-xs sm:text-sm" style="color: var(--lp-muted, #94a3b8);">${escapeHtml(b.subtitle)}</p>` : ''}
+                                </div>
+                            ` : ''}
+                            <div class="grid ${gridCols} gap-4 sm:gap-6">
+                                ${pCards.map((card, cIdx) => `
+                                    <div class="group relative rounded-2xl border border-slate-700/80 bg-[#14151a] overflow-hidden shadow-lg hover:shadow-2xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between">
+                                        <div>
+                                            <!-- Card Image -->
+                                            <div class="relative aspect-square overflow-hidden bg-slate-950">
+                                                <img src="${escapeHtml(card.image || PRODUCT.thumbnail)}" alt="${escapeHtml(card.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                                ${card.discount_badge ? `
+                                                    <span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow">
+                                                        ${escapeHtml(card.discount_badge)}
+                                                    </span>
+                                                ` : ''}
+                                            </div>
+                                            <!-- Card Content -->
+                                            <div class="p-3.5 sm:p-4 space-y-2">
+                                                <div class="flex items-center justify-between text-[10px] text-slate-400">
+                                                    <span class="uppercase font-bold tracking-wider">${escapeHtml(card.category || 'প্রোডাক্ট')}</span>
+                                                    <span class="text-amber-400 font-bold">★ ${card.rating || 5}.0 (${card.reviews_count || 12})</span>
+                                                </div>
+                                                <h4 class="text-xs sm:text-sm font-bold leading-snug line-clamp-2 min-h-[2.5rem] break-words text-white">
+                                                    ${escapeHtml(card.name || 'প্রোডাক্ট শিরোনাম')}
+                                                </h4>
+                                                <div class="flex items-baseline gap-2 pt-1">
+                                                    <span class="text-base sm:text-lg font-black text-emerald-400">
+                                                        ৳ ${numberFormat(card.sale_price || 0)}
+                                                    </span>
+                                                    ${(card.regular_price > card.sale_price) ? `
+                                                        <span class="text-xs text-slate-500 line-through">
+                                                            ৳ ${numberFormat(card.regular_price)}
+                                                        </span>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="p-3.5 sm:p-4 pt-0">
+                                            <a href="#orderFormPreview" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition-all cursor-pointer">
+                                                <span>${escapeHtml(card.btn_text || 'অর্ডার করুন 🛒')}</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                case 'image_showcase':
+                    const scImages = (b.images && b.images.length) ? b.images : [
+                        { url: PRODUCT.thumbnail, caption: 'মেইন ভিউ' }
+                    ];
+                    const scActive = b.active_index || 0;
+                    const mainImg = scImages[scActive] || scImages[0] || { url: PRODUCT.thumbnail };
+                    const scHeight = b.image_height || '380px';
+                    return `
+                        <div class="p-4 sm:p-6 rounded-2xl border border-slate-700/80 space-y-4" ${cardBgStyle}>
+                            ${(b.title || b.subtitle) ? `
+                                <div class="text-center space-y-1">
+                                    ${b.title ? `<h3 class="text-lg sm:text-xl font-black text-white">${escapeHtml(b.title)}</h3>` : ''}
+                                    ${b.subtitle ? `<p class="text-xs text-slate-400">${escapeHtml(b.subtitle)}</p>` : ''}
+                                </div>
+                            ` : ''}
+                            <!-- Main Featured Image -->
+                            <div class="relative rounded-2xl overflow-hidden bg-black/60 border border-slate-700 shadow-xl flex items-center justify-center group" style="height: ${scHeight};">
+                                <img src="${escapeHtml(mainImg.url)}" alt="${escapeHtml(mainImg.caption || 'Product')}" class="w-full h-full object-${b.image_fit || 'cover'} transition-all duration-300">
+                                ${mainImg.caption ? `
+                                    <div class="absolute bottom-3 left-3 bg-black/75 backdrop-blur-xs text-white text-xs font-bold px-3 py-1 rounded-lg border border-white/10">
+                                        ${escapeHtml(mainImg.caption)}
+                                    </div>
+                                ` : ''}
+                                <div class="absolute top-3 right-3 bg-black/60 text-white text-xs px-2.5 py-1 rounded-lg flex items-center gap-1 cursor-pointer" onclick="openImageLightbox('${escapeHtml(mainImg.url)}', '${escapeHtml(mainImg.caption || '')}', event)">
+                                    <span>🔍 জুম করুন</span>
+                                </div>
+                            </div>
+                            <!-- Thumbnails Strip -->
+                            <div class="flex items-center gap-2.5 overflow-x-auto pb-1 pt-1 justify-center">
+                                ${scImages.map((img, scI) => `
+                                    <button type="button" onclick="switchShowcaseImage('${b.id}', ${scI}, event)" 
+                                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${scI === scActive ? 'border-cyan-400 shadow-md scale-105' : 'border-slate-700 opacity-60 hover:opacity-100'}">
+                                        <img src="${escapeHtml(img.url)}" class="w-full h-full object-cover">
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+
                 default:
                     return `
                         <div class="p-4 bg-slate-800 rounded-xl border border-slate-700 text-xs text-slate-400">
@@ -1643,6 +1838,67 @@
                     newBlock.title = 'অর্ডার করতে আপনার সঠিক তথ্য দিন';
                     newBlock.subtitle = 'ডেলিভারি ম্যানের কাছে পণ্য পেয়ে মূল্য পরিশোধ করুন';
                     break;
+                case 'product_cards':
+                    newBlock.title = 'আমাদের জনপ্রিয় পণ্যসমূহ';
+                    newBlock.subtitle = 'সেরা কোয়ালিটি এবং আকর্ষণীয় মূল্যে বেছে নিন আপনার পছন্দের পণ্য';
+                    newBlock.columns = 3;
+                    newBlock.products = [
+                        {
+                            name: PRODUCT.name || 'প্রিমিয়াম স্পেশাল প্রোডাক্ট',
+                            sale_price: PRODUCT.salePrice || 990,
+                            regular_price: PRODUCT.regularPrice || 1450,
+                            discount_badge: 'হট ডিল',
+                            category: 'অফার কালেকশন',
+                            rating: 5,
+                            reviews_count: 24,
+                            btn_text: 'অর্ডার করুন 🛒',
+                            image: PRODUCT.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80'
+                        },
+                        {
+                            name: 'আল্ট্রা স্মার্ট ওয়াচ প্রো ৮',
+                            sale_price: 1250,
+                            regular_price: 1850,
+                            discount_badge: '৩০% ছাড়',
+                            category: 'স্মার্ট গ্যাজেট',
+                            rating: 5,
+                            reviews_count: 48,
+                            btn_text: 'অর্ডার করুন 🛒',
+                            image: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=600&auto=format&fit=crop&q=80'
+                        },
+                        {
+                            name: 'ওয়্যারলেস নয়েজ ক্যানসেলিং ইয়ারবাডস',
+                            sale_price: 850,
+                            regular_price: 1350,
+                            discount_badge: 'জনপ্রিয়',
+                            category: 'অডিও গ্যাজেট',
+                            rating: 5,
+                            reviews_count: 36,
+                            btn_text: 'অর্ডার করুন 🛒',
+                            image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80'
+                        }
+                    ];
+                    break;
+                case 'image_showcase':
+                    newBlock.title = 'পণ্যের মাল্টি-অ্যাঙ্গেল ভিজ্যুয়াল শোকেস';
+                    newBlock.subtitle = 'বাস্তব ছবি ও সম্পূর্ণ ভিউ দেখে নিশ্চিন্তে অর্ডার করুন';
+                    newBlock.image_fit = 'cover';
+                    newBlock.image_height = '420px';
+                    newBlock.active_index = 0;
+                    newBlock.images = [
+                        {
+                            url: PRODUCT.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80',
+                            caption: 'প্রধান সম্মুখ দৃশ্য (Front View)'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=800&auto=format&fit=crop&q=80',
+                            caption: 'পার্শ্ব দৃশ্য ও কার্ভ ডিজাইন (Side View)'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&auto=format&fit=crop&q=80',
+                            caption: 'প্রিমিয়াম বিল্ড কোয়ালিটি ও ডিটেইলস'
+                        }
+                    ];
+                    break;
             }
 
             blocks.push(newBlock);
@@ -1719,7 +1975,11 @@
             };
 
             // Switch by type
-            if (block.type === 'gallery') {
+            if (block.type === 'product_cards') {
+                inspectorFields.appendChild(renderProductCardsInspector(block));
+            } else if (block.type === 'image_showcase') {
+                inspectorFields.appendChild(renderImageShowcaseInspector(block));
+            } else if (block.type === 'gallery') {
                 inspectorFields.appendChild(renderGalleryInspector(block));
             } else if (block.type === 'carousel') {
                 inspectorFields.appendChild(renderCarouselInspector(block));
@@ -1771,14 +2031,143 @@
                 inspectorFields.appendChild(itemsDiv);
             }
 
-            // Universal Block Style Overrides (Section Custom Color)
-            const styleAccordion = document.createElement('div');
-            styleAccordion.className = 'pt-4 mt-4 border-t border-[#2b2d35] space-y-2';
-            styleAccordion.innerHTML = `
-                <label class="block font-bold text-cyan-400 text-xs uppercase tracking-wider">🎨 সেকশন কালার ওভাররাইড</label>
-                <div class="space-y-2 text-[11px]">
-                    <div>
-                        <label class="block text-slate-400 mb-1">কাস্টম ব্যাকগ্রাউন্ড কালার:</label>
+            // Universal Elementor-Style Box Sizing, Spacing & Border Controls
+            inspectorFields.appendChild(renderUniversalSizingAndBorderInspector(block));
+        }
+
+        // -------------------------------------------------------------------------
+        // UNIVERSAL BOX SIZING, SPACING, BORDER & SHADOW INSPECTOR
+        // -------------------------------------------------------------------------
+        function renderUniversalSizingAndBorderInspector(block) {
+            const container = document.createElement('div');
+            container.className = 'pt-4 mt-4 border-t border-[#2e313d] space-y-3';
+            container.innerHTML = `
+                <div class="flex items-center justify-between cursor-pointer p-2.5 bg-[#18191c] rounded-xl border border-cyan-800/40 hover:border-cyan-500/60 transition-all toggle-styling-accordion">
+                    <span class="text-xs font-black text-cyan-400 flex items-center gap-1.5">
+                        <span>📐</span> সাইজিং, স্পেসিং ও বর্ডার (Box Controls)
+                    </span>
+                    <span class="text-xs text-slate-400 styling-chevron">▼</span>
+                </div>
+
+                <div class="styling-body space-y-3.5 p-3.5 bg-[#18191c]/90 rounded-xl border border-[#2e313d]">
+                    <!-- Box Max Width -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <label class="font-bold text-slate-300">বক্স প্রস্থ (Max Width)</label>
+                            <span class="text-cyan-400 font-mono text-[10px]">${block.box_max_width || '100% (Full)'}</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button type="button" class="btn-width p-1 text-[10px] font-bold rounded border ${(!block.box_max_width || block.box_max_width === '100%') ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="100%">100%</button>
+                            <button type="button" class="btn-width p-1 text-[10px] font-bold rounded border ${block.box_max_width === '1200px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="1200px">1200px</button>
+                            <button type="button" class="btn-width p-1 text-[10px] font-bold rounded border ${block.box_max_width === '960px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="960px">960px</button>
+                            <button type="button" class="btn-width p-1 text-[10px] font-bold rounded border ${block.box_max_width === '720px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="720px">720px</button>
+                        </div>
+                        <input type="text" placeholder="কাস্টম প্রস্থ (যেমন: 850px বা 90%)" value="${escapeHtml(block.box_max_width || '')}" 
+                               class="inp-custom-width w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                    </div>
+
+                    <!-- Inner Padding -->
+                    <div class="space-y-1.5 pt-2 border-t border-[#2e313d]/60">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <label class="font-bold text-slate-300">ভিতরের প্যাডিং (Padding)</label>
+                            <span class="text-cyan-400 font-mono text-[10px]">${block.box_padding || '0px'}</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button type="button" class="btn-pad p-1 text-[10px] font-bold rounded border ${(!block.box_padding || block.box_padding === '0px') ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="0px">None</button>
+                            <button type="button" class="btn-pad p-1 text-[10px] font-bold rounded border ${block.box_padding === '16px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="16px">16px</button>
+                            <button type="button" class="btn-pad p-1 text-[10px] font-bold rounded border ${block.box_padding === '24px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="24px">24px</button>
+                            <button type="button" class="btn-pad p-1 text-[10px] font-bold rounded border ${block.box_padding === '36px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="36px">36px</button>
+                        </div>
+                        <input type="text" placeholder="কাস্টম প্যাডিং (যেমন: 20px বা 15px 25px)" value="${escapeHtml(block.box_padding || '')}" 
+                               class="inp-custom-pad w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                    </div>
+
+                    <!-- Vertical Spacing (Margin Y) -->
+                    <div class="space-y-1.5 pt-2 border-t border-[#2e313d]/60">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <label class="font-bold text-slate-300">উপর-নিচ মার্জিন (Margin Y)</label>
+                            <span class="text-cyan-400 font-mono text-[10px]">${block.box_margin_y || '0px'}</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button type="button" class="btn-my p-1 text-[10px] font-bold rounded border ${(!block.box_margin_y || block.box_margin_y === '0px') ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="0px">0px</button>
+                            <button type="button" class="btn-my p-1 text-[10px] font-bold rounded border ${block.box_margin_y === '16px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="16px">16px</button>
+                            <button type="button" class="btn-my p-1 text-[10px] font-bold rounded border ${block.box_margin_y === '28px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="28px">28px</button>
+                            <button type="button" class="btn-my p-1 text-[10px] font-bold rounded border ${block.box_margin_y === '48px' ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-val="48px">48px</button>
+                        </div>
+                    </div>
+
+                    <!-- Border (Width, Style, Color, Radius) -->
+                    <div class="space-y-2 pt-2 border-t border-[#2e313d]/60">
+                        <label class="font-bold text-slate-300 text-[11px] block">বর্ডার সেটিংস (Border & Radius)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">থিকনেস</span>
+                                <select class="sel-border-w w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                                    <option value="0px" ${(!block.border_width || block.border_width === '0px') ? 'selected' : ''}>0px (None)</option>
+                                    <option value="1px" ${block.border_width === '1px' ? 'selected' : ''}>1px</option>
+                                    <option value="2px" ${block.border_width === '2px' ? 'selected' : ''}>2px</option>
+                                    <option value="3px" ${block.border_width === '3px' ? 'selected' : ''}>3px</option>
+                                    <option value="4px" ${block.border_width === '4px' ? 'selected' : ''}>4px</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">স্টাইল</span>
+                                <select class="sel-border-s w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                                    <option value="solid" ${(!block.border_style || block.border_style === 'solid') ? 'selected' : ''}>Solid</option>
+                                    <option value="dashed" ${block.border_style === 'dashed' ? 'selected' : ''}>Dashed</option>
+                                    <option value="dotted" ${block.border_style === 'dotted' ? 'selected' : ''}>Dotted</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block mb-1">কর্নার রেডিয়াস</span>
+                                <select class="sel-border-r w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                                    <option value="0px" ${block.border_radius === '0px' ? 'selected' : ''}>0px (Square)</option>
+                                    <option value="8px" ${block.border_radius === '8px' ? 'selected' : ''}>8px (Small)</option>
+                                    <option value="16px" ${(!block.border_radius || block.border_radius === '16px') ? 'selected' : ''}>16px (Card)</option>
+                                    <option value="24px" ${block.border_radius === '24px' ? 'selected' : ''}>24px (Smooth)</option>
+                                    <option value="36px" ${block.border_radius === '36px' ? 'selected' : ''}>36px (Large)</option>
+                                    <option value="9999px" ${block.border_radius === '9999px' ? 'selected' : ''}>Full Pill</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block mb-1">বর্ডার কালার</span>
+                            <div class="flex items-center gap-2">
+                                <input type="color" class="w-7 h-7 rounded border border-[#2e313d] bg-transparent cursor-pointer inp-border-color" value="${block.border_color || '#334155'}">
+                                <input type="text" value="${escapeHtml(block.border_color || '#334155')}" class="inp-border-color-text flex-1 p-1 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shadow & Alignment -->
+                    <div class="space-y-2 pt-2 border-t border-[#2e313d]/60">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="font-bold text-slate-300 text-[11px] block mb-1">বক্স শ্যাডো</label>
+                                <select class="sel-shadow w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                                    <option value="" ${!block.box_shadow ? 'selected' : ''}>None</option>
+                                    <option value="sm" ${block.box_shadow === 'sm' ? 'selected' : ''}>Small (হালকা)</option>
+                                    <option value="md" ${block.box_shadow === 'md' ? 'selected' : ''}>Medium</option>
+                                    <option value="lg" ${block.box_shadow === 'lg' ? 'selected' : ''}>Large</option>
+                                    <option value="xl" ${block.box_shadow === 'xl' ? 'selected' : ''}>Extra Large</option>
+                                    <option value="glow" ${block.box_shadow === 'glow' ? 'selected' : ''}>Emerald Glow ✨</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-300 text-[11px] block mb-1">টেক্সট অ্যালাইনমেন্ট</label>
+                                <select class="sel-align w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                                    <option value="" ${!block.text_align ? 'selected' : ''}>Default</option>
+                                    <option value="left" ${block.text_align === 'left' ? 'selected' : ''}>বামে (Left)</option>
+                                    <option value="center" ${block.text_align === 'center' ? 'selected' : ''}>মাঝখানে (Center)</option>
+                                    <option value="right" ${block.text_align === 'right' ? 'selected' : ''}>ডানে (Right)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Color -->
+                    <div class="space-y-1 pt-2 border-t border-[#2e313d]/60">
+                        <label class="font-bold text-slate-300 text-[11px] block">কাস্টম ব্যাকগ্রাউন্ড কালার</label>
                         <div class="flex items-center gap-2">
                             <input type="color" class="w-8 h-8 rounded border border-[#2e313d] bg-transparent cursor-pointer inp-custom-bg" value="${block.custom_bg || '#1e293b'}">
                             <input type="text" placeholder="যেমন: #1e293b" value="${escapeHtml(block.custom_bg || '')}" class="flex-1 p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs inp-custom-bg-text">
@@ -1787,10 +2176,94 @@
                     </div>
                 </div>
             `;
-            const inpBg = styleAccordion.querySelector('.inp-custom-bg');
-            const inpBgText = styleAccordion.querySelector('.inp-custom-bg-text');
-            const btnClearBg = styleAccordion.querySelector('.btn-clear-bg');
 
+            // Accordion toggle
+            const toggleBtn = container.querySelector('.toggle-styling-accordion');
+            const stylingBody = container.querySelector('.styling-body');
+            const chevron = container.querySelector('.styling-chevron');
+            toggleBtn.onclick = () => {
+                stylingBody.classList.toggle('hidden');
+                chevron.textContent = stylingBody.classList.contains('hidden') ? '▶' : '▼';
+            };
+
+            // Width
+            container.querySelectorAll('.btn-width').forEach(btn => {
+                btn.onclick = () => {
+                    block.box_max_width = btn.getAttribute('data-val');
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+            });
+            const inpCustomWidth = container.querySelector('.inp-custom-width');
+            inpCustomWidth.oninput = (e) => {
+                block.box_max_width = e.target.value;
+                renderBlocks();
+            };
+
+            // Padding
+            container.querySelectorAll('.btn-pad').forEach(btn => {
+                btn.onclick = () => {
+                    block.box_padding = btn.getAttribute('data-val');
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+            });
+            const inpCustomPad = container.querySelector('.inp-custom-pad');
+            inpCustomPad.oninput = (e) => {
+                block.box_padding = e.target.value;
+                renderBlocks();
+            };
+
+            // Margin Y
+            container.querySelectorAll('.btn-my').forEach(btn => {
+                btn.onclick = () => {
+                    block.box_margin_y = btn.getAttribute('data-val');
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+            });
+
+            // Border
+            container.querySelector('.sel-border-w').onchange = (e) => {
+                block.border_width = e.target.value;
+                renderBlocks();
+            };
+            container.querySelector('.sel-border-s').onchange = (e) => {
+                block.border_style = e.target.value;
+                renderBlocks();
+            };
+            container.querySelector('.sel-border-r').onchange = (e) => {
+                block.border_radius = e.target.value;
+                renderBlocks();
+            };
+            const inpBorderColor = container.querySelector('.inp-border-color');
+            const inpBorderColorText = container.querySelector('.inp-border-color-text');
+            inpBorderColor.oninput = (e) => {
+                inpBorderColorText.value = e.target.value;
+                block.border_color = e.target.value;
+                renderBlocks();
+            };
+            inpBorderColorText.oninput = (e) => {
+                block.border_color = e.target.value;
+                renderBlocks();
+            };
+
+            // Shadow
+            container.querySelector('.sel-shadow').onchange = (e) => {
+                block.box_shadow = e.target.value;
+                renderBlocks();
+            };
+
+            // Alignment
+            container.querySelector('.sel-align').onchange = (e) => {
+                block.text_align = e.target.value;
+                renderBlocks();
+            };
+
+            // Background
+            const inpBg = container.querySelector('.inp-custom-bg');
+            const inpBgText = container.querySelector('.inp-custom-bg-text');
+            const btnClearBg = container.querySelector('.btn-clear-bg');
             if (inpBg && inpBgText) {
                 inpBg.oninput = (e) => {
                     inpBgText.value = e.target.value;
@@ -1809,7 +2282,366 @@
                     buildInspectorFields(block);
                 };
             }
-            inspectorFields.appendChild(styleAccordion);
+
+            return container;
+        }
+
+        // -------------------------------------------------------------------------
+        // INSPECTOR: PRODUCT CARDS GRID MANAGER
+        // -------------------------------------------------------------------------
+        function renderProductCardsInspector(block) {
+            const div = document.createElement('div');
+            div.className = 'space-y-4';
+
+            const createInput = (label, key, val) => {
+                const d = document.createElement('div');
+                d.className = 'space-y-1';
+                d.innerHTML = `
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
+                    <input type="text" value="${escapeHtml(val || '')}" class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500">
+                `;
+                d.querySelector('input').oninput = (e) => {
+                    block[key] = e.target.value;
+                    renderBlocks();
+                };
+                return d;
+            };
+
+            div.appendChild(createInput('সেকশন শিরোনাম (Title)', 'title', block.title || 'আমাদের জনপ্রিয় পণ্যসমূহ'));
+            div.appendChild(createInput('সাবটাইটেল (Subtitle)', 'subtitle', block.subtitle || ''));
+
+            // Column selector
+            const colDiv = document.createElement('div');
+            colDiv.className = 'space-y-1';
+            colDiv.innerHTML = `
+                <label class="block font-bold text-slate-300 text-[11px]">কলাম সংখ্যা (Grid Columns)</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" class="col-btn p-1.5 rounded-lg border text-xs font-bold ${block.columns == 2 ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-cols="2">২ কলাম</button>
+                    <button type="button" class="col-btn p-1.5 rounded-lg border text-xs font-bold ${(!block.columns || block.columns == 3) ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-cols="3">৩ কলাম</button>
+                    <button type="button" class="col-btn p-1.5 rounded-lg border text-xs font-bold ${block.columns == 4 ? 'bg-cyan-600 text-white border-cyan-500' : 'bg-[#252730] text-slate-300 border-[#2e313d]'}" data-cols="4">৪ কলাম</button>
+                </div>
+            `;
+            colDiv.querySelectorAll('.col-btn').forEach(b => {
+                b.onclick = () => {
+                    block.columns = parseInt(b.getAttribute('data-cols'));
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+            });
+            div.appendChild(colDiv);
+
+            // Add Product Card Button
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow flex items-center justify-center gap-1.5 cursor-pointer';
+            addBtn.innerHTML = '<span>➕ নতুন প্রোডাক্ট কার্ড যোগ করুন</span>';
+            addBtn.onclick = () => {
+                block.products = block.products || [];
+                block.products.push({
+                    name: 'নতুন আকর্ষণীয় প্রোডাক্ট',
+                    sale_price: 990,
+                    regular_price: 1400,
+                    discount_badge: 'হট ডিল',
+                    category: 'অফার কালেকশন',
+                    rating: 5,
+                    reviews_count: 15,
+                    btn_text: 'অর্ডার করুন 🛒',
+                    image: PRODUCT.thumbnail || ''
+                });
+                renderBlocks();
+                buildInspectorFields(block);
+            };
+            div.appendChild(addBtn);
+
+            // Cards List
+            const listContainer = document.createElement('div');
+            listContainer.className = 'space-y-3';
+            (block.products || []).forEach((prod, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 bg-[#252730] border border-[#2e313d] rounded-xl space-y-2.5';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-[#2e313d] pb-1.5">
+                        <span class="font-bold text-emerald-400 text-xs">কার্ড #${pIdx + 1}: ${escapeHtml(prod.name || '')}</span>
+                        <div class="flex items-center gap-1">
+                            <button type="button" class="btn-up text-slate-400 hover:text-white p-1 text-xs" title="উপরে">▲</button>
+                            <button type="button" class="btn-down text-slate-400 hover:text-white p-1 text-xs" title="নিচে">▼</button>
+                            <button type="button" class="btn-del text-rose-400 hover:text-rose-300 p-1 text-xs" title="মুছে ফেলুন">✕</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-300 text-[10px] mb-1">প্রোডাক্টের নাম</label>
+                        <input type="text" class="inp-pname w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(prod.name || '')}">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">অফার মূল্য (Sale Price)</label>
+                            <input type="number" class="inp-psale w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-emerald-400 font-bold text-xs" value="${prod.sale_price || 0}">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">পূর্বের মূল্য (Regular Price)</label>
+                            <input type="number" class="inp-preg w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-400 text-xs" value="${prod.regular_price || 0}">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">ডিসকাউন্ট ব্যাজ</label>
+                            <input type="text" placeholder="যেমন: হট ডিল বা ৩০% ছাড়" class="inp-pbadge w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(prod.discount_badge || '')}">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">ক্যাটাগরি / ট্যাগ</label>
+                            <input type="text" placeholder="যেমন: গ্যাজেট" class="inp-pcat w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(prod.category || '')}">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">স্টার রেটিং (১-৫)</label>
+                            <input type="number" min="1" max="5" class="inp-prating w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-amber-400 font-bold text-xs" value="${prod.rating || 5}">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-300 text-[10px] mb-1">বাটন টেক্সট</label>
+                            <input type="text" class="inp-pbtn w-full p-1.5 bg-[#18191c] border border-[#2e313d] rounded text-slate-200 text-xs" value="${escapeHtml(prod.btn_text || 'অর্ডার করুন 🛒')}">
+                        </div>
+                    </div>
+                    <div class="image-slot"></div>
+                `;
+
+                card.querySelector('.inp-pname').oninput = (e) => { prod.name = e.target.value; renderBlocks(); };
+                card.querySelector('.inp-psale').oninput = (e) => { prod.sale_price = parseFloat(e.target.value) || 0; renderBlocks(); };
+                card.querySelector('.inp-preg').oninput = (e) => { prod.regular_price = parseFloat(e.target.value) || 0; renderBlocks(); };
+                card.querySelector('.inp-pbadge').oninput = (e) => { prod.discount_badge = e.target.value; renderBlocks(); };
+                card.querySelector('.inp-pcat').oninput = (e) => { prod.category = e.target.value; renderBlocks(); };
+                card.querySelector('.inp-prating').oninput = (e) => { prod.rating = parseInt(e.target.value) || 5; renderBlocks(); };
+                card.querySelector('.inp-pbtn').oninput = (e) => { prod.btn_text = e.target.value; renderBlocks(); };
+
+                const imgUploader = createImageUploadField('কার্ড ইমেজ (Product Image)', prod.image, (newUrl) => {
+                    prod.image = newUrl;
+                    renderBlocks();
+                });
+                card.querySelector('.image-slot').appendChild(imgUploader);
+
+                card.querySelector('.btn-up').onclick = () => {
+                    if (pIdx > 0) {
+                        const tmp = block.products[pIdx];
+                        block.products[pIdx] = block.products[pIdx - 1];
+                        block.products[pIdx - 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+                card.querySelector('.btn-down').onclick = () => {
+                    if (pIdx < block.products.length - 1) {
+                        const tmp = block.products[pIdx];
+                        block.products[pIdx] = block.products[pIdx + 1];
+                        block.products[pIdx + 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+                card.querySelector('.btn-del').onclick = () => {
+                    block.products.splice(pIdx, 1);
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+
+                listContainer.appendChild(card);
+            });
+            div.appendChild(listContainer);
+
+            return div;
+        }
+
+        // -------------------------------------------------------------------------
+        // INSPECTOR: MULTI-IMAGE SHOWCASE MANAGER
+        // -------------------------------------------------------------------------
+        function renderImageShowcaseInspector(block) {
+            const div = document.createElement('div');
+            div.className = 'space-y-4';
+
+            const createInput = (label, key, val) => {
+                const d = document.createElement('div');
+                d.className = 'space-y-1';
+                d.innerHTML = `
+                    <label class="block font-bold text-slate-300 text-[11px]">${escapeHtml(label)}</label>
+                    <input type="text" value="${escapeHtml(val || '')}" class="w-full p-2 bg-[#252730] border border-[#2e313d] rounded-lg text-slate-200 text-xs focus:border-cyan-500">
+                `;
+                d.querySelector('input').oninput = (e) => {
+                    block[key] = e.target.value;
+                    renderBlocks();
+                };
+                return d;
+            };
+
+            div.appendChild(createInput('শোকেস শিরোনাম (Title)', 'title', block.title || 'পণ্যের মাল্টি-অ্যাঙ্গেল ভিজ্যুয়াল শোকেস'));
+            div.appendChild(createInput('সাবটাইটেল (Subtitle)', 'subtitle', block.subtitle || ''));
+
+            // Height and Fit controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'grid grid-cols-2 gap-2';
+            controlsDiv.innerHTML = `
+                <div>
+                    <label class="block font-bold text-slate-300 text-[10px] mb-1">ইমেজ উচ্চতা (Height)</label>
+                    <select class="sel-height w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                        <option value="320px" ${block.image_height === '320px' ? 'selected' : ''}>320px (Compact)</option>
+                        <option value="380px" ${(!block.image_height || block.image_height === '380px') ? 'selected' : ''}>380px (Standard)</option>
+                        <option value="450px" ${block.image_height === '450px' ? 'selected' : ''}>450px (Large)</option>
+                        <option value="520px" ${block.image_height === '520px' ? 'selected' : ''}>520px (Hero View)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 text-[10px] mb-1">ইমেজ ফিট (Fit Mode)</label>
+                    <select class="sel-fit w-full p-1.5 bg-[#252730] border border-[#2e313d] rounded text-slate-200 text-xs">
+                        <option value="cover" ${(!block.image_fit || block.image_fit === 'cover') ? 'selected' : ''}>Cover (পূর্ণ বক্স পূরণ)</option>
+                        <option value="contain" ${block.image_fit === 'contain' ? 'selected' : ''}>Contain (সম্পূর্ণ ছবি অক্ষত)</option>
+                    </select>
+                </div>
+            `;
+            controlsDiv.querySelector('.sel-height').onchange = (e) => {
+                block.image_height = e.target.value;
+                renderBlocks();
+            };
+            controlsDiv.querySelector('.sel-fit').onchange = (e) => {
+                block.image_fit = e.target.value;
+                renderBlocks();
+            };
+            div.appendChild(controlsDiv);
+
+            // Upload Box
+            const uploadBox = document.createElement('div');
+            uploadBox.className = 'p-3 bg-cyan-950/40 border border-cyan-700/50 rounded-xl space-y-2';
+            uploadBox.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-cyan-300">🖼️ শোকেস ছবি যুক্ত করুন</span>
+                    <span class="text-[10px] text-slate-400">${(block.images || []).length} টি ছবি যুক্ত আছে</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button type="button" class="btn-bulk-upload w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow cursor-pointer">
+                        <span>📁 একাধিক ছবি একসাথে আপলোড করুন</span>
+                    </button>
+                    <input type="file" multiple accept="image/*" class="hidden bulk-file-input">
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="btn-add-prod-imgs flex-1 py-1.5 bg-[#252730] hover:bg-[#2e313d] text-slate-300 rounded text-[10px] font-bold border border-[#2e313d] cursor-pointer">
+                            📦 প্রডাক্টের সব ছবি যোগ
+                        </button>
+                        <button type="button" class="btn-add-url flex-1 py-1.5 bg-[#252730] hover:bg-[#2e313d] text-slate-300 rounded text-[10px] font-bold border border-[#2e313d] cursor-pointer">
+                            ➕ লিংক দিয়ে ছবি যোগ
+                        </button>
+                    </div>
+                </div>
+            `;
+            const bulkInput = uploadBox.querySelector('.bulk-file-input');
+            const btnBulk = uploadBox.querySelector('.btn-bulk-upload');
+            btnBulk.onclick = () => bulkInput.click();
+
+            bulkInput.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                if (!files.length) return;
+                showToast(files.length + ' টি ছবি আপলোড হচ্ছে...');
+                try {
+                    const uploadedFiles = await uploadMultipleImageFiles(files);
+                    block.images = block.images || [];
+                    uploadedFiles.forEach(f => {
+                        block.images.push({ url: f.url, caption: f.name || '' });
+                    });
+                    renderBlocks();
+                    buildInspectorFields(block);
+                    showToast('ছবিসমূহ শোকেসে যুক্ত হয়েছে!');
+                } catch (err) {
+                    alert(err.message || 'ছবি আপলোডে সমস্যা হয়েছে');
+                }
+            };
+
+            uploadBox.querySelector('.btn-add-prod-imgs').onclick = () => {
+                block.images = block.images || [];
+                if (PRODUCT.thumbnail) {
+                    block.images.push({ url: PRODUCT.thumbnail, caption: 'মেইন থাম্বনেইল' });
+                }
+                if (PRODUCT.gallery && PRODUCT.gallery.length) {
+                    PRODUCT.gallery.forEach((gUrl, idx) => {
+                        block.images.push({ url: gUrl, caption: 'গ্যালারি ভিউ ' + (idx + 1) });
+                    });
+                }
+                renderBlocks();
+                buildInspectorFields(block);
+                showToast('প্রডাক্টের ছবিসমূহ শোকেসে যোগ হয়েছে!');
+            };
+
+            uploadBox.querySelector('.btn-add-url').onclick = () => {
+                const url = prompt('ছবির সরাসরি ইমেজ ইউআরএল (URL) দিন:');
+                if (url && url.trim()) {
+                    block.images = block.images || [];
+                    block.images.push({ url: url.trim(), caption: '' });
+                    renderBlocks();
+                    buildInspectorFields(block);
+                }
+            };
+            div.appendChild(uploadBox);
+
+            // Images List
+            const itemsList = document.createElement('div');
+            itemsList.className = 'space-y-2 pt-2';
+            (block.images || []).forEach((img, idx) => {
+                const itemCard = document.createElement('div');
+                itemCard.className = `p-2.5 bg-[#252730] border rounded-xl flex items-center gap-2.5 ${idx === (block.active_index || 0) ? 'border-cyan-500 bg-[#232733]' : 'border-[#2e313d]'}`;
+                const imgUrl = img.url || img;
+                itemCard.innerHTML = `
+                    <img src="${escapeHtml(imgUrl)}" class="w-11 h-11 object-cover rounded-lg border border-slate-700 flex-shrink-0">
+                    <div class="flex-1 min-w-0 space-y-1">
+                        <input type="text" placeholder="অ্যাঙ্গেল / ক্যাপশন (যেমন: Front View)" value="${escapeHtml(img.caption || '')}" 
+                               class="w-full p-1 bg-[#18191c] border border-[#2e313d] rounded text-[10px] text-slate-200">
+                        <div class="flex items-center gap-2 text-[9px]">
+                            <button type="button" class="btn-set-active text-cyan-400 hover:underline ${idx === (block.active_index || 0) ? 'font-bold' : ''}">
+                                ${idx === (block.active_index || 0) ? '✓ প্রধান দৃশ্য' : 'প্রধান ভিউ করুন'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button type="button" class="btn-up text-slate-400 hover:text-white p-0.5 text-xs" title="উপরে">▲</button>
+                        <button type="button" class="btn-down text-slate-400 hover:text-white p-0.5 text-xs" title="নিচে">▼</button>
+                        <button type="button" class="btn-del p-0.5 text-rose-400 hover:bg-rose-950/60 rounded text-xs" title="মুছে ফেলুন">✕</button>
+                    </div>
+                `;
+                itemCard.querySelector('input').oninput = (e) => {
+                    if (typeof block.images[idx] === 'string') {
+                        block.images[idx] = { url: block.images[idx], caption: e.target.value };
+                    } else {
+                        block.images[idx].caption = e.target.value;
+                    }
+                    renderBlocks();
+                };
+                itemCard.querySelector('.btn-set-active').onclick = () => {
+                    block.active_index = idx;
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+                itemCard.querySelector('.btn-up').onclick = () => {
+                    if (idx > 0) {
+                        const tmp = block.images[idx];
+                        block.images[idx] = block.images[idx - 1];
+                        block.images[idx - 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+                itemCard.querySelector('.btn-down').onclick = () => {
+                    if (idx < block.images.length - 1) {
+                        const tmp = block.images[idx];
+                        block.images[idx] = block.images[idx + 1];
+                        block.images[idx + 1] = tmp;
+                        renderBlocks();
+                        buildInspectorFields(block);
+                    }
+                };
+                itemCard.querySelector('.btn-del').onclick = () => {
+                    block.images.splice(idx, 1);
+                    if (block.active_index >= block.images.length) block.active_index = 0;
+                    renderBlocks();
+                    buildInspectorFields(block);
+                };
+                itemsList.appendChild(itemCard);
+            });
+            div.appendChild(itemsList);
+
+            return div;
         }
 
         // Inspector: Multi-Image Gallery Grid Manager

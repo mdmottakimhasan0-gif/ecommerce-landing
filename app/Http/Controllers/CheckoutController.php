@@ -103,8 +103,35 @@ class CheckoutController extends Controller
                 }
             }
 
-            $grandTotal = $subtotal + $deliveryCharge;
+            // Calculate Promo Code Discount
+            $promoCode = strtoupper(trim((string) $request->input('promo_code', '')));
+            $discount = 0.00;
+
+            if (! empty($promoCode)) {
+                if ($promoCode === 'SAVE100') {
+                    $discount = min(100.00, $subtotal);
+                } elseif ($promoCode === 'OFFER50') {
+                    $discount = min(50.00, $subtotal);
+                } elseif ($promoCode === 'DEMAND10') {
+                    $discount = round($subtotal * 0.10, 2);
+                } elseif ($promoCode === 'FREESHIP') {
+                    $discount = $deliveryCharge;
+                } else {
+                    // Check if custom discount amount sent and valid
+                    $clientDiscount = (float) $request->input('discount_amount', 0);
+                    if ($clientDiscount > 0 && $clientDiscount <= $subtotal) {
+                        $discount = $clientDiscount;
+                    }
+                }
+            }
+
+            $grandTotal = max(0.00, ($subtotal + $deliveryCharge) - $discount);
             $orderNumber = 'DH-'.date('ymd').'-'.strtoupper(Str::random(4));
+
+            $orderNotes = $validated['notes'] ?? '';
+            if (! empty($promoCode) && $discount > 0) {
+                $orderNotes = trim($orderNotes." [কুপন: {$promoCode} (-৳{$discount})]");
+            }
 
             $order = Order::create([
                 'user_id' => auth()->id(),
@@ -123,7 +150,7 @@ class CheckoutController extends Controller
                 'payment_sender_number' => $request->input('payment_sender_number'),
                 'transaction_id' => $request->input('transaction_id'),
                 'landing_page_id' => $validated['landing_page_id'] ?? null,
-                'notes' => $validated['notes'] ?? null,
+                'notes' => $orderNotes ?: null,
             ]);
 
             foreach ($orderItemsData as $item) {

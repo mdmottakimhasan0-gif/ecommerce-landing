@@ -1,4 +1,5 @@
 import confetti from 'canvas-confetti';
+import './theme-manager.js';
 
 // =========================================================================
 // BANGLA & ENGLISH MULTILINGUAL TRANSLATION ENGINE
@@ -400,15 +401,126 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalSubmitBtn = document.getElementById('modalSubmitBtn');
 
     let currentModalPrice = 0;
+    let currentPromoCode = '';
+    let currentDiscount = 0;
 
     const recalcModalTotal = () => {
         const qty = parseInt(modalQtyInput.value) || 1;
         const subtotal = currentModalPrice * qty;
         const isOutside = quickOrderForm.querySelector('input[name="delivery_area"]:checked')?.value === 'outside_dhaka';
         const deliveryFee = isOutside ? (window.DemandHat?.deliveryOutside || 130) : (window.DemandHat?.deliveryInside || 70);
-        const grandTotal = subtotal + deliveryFee;
+
+        // Calculate promo discount
+        let discount = 0;
+        if (currentPromoCode === 'SAVE100') {
+            discount = Math.min(100, subtotal);
+        } else if (currentPromoCode === 'OFFER50') {
+            discount = Math.min(50, subtotal);
+        } else if (currentPromoCode === 'DEMAND10') {
+            discount = Math.round(subtotal * 0.10);
+        } else if (currentPromoCode === 'FREESHIP') {
+            discount = deliveryFee;
+        }
+        currentDiscount = discount;
+
+        const grandTotal = Math.max(0, (subtotal + deliveryFee) - discount);
+
+        const modalSubtotal = document.getElementById('modalSubtotal');
+        const modalDeliveryFee = document.getElementById('modalDeliveryFee');
+        const modalDiscountRow = document.getElementById('modalDiscountRow');
+        const modalDiscountAmount = document.getElementById('modalDiscountAmount');
+
+        if (modalSubtotal) modalSubtotal.textContent = `৳ ${subtotal.toLocaleString('en-US')}`;
+        if (modalDeliveryFee) modalDeliveryFee.textContent = `৳ ${deliveryFee.toLocaleString('en-US')}`;
+
+        if (modalDiscountRow && modalDiscountAmount) {
+            if (discount > 0) {
+                modalDiscountRow.classList.remove('hidden');
+                modalDiscountAmount.textContent = `- ৳ ${discount.toLocaleString('en-US')}`;
+            } else {
+                modalDiscountRow.classList.add('hidden');
+            }
+        }
+
         if (modalGrandTotal) {
             modalGrandTotal.textContent = `৳ ${grandTotal.toLocaleString('en-US')}`;
+        }
+    };
+
+    const applyQuickPromoCode = (code) => {
+        const promoInput = document.getElementById('quickPromoInput');
+        if (promoInput) promoInput.value = code;
+        handleQuickPromoApply();
+    };
+
+    const handleQuickPromoApply = () => {
+        const promoInput = document.getElementById('quickPromoInput');
+        const statusEl = document.getElementById('quickPromoStatus');
+        const badgeEl = document.getElementById('quickPromoAppliedBadge');
+        const codeEl = document.getElementById('quickPromoAppliedCode');
+        const discTextEl = document.getElementById('quickPromoAppliedDiscountText');
+
+        const code = promoInput?.value.trim().toUpperCase();
+        if (!code) {
+            if (statusEl) {
+                statusEl.textContent = 'কুপন কোড লিখুন';
+                statusEl.className = 'text-[11px] font-bold text-rose-500';
+                statusEl.classList.remove('hidden');
+            }
+            return;
+        }
+
+        const validCodes = {
+            'SAVE100': '৳১০০ ছাড়',
+            'OFFER50': '৳৫০ ছাড়',
+            'DEMAND10': '১০% ছাড়',
+            'FREESHIP': 'ফ্রি ডেলিভারি'
+        };
+
+        if (validCodes[code]) {
+            currentPromoCode = code;
+            if (badgeEl) badgeEl.classList.remove('hidden');
+            if (codeEl) codeEl.textContent = code;
+            if (discTextEl) discTextEl.textContent = `(${validCodes[code]})`;
+            if (statusEl) {
+                statusEl.textContent = 'সফলভাবে প্রয়োগ হয়েছে!';
+                statusEl.className = 'text-[11px] font-bold text-emerald-600 dark:text-emerald-400';
+                statusEl.classList.remove('hidden');
+            }
+            recalcModalTotal();
+        } else {
+            if (statusEl) {
+                statusEl.textContent = 'অকার্যকর প্রোমো কোড!';
+                statusEl.className = 'text-[11px] font-bold text-rose-500';
+                statusEl.classList.remove('hidden');
+            }
+        }
+    };
+
+    const removeQuickPromoCode = () => {
+        currentPromoCode = '';
+        currentDiscount = 0;
+        const promoInput = document.getElementById('quickPromoInput');
+        const statusEl = document.getElementById('quickPromoStatus');
+        const badgeEl = document.getElementById('quickPromoAppliedBadge');
+        if (promoInput) promoInput.value = '';
+        if (badgeEl) badgeEl.classList.add('hidden');
+        if (statusEl) statusEl.classList.add('hidden');
+        recalcModalTotal();
+    };
+
+    window.applyQuickPromoCode = applyQuickPromoCode;
+    window.handleQuickPromoApply = handleQuickPromoApply;
+    window.removeQuickPromoCode = removeQuickPromoCode;
+
+    // Mobile theme cycle helper
+    window.cycleStorefrontTheme = () => {
+        const current = window.DemandHatTheme?.getTheme() || 'system';
+        const next = current === 'system' ? 'light' : (current === 'light' ? 'dark' : 'system');
+        window.DemandHatTheme?.setTheme(next);
+        const mobileIcon = document.getElementById('mobileThemeIcon');
+        if (mobileIcon) {
+            mobileIcon.textContent = next === 'dark' ? '🌙' : (next === 'light' ? '☀️' : '💻');
         }
     };
 
@@ -421,6 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalProductPrice) modalProductPrice.textContent = `৳ ${currentModalPrice.toLocaleString('en-US')}`;
         if (modalQtyInput) modalQtyInput.value = data.quantity || 1;
         
+        removeQuickPromoCode();
         recalcModalTotal();
         quickModal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
@@ -570,6 +683,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 payment_method: paymentMethod,
                 payment_sender_number: senderNumber || null,
                 transaction_id: trxId || null,
+                promo_code: currentPromoCode || null,
+                discount_amount: currentDiscount || 0,
                 items: [
                     {
                         product_id: parseInt(formData.get('product_id')),

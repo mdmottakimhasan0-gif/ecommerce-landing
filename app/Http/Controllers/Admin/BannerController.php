@@ -30,6 +30,38 @@ class BannerController extends Controller
                 'bg_gradient' => 'from-emerald-900 via-teal-900 to-slate-900',
                 'is_active' => true,
                 'show_text' => false,
+                'slides' => [
+                    [
+                        'badge' => '🌿 প্রিমিয়াম অর্গানিক কালেকশন',
+                        'title' => 'প্রকৃতির খাঁটি স্বাদ ও স্বাস্থ্যকর খাবার!',
+                        'subtitle' => 'সুন্দরবনের প্রাকৃতিক চাকের মধু ও কাঠের ঘানি ভাঙা খাঁটি সরিষার তেল। ১০০% নির্ভেজাল পণ্যের নিশ্চয়তা।',
+                        'btn1_text' => 'অর্ডার করুন 🛒',
+                        'btn1_link' => '/products?category=organic-products',
+                        'image' => 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=80',
+                        'bg_gradient' => 'from-emerald-950 via-teal-900 to-slate-950',
+                        'show_text' => false,
+                    ],
+                    [
+                        'badge' => '⚡ স্মার্ট গ্যাজেট ও ইলেকট্রনিক্স',
+                        'title' => 'আধুনিক লাইফস্টাইলের সেরা টেক পণ্য!',
+                        'subtitle' => 'স্মার্ট ওয়াচ, ব্লুটুথ ট্রিমার ও ট্রেন্ডিং ইলেকট্রনিক্সে মেগা অফার। সারাদেশে ক্যাশ অন ডেলিভারি।',
+                        'btn1_text' => 'অফার দেখুন ⚡',
+                        'btn1_link' => '/products?category=electronics-gadgets',
+                        'image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80',
+                        'bg_gradient' => 'from-blue-950 via-indigo-900 to-slate-950',
+                        'show_text' => false,
+                    ],
+                    [
+                        'badge' => '🍳 কিচেন ও হোম অ্যাপ্লায়েন্স',
+                        'title' => 'রান্নার কাজ সহজ করুন স্মার্ট চপারে!',
+                        'subtitle' => 'মাল্টিফাংশন ভেজিটেবল কাটার ও কিচেন গ্যাজেটে বিশেষ ক্যাশ অন ডেলিভারি ডিসকাউন্ট।',
+                        'btn1_text' => 'এখনই কিনুন 🍳',
+                        'btn1_link' => '/products?category=home-kitchen',
+                        'image' => 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&auto=format&fit=crop&q=80',
+                        'bg_gradient' => 'from-amber-950 via-orange-900 to-slate-950',
+                        'show_text' => false,
+                    ],
+                ],
             ],
             'banner2' => [
                 'badge' => 'স্মার্ট হোম ও কিচেন',
@@ -125,6 +157,53 @@ class BannerController extends Controller
             'is_active' => $request->boolean('banner1_is_active', true),
             'show_text' => $request->boolean('banner1_show_text', false),
         ];
+
+        // Process Banner 1 Multi-Slides
+        $slides = [];
+        $submittedSlides = $request->input('banner1_slides');
+        if (is_array($submittedSlides) && count($submittedSlides) > 0) {
+            foreach ($submittedSlides as $sIdx => $sData) {
+                $slideImg = $sData['image'] ?? '';
+                if ($request->hasFile("banner1_slide_file_{$sIdx}")) {
+                    $path = $request->file("banner1_slide_file_{$sIdx}")->store('banners', 'public');
+                    $slideImg = asset('storage/'.$path);
+                } elseif (! empty($sData['image_url'])) {
+                    $slideImg = $sData['image_url'];
+                }
+
+                if (! empty($slideImg) || ! empty($sData['title'])) {
+                    $slides[] = [
+                        'badge' => $sData['badge'] ?? '',
+                        'title' => $sData['title'] ?? '',
+                        'subtitle' => $sData['subtitle'] ?? '',
+                        'btn1_text' => $sData['btn1_text'] ?? 'অর্ডার করুন 🛒',
+                        'btn1_link' => $sData['btn1_link'] ?? '/products',
+                        'image' => $slideImg,
+                        'bg_gradient' => $sData['bg_gradient'] ?? 'from-emerald-950 via-teal-900 to-slate-950',
+                        'show_text' => ! empty($sData['show_text']),
+                    ];
+                }
+            }
+        }
+
+        // Fallback: If no custom slides array submitted, use existing slides or build slide from main banner 1
+        if (empty($slides)) {
+            if ($request->has('banner1_title') || $request->has('banner1_file') || $request->has('banner1_image_url')) {
+                $slides = [[
+                    'badge' => $banner1['badge'],
+                    'title' => $banner1['title'],
+                    'subtitle' => $banner1['subtitle'],
+                    'btn1_text' => $banner1['btn1_text'],
+                    'btn1_link' => $banner1['btn1_link'],
+                    'image' => $banner1Image,
+                    'bg_gradient' => $banner1['bg_gradient'],
+                    'show_text' => $banner1['show_text'],
+                ]];
+            } else {
+                $slides = $existing['banner1']['slides'] ?? [];
+            }
+        }
+        $banner1['slides'] = $slides;
 
         // 2. Process Banner 2
         $banner2Image = $existing['banner2']['image'] ?? '';

@@ -141,8 +141,52 @@
         @if(!empty($contentBlocks) && count($contentBlocks) > 0)
             {{-- Dynamic Blocks Rendering --}}
             @foreach($contentBlocks as $b)
-                @php $bType = $b['type'] ?? ''; @endphp
+                @php 
+                    $bType = $b['type'] ?? ''; 
+                    $bStyles = [];
+                    if (!empty($b['box_max_width'])) {
+                        $bStyles[] = 'max-width: ' . e($b['box_max_width']);
+                        if ($b['box_max_width'] !== '100%') {
+                            $bStyles[] = 'margin-left: auto; margin-right: auto';
+                        }
+                    }
+                    if (!empty($b['box_padding'])) {
+                        $bStyles[] = 'padding: ' . e($b['box_padding']);
+                    }
+                    if (!empty($b['box_margin_y'])) {
+                        $bStyles[] = 'margin-top: ' . e($b['box_margin_y']) . '; margin-bottom: ' . e($b['box_margin_y']);
+                    }
+                    if (!empty($b['border_width']) && $b['border_width'] !== '0px') {
+                        $bStyles[] = 'border-width: ' . e($b['border_width']);
+                        $bStyles[] = 'border-style: ' . e($b['border_style'] ?? 'solid');
+                        $bStyles[] = 'border-color: ' . e($b['border_color'] ?? '#334155');
+                    }
+                    if (!empty($b['border_radius'])) {
+                        $bStyles[] = 'border-radius: ' . e($b['border_radius']);
+                    }
+                    if (!empty($b['box_shadow'])) {
+                        $shadowMap = [
+                            'none' => 'none',
+                            'sm' => '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                            'md' => '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                            'lg' => '0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)',
+                            'xl' => '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.15)',
+                            'glow' => '0 0 25px -5px rgba(16, 185, 129, 0.4)'
+                        ];
+                        if (isset($shadowMap[$b['box_shadow']])) {
+                            $bStyles[] = 'box-shadow: ' . $shadowMap[$b['box_shadow']];
+                        }
+                    }
+                    if (!empty($b['custom_bg'])) {
+                        $bStyles[] = 'background-color: ' . e($b['custom_bg']);
+                    }
+                    if (!empty($b['text_align'])) {
+                        $bStyles[] = 'text-align: ' . e($b['text_align']);
+                    }
+                    $styleAttr = !empty($bStyles) ? 'style="' . implode('; ', $bStyles) . '"' : '';
+                @endphp
 
+                <div class="landing-block-wrapper w-full max-w-full overflow-hidden break-words transition-all" {!! $styleAttr !!}>
                 @if($bType === 'product_hero')
                     <div class="lp-card rounded-3xl p-5 sm:p-8 border shadow-2xl space-y-6">
                         <div class="text-center space-y-3">
@@ -466,7 +510,127 @@
 
                 @elseif($bType === 'order_form')
                     @include('storefront.landing._order_form_block', ['block' => $b])
+
+                {{-- WEBSITE-STYLE PRODUCT CARDS / GRID --}}
+                @elseif($bType === 'product_cards')
+                    @php
+                        $pCols = $b['columns'] ?? 3;
+                        $gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
+                        if ($pCols == 2) {
+                            $gridClass = 'grid-cols-1 sm:grid-cols-2';
+                        } elseif ($pCols == 4) {
+                            $gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4';
+                        }
+                        $pCards = $b['products'] ?? [];
+                    @endphp
+                    <div class="lp-card rounded-3xl p-5 sm:p-8 border space-y-6 shadow-xl">
+                        @if(!empty($b['title']) || !empty($b['subtitle']))
+                        <div class="text-center space-y-1">
+                            @if(!empty($b['title']))
+                            <h3 class="text-xl sm:text-2xl font-black">{{ $b['title'] }}</h3>
+                            @endif
+                            @if(!empty($b['subtitle']))
+                            <p class="text-xs sm:text-sm lp-muted-text">{{ $b['subtitle'] }}</p>
+                            @endif
+                        </div>
+                        @endif
+
+                        <div class="grid {{ $gridClass }} gap-4 sm:gap-6">
+                            @foreach($pCards as $card)
+                            <div class="group relative rounded-2xl border border-white/10 bg-black/30 overflow-hidden shadow-lg hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between">
+                                <div>
+                                    <div class="relative aspect-square overflow-hidden bg-black/50">
+                                        <img src="{{ $card['image'] ?? $product->thumbnail }}" alt="{{ $card['name'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        @if(!empty($card['discount_badge']))
+                                        <span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow">
+                                            {{ $card['discount_badge'] }}
+                                        </span>
+                                        @endif
+                                    </div>
+                                    <div class="p-4 space-y-2">
+                                        <div class="flex items-center justify-between text-[10px] lp-muted-text">
+                                            <span class="uppercase font-bold tracking-wider">{{ $card['category'] ?? 'প্রোডাক্ট' }}</span>
+                                            <span class="text-amber-400 font-bold">★ {{ $card['rating'] ?? 5 }}.0 ({{ $card['reviews_count'] ?? 12 }})</span>
+                                        </div>
+                                        <h4 class="text-xs sm:text-sm font-bold leading-snug line-clamp-2 min-h-[2.5rem] break-words">
+                                            {{ $card['name'] ?? 'প্রোডাক্ট শিরোনাম' }}
+                                        </h4>
+                                        <div class="flex items-baseline gap-2 pt-1">
+                                            <span class="text-base sm:text-lg font-black lp-primary-text">
+                                                ৳ {{ number_format($card['sale_price'] ?? 0) }}
+                                            </span>
+                                            @if(($card['regular_price'] ?? 0) > ($card['sale_price'] ?? 0))
+                                            <span class="text-xs lp-muted-text line-through opacity-70">
+                                                ৳ {{ number_format($card['regular_price']) }}
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4 pt-0">
+                                    <a href="#orderSection" class="w-full py-2.5 lp-primary-btn font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition-all cursor-pointer">
+                                        <span>{{ $card['btn_text'] ?? 'অর্ডার করুন 🛒' }}</span>
+                                    </a>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                {{-- MULTI-IMAGE SHOWCASE WITH THUMBNAILS & LIGHTBOX --}}
+                @elseif($bType === 'image_showcase')
+                    @php
+                        $scImages = !empty($b['images']) ? $b['images'] : [['url' => $product->thumbnail, 'caption' => 'মেইন ভিউ']];
+                        $scHeight = $b['image_height'] ?? '420px';
+                        $scFit = $b['image_fit'] ?? 'cover';
+                        $showcaseUid = 'sc_' . uniqid();
+                    @endphp
+                    <div class="lp-card rounded-3xl p-5 sm:p-8 border space-y-4 shadow-xl" id="{{ $showcaseUid }}">
+                        @if(!empty($b['title']) || !empty($b['subtitle']))
+                        <div class="text-center space-y-1">
+                            @if(!empty($b['title']))
+                            <h3 class="text-xl sm:text-2xl font-black">{{ $b['title'] }}</h3>
+                            @endif
+                            @if(!empty($b['subtitle']))
+                            <p class="text-xs sm:text-sm lp-muted-text">{{ $b['subtitle'] }}</p>
+                            @endif
+                        </div>
+                        @endif
+
+                        <!-- Main Featured Image -->
+                        <div class="relative rounded-2xl overflow-hidden bg-black/50 border border-white/10 shadow-xl flex items-center justify-center group" style="height: {{ $scHeight }};">
+                            <img id="{{ $showcaseUid }}_mainImg" src="{{ $scImages[0]['url'] ?? $product->thumbnail }}" alt="{{ $scImages[0]['caption'] ?? 'Product' }}" class="w-full h-full object-{{ $scFit }} transition-all duration-300">
+                            <div id="{{ $showcaseUid }}_caption" class="absolute bottom-3 left-3 bg-black/75 backdrop-blur-xs text-white text-xs font-bold px-3 py-1 rounded-lg border border-white/10 {{ empty($scImages[0]['caption']) ? 'hidden' : '' }}">
+                                {{ $scImages[0]['caption'] ?? '' }}
+                            </div>
+                            <button type="button" class="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer transition-all border border-white/10"
+                                    onclick="openStorefrontLightbox(document.getElementById('{{ $showcaseUid }}_mainImg').src, document.getElementById('{{ $showcaseUid }}_caption').textContent.trim())">
+                                <span>🔍 জুম করুন</span>
+                            </button>
+                        </div>
+
+                        <!-- Thumbnails Strip -->
+                        @if(count($scImages) > 1)
+                        <div class="flex items-center gap-2.5 overflow-x-auto pb-1 pt-1 justify-center">
+                            @foreach($scImages as $sIdx => $sImg)
+                            <button type="button" 
+                                    onclick="
+                                        document.getElementById('{{ $showcaseUid }}_mainImg').src = '{{ addslashes($sImg['url'] ?? '') }}';
+                                        var capEl = document.getElementById('{{ $showcaseUid }}_caption');
+                                        var cText = '{{ addslashes($sImg['caption'] ?? '') }}';
+                                        if (cText) { capEl.textContent = cText; capEl.classList.remove('hidden'); } else { capEl.classList.add('hidden'); }
+                                        this.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('border-emerald-400', 'scale-105'));
+                                        this.classList.add('border-emerald-400', 'scale-105');
+                                    "
+                                    class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer {{ $sIdx === 0 ? 'border-emerald-400 scale-105' : 'border-white/15 opacity-70 hover:opacity-100' }}">
+                                <img src="{{ $sImg['url'] ?? '' }}" alt="thumb" class="w-full h-full object-cover">
+                            </button>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
                 @endif
+                </div>
             @endforeach
 
             {{-- If order form was not explicitly added as a block, render it at the bottom --}}

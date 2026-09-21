@@ -15,17 +15,20 @@
 
     <script>
         // Immediately set theme to avoid FOUC
-        if (localStorage.getItem('admin_theme') === 'dark' || (!('admin_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        (function() {
+            const theme = localStorage.getItem('theme_preference') || localStorage.getItem('admin_theme') || 'system';
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     <style>
         @media print {
-            /* Hide dashboard chrome, top headers, sidebar, buttons, forms, floating elements */
             aside,
             header.admin-top-header,
             .admin-top-header,
@@ -36,7 +39,8 @@
             .modal,
             [role="dialog"],
             #adminLangToggleBtn,
-            #adminThemeToggleBtn {
+            #adminThemeToggleBtn,
+            #adminThemeMenu {
                 display: none !important;
             }
 
@@ -54,10 +58,27 @@
     </style>
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-slate-100 text-slate-900 min-h-screen flex selection:bg-emerald-500 selection:text-white transition-colors duration-200">
+<body class="font-sans antialiased bg-slate-100 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col md:flex-row selection:bg-emerald-500 selection:text-white transition-colors duration-200">
 
-    <!-- Sidebar Navigation (Sticky at top, full screen height, stays in place when page scrolls) -->
-    <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 hidden md:flex flex-col border-r border-slate-800 sticky top-0 h-screen transition-colors">
+    <!-- Mobile Header (Visible on md:hidden) -->
+    <div class="md:hidden bg-slate-900 text-white p-3 border-b border-slate-800 flex items-center justify-between flex-shrink-0 z-30">
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow">D</div>
+            <div>
+                <span class="text-sm font-black tracking-tight text-white block leading-none">DEMAND<span class="text-emerald-400">HAT</span></span>
+                <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider" data-bn="এডমিন প্যানেল" data-en="Admin Panel">Admin Panel</span>
+            </div>
+        </a>
+        <button type="button" onclick="toggleAdminMobileSidebar(true)" class="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer" title="Toggle Navigation">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </div>
+
+    <!-- Backdrop for Mobile Sidebar -->
+    <div id="adminSidebarBackdrop" onclick="toggleAdminMobileSidebar(false)" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
+
+    <!-- Sidebar Navigation (Desktop: Fixed 100% height, Mobile: Off-canvas drawer) -->
+    <aside id="adminSidebar" class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 fixed inset-y-0 left-0 z-50 transform -translate-x-full md:relative md:translate-x-0 md:flex flex-col border-r border-slate-800 h-full transition-transform duration-200">
         <!-- Brand Header -->
         <div class="p-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
@@ -69,9 +90,12 @@
                     <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider" data-bn="এডমিন প্যানেল" data-en="Admin Panel">Admin Panel</span>
                 </div>
             </a>
+            <button type="button" onclick="toggleAdminMobileSidebar(false)" class="md:hidden text-slate-400 hover:text-white p-1">
+                ✕
+            </button>
         </div>
 
-        <!-- Navigation Links (Compact, fits cleanly) -->
+        <!-- Navigation Links (Independent inner scroll if links exceed viewport) -->
         <nav class="flex-1 p-3 space-y-1 text-xs font-semibold overflow-y-auto">
             <a href="{{ route('admin.dashboard') }}" 
                class="flex items-center gap-3 px-3 py-2 rounded-xl transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-600 text-white shadow' : 'hover:bg-slate-800 hover:text-white' }}">
@@ -158,54 +182,75 @@
 
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-1.5 px-3 py-1 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg text-xs font-semibold transition-colors">
+                <button type="submit" class="w-full flex items-center justify-center gap-1.5 px-3 py-1 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
                     <span data-bn="লগআউট" data-en="Logout">Logout</span>
                 </button>
             </form>
         </div>
     </aside>
 
-    <!-- Main Admin Content Container -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <!-- Main Admin Content Container (Independently scrollable) -->
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
         <!-- Top Admin Header -->
-        <header class="admin-top-header bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between transition-colors">
-            <div class="flex items-center gap-3">
-                <span class="text-xs font-black tracking-wide text-slate-700 uppercase" data-bn="ম্যানেজমেন্ট কনসোল" data-en="Management Console">Management Console</span>
+        <header class="admin-top-header bg-white dark:bg-[#111827] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between transition-colors flex-shrink-0 sticky top-0 z-30 shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <button type="button" onclick="toggleAdminMobileSidebar(true)" class="md:hidden p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <span class="text-xs font-black tracking-wide text-slate-700 dark:text-slate-300 uppercase" data-bn="ম্যানেজমেন্ট কনসোল" data-en="Management Console">Management Console</span>
             </div>
 
-            <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2.5 flex-wrap">
                 @yield('top_actions')
 
-                <!-- Global Language Switcher -->
-                <button type="button" id="adminLangToggleBtn" onclick="toggleAdminLang()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Switch Language">
-                    <span id="adminLangIcon">🇧🇩</span>
-                    <span id="adminLangLabel">বাংলা</span>
-                </button>
+                <!-- Global Language Switcher (EN ↔ BN) -->
+                <div class="flex items-center gap-1">
+                    <button type="button" id="adminLangToggleBtn" onclick="toggleAdminLang()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Switch Language">
+                        <span id="adminLangIcon">🇧🇩</span>
+                        <span id="adminLangLabel">বাংলা</span>
+                    </button>
+                    <button type="button" id="btnLangBn" onclick="setAdminLanguage('bn')" class="hidden"></button>
+                    <button type="button" id="btnLangEn" onclick="setAdminLanguage('en')" class="hidden"></button>
+                </div>
 
-                <!-- Global Theme Switcher (Dark / Light) -->
-                <button type="button" id="adminThemeToggleBtn" onclick="toggleAdminTheme()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Toggle Dark/Light Mode">
-                    <span id="adminThemeIcon">🌙</span>
-                    <span id="adminThemeLabel" data-bn="ডার্ক মোড" data-en="Dark">Dark</span>
-                </button>
+                <!-- Global 3-Mode Theme Selector (Light, Dark, System) -->
+                <div class="relative" id="adminThemeDropdownWrapper">
+                    <button type="button" id="adminThemeToggleBtn" onclick="toggleAdminThemeMenu()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs" title="Theme (Light / Dark / System)">
+                        <span id="adminThemeIcon">💻</span>
+                        <span id="adminThemeLabel">System</span>
+                        <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div id="adminThemeMenu" class="hidden absolute right-0 mt-1.5 w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg p-1 z-50 text-xs font-bold space-y-0.5">
+                        <button type="button" onclick="selectAdminThemeMode('light')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left cursor-pointer">
+                            <span>☀️</span> <span data-bn="লাইট মোড" data-en="Light">Light</span>
+                        </button>
+                        <button type="button" onclick="selectAdminThemeMode('dark')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left cursor-pointer">
+                            <span>🌙</span> <span data-bn="ডার্ক মোড" data-en="Dark">Dark</span>
+                        </button>
+                        <button type="button" onclick="selectAdminThemeMode('system')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left cursor-pointer">
+                            <span>💻</span> <span data-bn="সিস্টেম মোড" data-en="System">System</span>
+                        </button>
+                    </div>
+                </div>
 
-                <div class="flex items-center gap-2 text-xs font-bold text-slate-700 pl-2 border-l border-slate-200">
-                    <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center font-black text-xs">A</span>
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-200 pl-2 border-l border-slate-200 dark:border-slate-700">
+                    <span class="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-black text-xs">A</span>
                     <span class="hidden sm:inline">Super Admin</span>
                 </div>
             </div>
         </header>
 
-        <!-- Main Body -->
-        <main class="flex-1 p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <!-- Main Body Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
             @if(session('success'))
-            <div class="p-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl text-xs font-bold flex items-center justify-between">
+            <div class="p-4 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 rounded-2xl text-xs font-bold flex items-center justify-between">
                 <span>✓ {{ session('success') }}</span>
                 <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 font-black">✕</button>
             </div>
             @endif
 
             @if(session('error'))
-            <div class="p-4 bg-rose-50 border border-rose-300 text-rose-800 rounded-2xl text-xs font-bold flex items-center justify-between">
+            <div class="p-4 bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 rounded-2xl text-xs font-bold flex items-center justify-between">
                 <span>✕ {{ session('error') }}</span>
                 <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 font-black">✕</button>
             </div>
@@ -215,67 +260,229 @@
         </main>
     </div>
 
-    <!-- Global Admin Scripts (Theme & Bilingual Engine) -->
+    <!-- Global Admin Scripts (Theme, Mobile Sidebar & Complete Bilingual Translation Engine) -->
     <script>
-        // Universal Admin Language Dictionary
-        const adminTranslations = {
-            'Dashboard': 'ড্যাশবোর্ড',
-            'eCommerce Management': 'ই-কমার্স ম্যানেজমেন্ট',
-            'Products': 'প্রোডাক্টস',
-            'Categories': 'ক্যাটাগরি',
-            'Hero Banners': 'হোম ব্যানার',
-            'Header & Navbar': 'হেডার মেনু ও বার',
-            'Orders': 'অর্ডারসমূহ',
-            'Landing Page Engine': 'ল্যান্ডিং পেজ ইঞ্জিন',
-            'Landing Pages': 'ল্যান্ডিং পেজসমূহ',
-            'Builder': 'বিল্ডার',
-            'Template Library': 'টেমপ্লেট লাইব্রেরি',
-            'Configuration': 'কনফিগারেশন',
-            'Courier & Shipping': 'কুরিয়ার ও শিপিং',
-            'Pixel & Settings': 'পিক্সেল ও সেটিংস',
-            'View Website': 'ওয়েবসাইট দেখুন',
-            'Logout': 'লগআউট',
-            'Management Console': 'ম্যানেজমেন্ট কনসোল',
-            'Super Admin': 'সুপার এডমিন',
-            'Total Sales / Revenue': 'মোট সেলস / রাজস্ব',
-            'Total Orders': 'মোট অর্ডার সংখ্যা',
-            'Landing Page Sales': 'ল্যান্ডিং পেজ সেলস',
-            'Avg Conversion Rate': 'গড় কনভার্সন রেট',
-            'Top Landing Pages': 'সক্রিয় ল্যান্ডিং পেজসমূহ',
-            'Recent Orders': 'সাম্প্রতিক অর্ডারসমূহ',
-            'Create Landing Page': 'নতুন ল্যান্ডিং পেজ তৈরি করুন',
-            'View All': 'সবগুলো দেখুন',
-            'View All Orders': 'সব অর্ডার দেখুন',
-            'View Details': 'বিস্তারিত দেখুন',
-            'Page Name': 'পেজের নাম',
-            'Linked Product': 'সংযুক্ত প্রোডাক্ট',
-            'Views': 'ভিউ',
-            'Conversion': 'কনভার্সন',
-            'Status': 'স্ট্যাটাস',
-            'Action': 'অ্যাকশন',
-            'Order ID': 'অর্ডার আইডি',
-            'Customer & Phone': 'গ্রাহক ও মোবাইল',
-            'Area': 'এলাকা',
-            'Total Amount': 'মোট টাকা',
-            'Pending': 'পেন্ডিং',
-            'Processing': 'প্রসেসিং',
-            'Shipped': 'কুরিয়ারে',
-            'Delivered': 'ডেলিভার্ড',
-            'Cancelled': 'বাতিল',
-            'Published': 'পাবলিশড',
-            'Draft': 'ড্রাফট',
-            'Live': 'লাইভ'
+        // Mobile Sidebar Toggle
+        function toggleAdminMobileSidebar(open) {
+            const sidebar = document.getElementById('adminSidebar');
+            const backdrop = document.getElementById('adminSidebarBackdrop');
+            if (open) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        // Theme Dropdown Toggle
+        function toggleAdminThemeMenu() {
+            const menu = document.getElementById('adminThemeMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('adminThemeDropdownWrapper');
+            const menu = document.getElementById('adminThemeMenu');
+            if (wrapper && menu && !wrapper.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Select Theme Mode
+        function selectAdminThemeMode(mode) {
+            if (window.ThemeManager) {
+                window.ThemeManager.set(mode);
+            } else {
+                localStorage.setItem('theme_preference', mode);
+                const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.classList.toggle('dark', isDark);
+            }
+            updateAdminThemeMenuLabel(mode);
+            const menu = document.getElementById('adminThemeMenu');
+            if (menu) menu.classList.add('hidden');
+        }
+
+        function updateAdminThemeMenuLabel(theme) {
+            const icon = document.getElementById('adminThemeIcon');
+            const label = document.getElementById('adminThemeLabel');
+            if (icon) {
+                icon.textContent = theme === 'system' ? '💻' : (theme === 'dark' ? '🌙' : '☀️');
+            }
+            if (label) {
+                const lang = localStorage.getItem('admin_lang') || 'en';
+                if (theme === 'system') {
+                    label.textContent = lang === 'bn' ? 'সিস্টেম' : 'System';
+                } else if (theme === 'dark') {
+                    label.textContent = lang === 'bn' ? 'ডার্ক' : 'Dark';
+                } else {
+                    label.textContent = lang === 'bn' ? 'লাইট' : 'Light';
+                }
+            }
+        }
+
+        // =========================================================================
+        // COMPREHENSIVE ADMIN BILINGUAL ENGINE (BN ↔ EN)
+        // =========================================================================
+        const adminPhraseMap = {
+            // Navigation & Header
+            'হেডার মেনু ও অ্যানাউন্সমেন্ট বার': 'Header Menu & Announcement Bar',
+            'ওয়েবসাইটের শীর্ষ অ্যানাউন্সমেন্ট বার চালু/বন্ধ, মেনু আইটেম যোগ/মুছে ফেলা এবং মেনু সেন্টারে বসানোর সেটিংস।': 'Settings for top announcement bar on/off, adding/removing menu items and centering navbar.',
+            'টপ অ্যানাউন্সমেন্ট বার (অন / অফ টগল ও টেক্সট)': 'Top Announcement Bar (On/Off Toggle & Text)',
+            'চালু (ON) রাখলে পেজের শীর্ষে অ্যানিমেটেড নোটিশ বার আসবে, আর বন্ধ (OFF) করলে বারটি প্রদর্শিত হবে না।': 'When turned ON, animated notice bar appears at page top; when OFF, it is hidden.',
+            'অ্যানাউন্সমেন্ট বার টেক্সট': 'Announcement Bar Text',
+            'লাইভ অ্যানিমেশন প্রিভিউ:': 'Live Animation Preview:',
+            'চালু (ON)': 'Enabled (ON)',
+            'বন্ধ (OFF)': 'Disabled (OFF)',
+            'মেনু অবস্থান ও অ্যালাইনমেন্ট (Navbar Alignment)': 'Navbar Alignment & Positioning',
+            'মাঝখানে সারিবদ্ধ (Center-aligned)': 'Center-aligned',
+            'রিকমেন্ডেড ⭐': 'Recommended ⭐',
+            'বাম পাশে সারিবদ্ধ (Left-aligned)': 'Left-aligned',
+            'সকল মেনু আইটেম বার-এর ঠিক সেন্টারে সুন্দরভাবে বিন্যস্ত থাকবে।': 'All menu items will be neatly positioned in the center of the bar.',
+            'মেনু আইটেমগুলো বাম প্রান্ত থেকে শুরু হবে।': 'Menu items will align starting from the left edge.',
+            'মেনু আইটেম ম্যানেজার (Add / Remove / Reorder)': 'Menu Items Manager (Add / Remove / Reorder)',
+            'এখানে নতুন মেনু আইটেম যোগ করুন অথবা অপ্রয়োজনীয় মেনু ডিলিট (Remove) করুন।': 'Add new menu items or delete unnecessary items here.',
+            'ডিফল্ট মেনু রিস্টোর করুন': 'Restore Default Menu',
+            'দ্রুত ক্যাটাগরি মেনুতে যোগ করুন (১-ক্লিক শর্টকাট):': 'Quick Add Category to Menu (1-Click Shortcut):',
+            '+ অর্গানিক ফুড (Organic)': '+ Organic Food (Organic)',
+            '+ ইলেকট্রনিক্স ও গ্যাজেট (Electronics)': '+ Electronics & Gadgets',
+            '+ হোম ও কিচেন (Home & Kitchen)': '+ Home & Kitchen',
+            'নতুন মেনু আইটেম যোগ করুন:': 'Add New Menu Item:',
+            'ইমোজি/আইকন': 'Emoji/Icon',
+            'যেমন: 🌿': 'e.g.: 🌿',
+            'মেনু নাম (Title) *': 'Menu Name (Title) *',
+            'যেমন: হট ডিলস': 'e.g.: Hot Deals',
+            'টার্গেট লিংক (URL) *': 'Target Link (URL) *',
+            '+ যোগ করুন': '+ Add Item',
+            'যোগ করুন': 'Add',
+            'ক্রম': 'SL',
+            'আইকন': 'Icon',
+            'মেনু নাম': 'Menu Name',
+            'টার্গেট লিংক': 'Target Link',
+            'সক্রিয়': 'Active',
+            'মুছে ফেলুন': 'Delete',
+            'রিমুভ': 'Remove',
+            'সেটিংস সংরক্ষণ করুন (Save)': 'Save Settings',
+            'ওয়েবসাইটে দেখুন': 'View on Website',
+            'হোমপেজ': 'Home',
+            'সব প্রোডাক্ট': 'All Products',
+            'অর্গানিক ফুড': 'Organic Food',
+            'ইলেকট্রনিক্স ও গ্যাজেট': 'Electronics & Gadgets',
+            'হোম ও কিচেন': 'Home & Kitchen',
+
+            // Sidebar & Common
+            'ড্যাশবোর্ড': 'Dashboard',
+            'ই-কমার্স ম্যানেজমেন্ট': 'eCommerce Management',
+            'প্রোডাক্টস': 'Products',
+            'ক্যাটাগরি': 'Categories',
+            'হোম ব্যানার': 'Hero Banners',
+            'হেডার মেনু ও বার': 'Header & Navbar',
+            'অর্ডারসমূহ': 'Orders',
+            'ল্যান্ডিং পেজ ইঞ্জিন': 'Landing Page Engine',
+            'ল্যান্ডিং পেজসমূহ': 'Landing Pages',
+            'বিল্ডার': 'Builder',
+            'টেমপ্লেট লাইব্রেরি': 'Template Library',
+            'কনফিগারেশন': 'Configuration',
+            'কুরিয়ার ও শিপিং': 'Courier & Shipping',
+            'পেমেন্ট ও হিস্ট্রি': 'Payments & History',
+            'পিক্সেল ও সেটিংস': 'Pixel & Settings',
+            'ওয়েবসাইট দেখুন': 'View Website',
+            'লগআউট': 'Logout',
+            'ম্যানেজমেন্ট কনসোল': 'Management Console',
+            'সুপার এডমিন': 'Super Admin',
+
+            // Dashboard Metrics
+            'মোট সেলস / রাজস্ব': 'Total Sales / Revenue',
+            'মোট অর্ডার সংখ্যা': 'Total Orders',
+            'ল্যান্ডিং পেজ সেলস': 'Landing Page Sales',
+            'গড় কনভার্সন রেট': 'Avg Conversion Rate',
+            'সক্রিয় ল্যান্ডিং পেজসমূহ': 'Active Landing Pages',
+            'সাম্প্রতিক অর্ডারসমূহ': 'Recent Orders',
+            'নতুন ল্যান্ডিং পেজ তৈরি করুন': 'Create Landing Page',
+            'সবগুলো দেখুন': 'View All',
+            'সব অর্ডার দেখুন': 'View All Orders',
+            'বিস্তারিত দেখুন': 'View Details',
+            'পেজের নাম': 'Page Name',
+            'সংযুক্ত প্রোডাক্ট': 'Linked Product',
+            'ভিউ': 'Views',
+            'কনভার্সন': 'Conversion',
+            'স্ট্যাটাস': 'Status',
+            'অ্যাকশন': 'Action',
+            'অর্ডার আইডি': 'Order ID',
+            'গ্রাহক ও মোবাইল': 'Customer & Phone',
+            'এলাকা': 'Area',
+            'মোট টাকা': 'Total Amount',
+            'পেন্ডিং': 'Pending',
+            'প্রসেসিং': 'Processing',
+            'কুরিয়ারে': 'In Courier',
+            'ডেলিভার্ড': 'Delivered',
+            'বাতিল': 'Cancelled',
+            'পাবলিশড': 'Published',
+            'ড্রাফট': 'Draft',
+            'লাইভ': 'Live',
+
+            // Products & Orders Management
+            'নতুন প্রোডাক্ট যোগ করুন': 'Add New Product',
+            'সব প্রোডাক্টসমূহ': 'All Products',
+            'প্রোডাক্ট নাম': 'Product Name',
+            'নিয়মিত মূল্য': 'Regular Price',
+            'অফার মূল্য': 'Sale Price',
+            'স্টক': 'Stock',
+            'ছবি': 'Image',
+            'এডিট': 'Edit',
+            'ডিলিট': 'Delete',
+            'পরিবর্তন করুন': 'Change',
+            'ইনভয়েস': 'Invoice',
+            'স্টিকার': 'Sticker',
+            'ফ্রড চেক': 'Fraud Check',
+            'কুরিয়ারে বুক করুন': 'Book Courier',
+            'কুরিয়ার স্ট্যাটাস': 'Courier Status',
+            'কুরিয়ার ট্র্যাকিং কোড': 'Tracking Code'
         };
 
-        const bnToEnMap = {};
-        for (const [en, bn] of Object.entries(adminTranslations)) {
-            bnToEnMap[bn] = en;
+        const sortedAdminPhraseKeys = Object.keys(adminPhraseMap).sort((a, b) => b.length - a.length);
+
+        function translateAdminDom(lang) {
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while ((node = walker.nextNode())) {
+                const parent = node.parentElement;
+                if (!parent || ['SCRIPT', 'STYLE', 'CODE', 'PRE'].includes(parent.tagName) || parent.hasAttribute('data-bn')) continue;
+
+                if (lang === 'en') {
+                    if (node._origBnText === undefined) {
+                        node._origBnText = node.nodeValue;
+                    }
+                    const text = node.nodeValue;
+                    if (!text || !text.trim()) continue;
+                    const trimmed = text.trim();
+                    if (adminPhraseMap[trimmed]) {
+                        node.nodeValue = text.replace(trimmed, adminPhraseMap[trimmed]);
+                        continue;
+                    }
+                    let updated = text;
+                    let matched = false;
+                    for (let i = 0; i < sortedAdminPhraseKeys.length; i++) {
+                        const key = sortedAdminPhraseKeys[i];
+                        if (updated.includes(key)) {
+                            updated = updated.split(key).join(adminPhraseMap[key]);
+                            matched = true;
+                        }
+                    }
+                    if (matched) {
+                        node.nodeValue = updated;
+                    }
+                } else {
+                    if (node._origBnText !== undefined) {
+                        node.nodeValue = node._origBnText;
+                    }
+                }
+            }
         }
 
         // Apply Language
-        function setLanguage(lang) {
+        function setAdminLanguage(lang) {
             localStorage.setItem('admin_lang', lang);
-            localStorage.setItem('admin_orders_lang', lang);
 
             // Update Header Toggle Button
             const langIcon = document.getElementById('adminLangIcon');
@@ -290,20 +497,7 @@
                 }
             }
 
-            // Also update legacy orders page switcher if present
-            const btnBn = document.getElementById('btnLangBn');
-            const btnEn = document.getElementById('btnLangEn');
-            if (btnBn && btnEn) {
-                if (lang === 'en') {
-                    btnEn.className = 'px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer bg-slate-900 text-white shadow-xs';
-                    btnBn.className = 'px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer text-slate-600 hover:text-slate-900';
-                } else {
-                    btnBn.className = 'px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer bg-slate-900 text-white shadow-xs';
-                    btnEn.className = 'px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer text-slate-600 hover:text-slate-900';
-                }
-            }
-
-            // Translate textContent for elements with data-bn and data-en
+            // Translate elements with explicit data-bn / data-en
             document.querySelectorAll('[data-bn][data-en]').forEach(el => {
                 el.textContent = (lang === 'en') ? el.getAttribute('data-en') : el.getAttribute('data-bn');
             });
@@ -313,71 +507,32 @@
                 el.placeholder = (lang === 'en') ? el.getAttribute('data-placeholder-en') : el.getAttribute('data-placeholder-bn');
             });
 
-            // Translate titles / tooltips
+            // Translate titles
             document.querySelectorAll('[data-title-bn][data-title-en]').forEach(el => {
                 el.title = (lang === 'en') ? el.getAttribute('data-title-en') : el.getAttribute('data-title-bn');
             });
 
-            // Translate text nodes using dictionary for elements without explicit data attributes
-            const targetMap = (lang === 'bn') ? adminTranslations : bnToEnMap;
-            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-            let node;
-            while (node = walker.nextNode()) {
-                if (node.parentElement && (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE' || node.parentElement.hasAttribute('data-bn'))) continue;
-                const trimmed = node.nodeValue.trim();
-                if (trimmed && targetMap[trimmed]) {
-                    node.nodeValue = node.nodeValue.replace(trimmed, targetMap[trimmed]);
-                }
-            }
+            // TreeWalker full body translation
+            translateAdminDom(lang);
+
+            // Update theme label for current language
+            const curTheme = localStorage.getItem('theme_preference') || 'system';
+            updateAdminThemeMenuLabel(curTheme);
         }
 
-        // Toggle Language function
         function toggleAdminLang() {
-            const currentLang = localStorage.getItem('admin_lang') || 'en';
-            const newLang = (currentLang === 'en') ? 'bn' : 'en';
-            setLanguage(newLang);
+            const current = localStorage.getItem('admin_lang') || 'en';
+            const next = current === 'en' ? 'bn' : 'en';
+            setAdminLanguage(next);
         }
 
-        // Apply Theme
-        function updateThemeUI(theme) {
-            const themeIcon = document.getElementById('adminThemeIcon');
-            const themeLabel = document.getElementById('adminThemeLabel');
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                if (themeIcon) themeIcon.textContent = '☀️';
-                if (themeLabel) {
-                    themeLabel.setAttribute('data-en', 'Light');
-                    themeLabel.setAttribute('data-bn', 'লাইট মোড');
-                    const lang = localStorage.getItem('admin_lang') || 'en';
-                    themeLabel.textContent = (lang === 'bn') ? 'লাইট মোড' : 'Light';
-                }
-            } else {
-                document.documentElement.classList.remove('dark');
-                if (themeIcon) themeIcon.textContent = '🌙';
-                if (themeLabel) {
-                    themeLabel.setAttribute('data-en', 'Dark');
-                    themeLabel.setAttribute('data-bn', 'ডার্ক মোড');
-                    const lang = localStorage.getItem('admin_lang') || 'en';
-                    themeLabel.textContent = (lang === 'bn') ? 'ডার্ক মোড' : 'Dark';
-                }
-            }
-        }
-
-        // Toggle Theme function
-        function toggleAdminTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const newTheme = isDark ? 'light' : 'dark';
-            localStorage.setItem('admin_theme', newTheme);
-            updateThemeUI(newTheme);
-        }
-
-        // Initial setup on DOM ready
+        // Initialize on DOM Ready
         document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('admin_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            updateThemeUI(savedTheme);
+            const savedTheme = localStorage.getItem('theme_preference') || 'system';
+            updateAdminThemeMenuLabel(savedTheme);
 
             const savedLang = localStorage.getItem('admin_lang') || 'en';
-            setLanguage(savedLang);
+            setAdminLanguage(savedLang);
         });
     </script>
 

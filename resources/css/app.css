@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
@@ -11,7 +13,6 @@
 
 html, body {
     max-width: 100%;
-    overflow-x: hidden;
 }
 
 body {
@@ -53,12 +54,24 @@ button:active, .btn-quick-buy:active, .btn-add-to-cart:active {
     background: #64748b;
 }
 
+/* Dark mode scrollbars */
+html.dark ::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+html.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
 /* ==========================================================================
-   Admin Dark Mode Theme Overrides
+   Global Dark Mode Palette & Overrides (Storefront + Admin)
    ========================================================================== */
 html.dark, html.dark body {
     background-color: #0b1120 !important;
     color: #f1f5f9 !important;
+    color-scheme: dark;
 }
 
 html.dark aside {
@@ -72,6 +85,8 @@ html.dark header.admin-top-header {
     color: #f1f5f9 !important;
 }
 
+/* Storefront sticky header & white cards in dark mode */
+html.dark header.bg-white,
 html.dark .bg-white {
     background-color: #111827 !important;
     border-color: #1f2937 !important;
@@ -81,23 +96,30 @@ html.dark .bg-white {
 html.dark .bg-slate-50,
 html.dark .bg-slate-50\/50,
 html.dark .bg-slate-50\/70,
+html.dark .bg-slate-50\/80,
 html.dark .bg-slate-100 {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
+    background-color: #1a2234 !important;
+    border-color: #334155 !important;
+}
+
+html.dark .bg-slate-200 {
+    background-color: #243048 !important;
+    border-color: #3b4b66 !important;
 }
 
 html.dark .text-slate-900,
 html.dark .text-slate-800 {
-    color: #f9fafb !important;
+    color: #f8fafc !important;
 }
 
 html.dark .text-slate-700,
 html.dark .text-slate-600 {
-    color: #d1d5db !important;
+    color: #cbd5e1 !important;
 }
 
-html.dark .text-slate-500 {
-    color: #9ca3af !important;
+html.dark .text-slate-500,
+html.dark .text-slate-400 {
+    color: #94a3b8 !important;
 }
 
 html.dark .border-slate-200,
@@ -122,14 +144,14 @@ html.dark thead {
 html.dark input:not([type="checkbox"]):not([type="radio"]),
 html.dark select,
 html.dark textarea {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
-    color: #f9fafb !important;
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
 }
 
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-    color: #6b7280 !important;
+    color: #64748b !important;
 }
 
 html.dark .bg-slate-900 {
@@ -138,5 +160,21 @@ html.dark .bg-slate-900 {
 
 html.dark .border-slate-800 {
     border-color: #1f2937 !important;
+}
+
+/* Quick Buy Modal and Cart Drawer in Dark Mode */
+html.dark #quickOrderModal .bg-white,
+html.dark #cartDrawer .bg-white {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+}
+
+html.dark #cartDrawer .bg-slate-50 {
+    background-color: #0b1120 !important;
+}
+
+/* Hero & Offer Badges in Dark Mode */
+html.dark .bg-slate-50\/90 {
+    background-color: #131d31 !important;
 }
 

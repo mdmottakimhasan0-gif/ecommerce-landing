@@ -10,6 +10,19 @@
     <title>@yield('title', ($settings['store_name'] ?? 'DemandHat BD') . ' - ' . ($settings['store_tagline'] ?? 'সেরা অনলাইন শপ'))</title>
     <meta name="description" content="@yield('meta_description', 'DemandHat BD - খাঁটি অর্গানিক ফুড, হোম ও কিচেন গ্যাজেট এবং ট্রেন্ডিং ইলেকট্রনিক্স পণ্যের বিশ্বস্ত অনলাইন শপ। সারাদেশে ক্যাশ অন ডেলিভারি।')">
 
+    <script>
+        // Immediately apply theme preference to avoid FOUC
+        (function() {
+            const theme = localStorage.getItem('theme_preference') || localStorage.getItem('admin_theme') || 'system';
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <!-- Open Graph Meta -->
     <meta property="og:title" content="@yield('title', $settings['store_name'] ?? 'DemandHat BD')">
     <meta property="og:description" content="@yield('meta_description', 'সেরা মূল্যে প্রিমিয়াম পণ্য অর্ডার করুন ক্যাশ অন ডেলিভারিতে')">
@@ -120,11 +133,33 @@
 
                     <!-- Compact Language Switch Button (BN / EN) -->
                     <button type="button" id="headerLangBtn" onclick="toggleLanguage()"
-                            class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-full text-xs font-bold text-slate-700 shadow-2xs transition-all cursor-pointer flex-shrink-0"
+                            class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200 shadow-2xs transition-all cursor-pointer flex-shrink-0"
                             title="ভাষা পরিবর্তন করুন (Switch Language)">
                         <span id="headerLangFlag">🇧🇩</span>
                         <span id="headerLangText">বাংলা</span>
                     </button>
+
+                    <!-- Storefront 3-Mode Theme Selector (Light / Dark / System) -->
+                    <div class="relative flex-shrink-0" id="storefrontThemeDropdownWrapper">
+                        <button type="button" id="storefrontThemeBtn" onclick="toggleStorefrontThemeMenu()"
+                                class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200 shadow-2xs transition-all cursor-pointer flex-shrink-0"
+                                title="Theme (Light / Dark / System)">
+                            <span id="storefrontThemeIcon">💻</span>
+                            <span id="storefrontThemeLabel" class="hidden xl:inline">System</span>
+                            <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div id="storefrontThemeMenu" class="hidden absolute right-0 mt-1.5 w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl p-1 z-50 text-xs font-bold space-y-0.5">
+                            <button type="button" onclick="selectStorefrontTheme('light')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left cursor-pointer">
+                                <span>☀️</span> <span>Light</span>
+                            </button>
+                            <button type="button" onclick="selectStorefrontTheme('dark')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left cursor-pointer">
+                                <span>🌙</span> <span>Dark</span>
+                            </button>
+                            <button type="button" onclick="selectStorefrontTheme('system')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left cursor-pointer">
+                                <span>💻</span> <span>System</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Right Actions: Track Order Button, User Profile Icon, Cart Trigger -->
@@ -219,8 +254,13 @@
                 </form>
 
                 <!-- Mobile Language Switcher Button -->
-                <button type="button" onclick="toggleLanguage()" class="px-2.5 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 flex-shrink-0 cursor-pointer" title="Switch Language">
+                <button type="button" onclick="toggleLanguage()" class="px-2.5 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 flex-shrink-0 cursor-pointer" title="Switch Language">
                     <span id="headerLangFlagMobile">🇧🇩</span>
+                </button>
+
+                <!-- Mobile Theme Switcher Button (3-Mode Cycle: Light / Dark / System) -->
+                <button type="button" onclick="cycleStorefrontTheme()" class="px-2.5 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 flex-shrink-0 cursor-pointer" title="Theme (Light / Dark / System)">
+                    <span id="mobileThemeIcon">💻</span>
                 </button>
             </div>
         </div>
@@ -400,6 +440,21 @@
                     <button type="button" id="closeQuickModalBtn" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
+                </div>
+
+                <!-- Special Deals Callout with 1-Click Coupon Badges -->
+                <div class="px-4 py-2.5 bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/40 dark:to-emerald-950/40 border-b border-amber-200/70 dark:border-amber-700/50">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+                        <span class="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1">
+                            <span>🎉</span> <span>স্পেশাল অফার প্রোমো কোড:</span>
+                        </span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="applyQuickPromoCode('SAVE100')" class="px-2 py-0.5 bg-white dark:bg-slate-800 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 font-mono font-black text-[10px] rounded-lg border border-emerald-300 dark:border-emerald-700 shadow-2xs transition-all cursor-pointer" title="৳১০০ ছাড় পান">SAVE100 (-৳100)</button>
+                            <button type="button" onclick="applyQuickPromoCode('OFFER50')" class="px-2 py-0.5 bg-white dark:bg-slate-800 hover:bg-amber-100 text-amber-700 dark:text-amber-400 font-mono font-black text-[10px] rounded-lg border border-amber-300 dark:border-amber-700 shadow-2xs transition-all cursor-pointer" title="৳৫০ ছাড় পান">OFFER50 (-৳50)</button>
+                            <button type="button" onclick="applyQuickPromoCode('DEMAND10')" class="px-2 py-0.5 bg-white dark:bg-slate-800 hover:bg-purple-100 text-purple-700 dark:text-purple-400 font-mono font-black text-[10px] rounded-lg border border-purple-300 dark:border-purple-700 shadow-2xs transition-all cursor-pointer" title="১০% ছাড় পান">DEMAND10 (-10%)</button>
+                            <button type="button" onclick="applyQuickPromoCode('FREESHIP')" class="px-2 py-0.5 bg-white dark:bg-slate-800 hover:bg-blue-100 text-blue-700 dark:text-blue-400 font-mono font-black text-[10px] rounded-lg border border-blue-300 dark:border-blue-700 shadow-2xs transition-all cursor-pointer" title="ফ্রি হোম ডেলিভারি">FREESHIP (ফ্রি ডেলিভারি)</button>
+                        </div>
+                    </div>
                 </div>
 
                 <form id="quickOrderForm" class="p-5 sm:p-6 space-y-4">
@@ -590,10 +645,51 @@
                         </div>
                     </div>
 
-                    <!-- Total summary -->
-                    <div class="bg-slate-100 p-3.5 rounded-2xl flex items-center justify-between text-sm">
-                        <span class="text-slate-600 font-bold" data-i18n="total_payable">মোট প্রদেয় টাকা:</span>
-                        <span id="modalGrandTotal" class="text-xl font-black text-emerald-700">৳0</span>
+                    <!-- Promo Code / Voucher Box -->
+                    <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
+                            <span class="flex items-center gap-1.5">
+                                <span>🎟️</span>
+                                <span>প্রোমো কোড / কুপন</span>
+                            </span>
+                            <span id="quickPromoStatus" class="text-[11px] font-bold hidden"></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="quickPromoInput" placeholder="যেমন: SAVE100" 
+                                   class="flex-1 px-3 py-2 text-xs font-mono uppercase font-bold border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white dark:bg-slate-900 dark:text-white">
+                            <button type="button" onclick="handleQuickPromoApply()" 
+                                    class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-2xs transition-all cursor-pointer">
+                                প্রয়োগ
+                            </button>
+                        </div>
+                        <div id="quickPromoAppliedBadge" class="hidden flex items-center justify-between bg-emerald-100/70 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 px-3 py-1.5 rounded-xl text-xs">
+                            <div class="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-200">
+                                <span>✓</span>
+                                <strong id="quickPromoAppliedCode" class="font-mono font-black"></strong>
+                                <span id="quickPromoAppliedDiscountText" class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400"></span>
+                            </div>
+                            <button type="button" onclick="removeQuickPromoCode()" class="text-rose-600 hover:text-rose-700 font-bold text-xs cursor-pointer">✕ সরান</button>
+                        </div>
+                    </div>
+
+                    <!-- Total summary Breakdown -->
+                    <div class="bg-slate-100 dark:bg-slate-800/80 p-3.5 rounded-2xl space-y-2 text-xs sm:text-sm border border-slate-200 dark:border-slate-700">
+                        <div class="flex justify-between text-slate-600 dark:text-slate-400">
+                            <span>পণ্যের সাবটোটাল:</span>
+                            <span id="modalSubtotal" class="font-bold text-slate-900 dark:text-white">৳0</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600 dark:text-slate-400">
+                            <span>ডেলিভারি চার্জ:</span>
+                            <span id="modalDeliveryFee" class="font-bold text-slate-900 dark:text-white">৳70</span>
+                        </div>
+                        <div id="modalDiscountRow" class="hidden flex justify-between text-emerald-700 dark:text-emerald-400 font-bold">
+                            <span>প্রোমো ছাড়:</span>
+                            <span id="modalDiscountAmount">- ৳0</span>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-sm sm:text-base">
+                            <span class="text-slate-800 dark:text-slate-200 font-black" data-i18n="total_payable">সর্বমোট প্রদেয়:</span>
+                            <span id="modalGrandTotal" class="text-xl font-black text-emerald-700 dark:text-emerald-400">৳0</span>
+                        </div>
                     </div>
 
                     <div id="quickOrderError" class="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-xl border border-rose-200 hidden"></div>

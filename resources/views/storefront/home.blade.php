@@ -27,53 +27,79 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             <!-- Main Hero Carousel / Banner 1 (Left 2/3) -->
             @php
-                $b1HasImage = !empty($b1['image']);
-                $b1ShowText = !empty($b1['show_text']) || (!$b1HasImage && !empty($b1['title']));
+                if (isset($decodedBanners['banner1']) && !isset($decodedBanners['banner1']['slides'])) {
+                    $b1Slides = [$b1];
+                } else {
+                    $b1Slides = $b1['slides'] ?? [$b1];
+                }
+                $hasMultipleSlides = count($b1Slides) > 1;
             @endphp
             @if(!empty($b1['is_active']))
-            <div class="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 min-h-[260px] sm:min-h-[360px] lg:min-h-[420px] flex items-center group">
-                @if($b1HasImage)
-                    <!-- Full Banner 1 Image -->
-                    <a href="{{ $b1['btn1_link'] ?? route('products.index') }}" class="absolute inset-0 w-full h-full block z-0" title="{{ $b1['title'] ?? 'Banner 1' }}">
-                        <img src="{{ $b1['image'] }}" alt="{{ $b1['title'] ?? 'Banner 1' }}" class="w-full h-full object-cover object-center group-hover:scale-[1.01] transition-transform duration-700">
-                    </a>
-                @else
-                    <div class="absolute inset-0 bg-gradient-to-r {{ $b1['bg_gradient'] ?? 'from-emerald-900 via-teal-900 to-slate-900' }}"></div>
-                @endif
+            <div id="heroBannerCarousel" class="lg:col-span-2 relative rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 min-h-[260px] sm:min-h-[360px] lg:min-h-[420px] flex items-center group select-none">
+                <!-- Slides Track -->
+                <div class="absolute inset-0 w-full h-full overflow-hidden" id="heroSlidesTrack">
+                    @foreach($b1Slides as $sIndex => $slide)
+                        @php
+                            $slideHasImg = !empty($slide['image']);
+                            $slideShowTxt = !empty($slide['show_text']) || (!$slideHasImg && !empty($slide['title']));
+                        @endphp
+                        <div class="hero-slide absolute inset-0 w-full h-full transition-all duration-700 ease-in-out {{ $sIndex === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 pointer-events-none z-0' }}" data-slide-idx="{{ $sIndex }}">
+                            @if($slideHasImg)
+                                <!-- Full Slide Image -->
+                                <a href="{{ $slide['btn1_link'] ?? route('products.index') }}" class="absolute inset-0 w-full h-full block z-0" title="{{ $slide['title'] ?? 'Banner' }}">
+                                    <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] ?? 'Banner' }}" class="w-full h-full object-cover object-center group-hover:scale-[1.01] transition-transform duration-700">
+                                </a>
+                            @else
+                                <div class="absolute inset-0 bg-gradient-to-r {{ $slide['bg_gradient'] ?? 'from-emerald-950 via-teal-900 to-slate-950' }}"></div>
+                            @endif
 
-                @if($b1ShowText)
-                <div class="relative z-10 max-w-xl p-6 sm:p-10 space-y-4 {{ $b1HasImage ? 'bg-slate-950/40 backdrop-blur-[2px] rounded-2xl m-4 sm:m-6 border border-white/10' : '' }}">
-                    @if(!empty($b1['badge']))
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider" data-i18n="b1_badge">
-                        {{ $b1['badge'] }}
-                    </span>
-                    @endif
+                            @if($slideShowTxt)
+                            <div class="relative z-10 max-w-xl p-6 sm:p-10 space-y-4 {{ $slideHasImg ? 'bg-slate-950/40 backdrop-blur-[2px] rounded-2xl m-4 sm:m-6 border border-white/10' : '' }}">
+                                @if(!empty($slide['badge']))
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-xs font-bold uppercase tracking-wider">
+                                    {{ $slide['badge'] }}
+                                </span>
+                                @endif
 
-                    @if(!empty($b1['title']))
-                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight text-white drop-shadow-md" data-i18n="b1_title">
-                        {{ $b1['title'] }}
-                    </h1>
-                    @endif
+                                @if(!empty($slide['title']))
+                                <h2 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight text-white drop-shadow-md">
+                                    {{ $slide['title'] }}
+                                </h2>
+                                @endif
 
-                    @if(!empty($b1['subtitle']))
-                    <p class="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-md drop-shadow" data-i18n="b1_subtitle">
-                        {{ $b1['subtitle'] }}
-                    </p>
-                    @endif
+                                @if(!empty($slide['subtitle']))
+                                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-md drop-shadow">
+                                    {{ $slide['subtitle'] }}
+                                </p>
+                                @endif
 
-                    <div class="pt-2 flex flex-wrap items-center gap-3">
-                        @if(!empty($b1['btn1_text']))
-                        <a href="{{ $b1['btn1_link'] ?? route('products.index') }}" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all" data-i18n="b1_btn1">
-                            {{ $b1['btn1_text'] }}
-                        </a>
-                        @endif
+                                <div class="pt-2 flex flex-wrap items-center gap-3">
+                                    @if(!empty($slide['btn1_text']))
+                                    <a href="{{ $slide['btn1_link'] ?? route('products.index') }}" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all">
+                                        {{ $slide['btn1_text'] }}
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
 
-                        @if(!empty($b1['btn2_text']))
-                        <a href="{{ $b1['btn2_link'] ?? route('products.index', ['category' => 'organic-products']) }}" class="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-xl backdrop-blur-sm border border-white/20 transition-colors" data-i18n="b1_btn2">
-                            {{ $b1['btn2_text'] }}
-                        </a>
-                        @endif
-                    </div>
+                @if($hasMultipleSlides)
+                <!-- Controls: Prev / Next Arrows -->
+                <button type="button" id="heroPrevBtn" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs border border-white/20 cursor-pointer shadow-lg" title="আগের স্লাইড">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button type="button" id="heroNextBtn" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs border border-white/20 cursor-pointer shadow-lg" title="পরের স্লাইড">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <!-- Dots Pagination Indicator -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10" id="heroDotsContainer">
+                    @foreach($b1Slides as $dotIdx => $s)
+                    <button type="button" class="hero-dot w-2.5 h-2.5 rounded-full transition-all cursor-pointer {{ $dotIdx === 0 ? 'bg-emerald-400 w-6' : 'bg-white/50 hover:bg-white' }}" data-dot-idx="{{ $dotIdx }}" title="Slide {{ $dotIdx + 1 }}"></button>
+                    @endforeach
                 </div>
                 @endif
             </div>
@@ -567,6 +593,92 @@
             track.addEventListener('touchend', startAutoScroll);
 
             startAutoScroll();
+        }
+
+        // Hero Banner Multi-Slide Carousel Controller
+        const heroCarousel = document.getElementById('heroBannerCarousel');
+        if (heroCarousel) {
+            const slides = heroCarousel.querySelectorAll('.hero-slide');
+            const dots = heroCarousel.querySelectorAll('.hero-dot');
+            const prevBtn = document.getElementById('heroPrevBtn');
+            const nextBtn = document.getElementById('heroNextBtn');
+            let currentIdx = 0;
+            let timer = null;
+
+            function showHeroSlide(index) {
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+                currentIdx = index;
+
+                slides.forEach((s, idx) => {
+                    if (idx === currentIdx) {
+                        s.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                        s.classList.add('opacity-100', 'scale-100', 'z-10');
+                    } else {
+                        s.classList.remove('opacity-100', 'scale-100', 'z-10');
+                        s.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                    }
+                });
+
+                dots.forEach((d, idx) => {
+                    if (idx === currentIdx) {
+                        d.className = 'hero-dot w-6 h-2.5 rounded-full bg-emerald-400 transition-all cursor-pointer';
+                    } else {
+                        d.className = 'hero-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all cursor-pointer';
+                    }
+                });
+            }
+
+            function startTimer() {
+                if (!timer && slides.length > 1) {
+                    timer = setInterval(() => {
+                        showHeroSlide(currentIdx + 1);
+                    }, 5000);
+                }
+            }
+
+            function stopTimer() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            function resetTimer() {
+                stopTimer();
+                startTimer();
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showHeroSlide(currentIdx - 1);
+                    resetTimer();
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showHeroSlide(currentIdx + 1);
+                    resetTimer();
+                });
+            }
+
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const idx = parseInt(dot.getAttribute('data-dot-idx'));
+                    showHeroSlide(idx);
+                    resetTimer();
+                });
+            });
+
+            heroCarousel.addEventListener('mouseenter', stopTimer);
+            heroCarousel.addEventListener('mouseleave', startTimer);
+            heroCarousel.addEventListener('touchstart', stopTimer, { passive: true });
+            heroCarousel.addEventListener('touchend', startTimer);
+
+            startTimer();
         }
     });
 </script>

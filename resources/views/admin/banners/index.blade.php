@@ -246,6 +246,87 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ============================================================= -->
+                <!-- BANNER 1: MULTI-SLIDE CAROUSEL MANAGER (Multiple Offers/Slides) -->
+                <!-- ============================================================= -->
+                <div class="pt-6 border-t-2 border-dashed border-slate-200">
+                    <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+                        <div>
+                            <h4 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                                <span>🎡 প্রধান ব্যানারে একাধিক স্লাইড ও অফার (Auto Slider)</span>
+                                <span class="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-bold">Multi-Slide Carousel</span>
+                            </h4>
+                            <p class="text-xs text-slate-500">হোমপেজে পর্যায়ক্রমে স্বয়ংক্রিয়ভাবে পরিবর্তিত হওয়া স্লাইডগুলো সেট করুন।</p>
+                        </div>
+                        <button type="button" onclick="addBanner1Slide()" 
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer">
+                            <span>+ নতুন স্লাইড যোগ করুন</span>
+                        </button>
+                    </div>
+
+                    @php
+                        $b1Slides = $banners['banner1']['slides'] ?? [];
+                        if (empty($b1Slides) && !empty($banners['banner1']['image'])) {
+                            $b1Slides = [$banners['banner1']];
+                        }
+                    @endphp
+
+                    <div id="banner1SlidesContainer" class="space-y-4">
+                        @foreach($b1Slides as $sIdx => $slide)
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 slide-card relative" data-slide-index="{{ $sIdx }}">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                                <span class="text-xs font-black text-slate-800 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs">{{ $loop->iteration }}</span>
+                                    <span>স্লাইড #{{ $loop->iteration }}</span>
+                                </span>
+                                <div class="flex items-center gap-3">
+                                    <label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+                                        <input type="checkbox" name="banner1_slides[{{ $sIdx }}][show_text]" value="1" {{ !empty($slide['show_text']) ? 'checked' : '' }} class="rounded text-emerald-600">
+                                        <span>টেক্সট দেখান</span>
+                                    </label>
+                                    <button type="button" onclick="this.closest('.slide-card').remove()" class="text-rose-600 hover:text-rose-700 text-xs font-bold flex items-center gap-1 cursor-pointer">
+                                        <span>✕ মুছুন</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 mb-1">টপ ব্যাজ (Badge)</label>
+                                    <input type="text" name="banner1_slides[{{ $sIdx }}][badge]" value="{{ $slide['badge'] ?? '' }}" placeholder="যেমন: 🌿 স্পেশাল অফার" class="w-full text-xs rounded-lg border-slate-300 p-2 bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 mb-1">হেডলাইন (Title)</label>
+                                    <input type="text" name="banner1_slides[{{ $sIdx }}][title]" value="{{ $slide['title'] ?? '' }}" placeholder="স্লাইড শিরোনাম" class="w-full text-xs font-bold rounded-lg border-slate-300 p-2 bg-white">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[11px] font-bold text-slate-600 mb-1">সাবটাইটেল (Description)</label>
+                                    <input type="text" name="banner1_slides[{{ $sIdx }}][subtitle]" value="{{ $slide['subtitle'] ?? '' }}" placeholder="সংক্ষিপ্ত বিবরণ" class="w-full text-xs rounded-lg border-slate-300 p-2 bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 mb-1">বাটন টেক্সট</label>
+                                    <input type="text" name="banner1_slides[{{ $sIdx }}][btn1_text]" value="{{ $slide['btn1_text'] ?? 'অর্ডার করুন 🛒' }}" class="w-full text-xs rounded-lg border-slate-300 p-2 bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 mb-1">বাটন লিংক</label>
+                                    <input type="text" name="banner1_slides[{{ $sIdx }}][btn1_link]" value="{{ $slide['btn1_link'] ?? '/products' }}" class="w-full text-xs font-mono rounded-lg border-slate-300 p-2 bg-white">
+                                </div>
+                                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                                    <div class="md:col-span-2 space-y-2">
+                                        <label class="block text-[11px] font-bold text-slate-700">স্লাইড ছবি (Image Upload or URL)</label>
+                                        <input type="file" name="banner1_slide_file_{{ $sIdx }}" accept="image/*" class="w-full text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" onchange="previewBannerFile(this, 'b1_slide_preview_{{ $sIdx }}')">
+                                        <input type="url" name="banner1_slides[{{ $sIdx }}][image_url]" value="{{ $slide['image'] ?? '' }}" placeholder="অথবা সরাসরি ইমেজ লিংক (https://...)" class="w-full text-xs font-mono rounded-lg border-slate-300 p-2 bg-white" oninput="previewBannerUrl(this.value, 'b1_slide_preview_{{ $sIdx }}')">
+                                    </div>
+                                    <div class="aspect-[16/10] max-h-24 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+                                        <img id="b1_slide_preview_{{ $sIdx }}" src="{{ $slide['image'] ?? 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=80' }}" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -555,6 +636,68 @@
             const img = document.getElementById(targetImgId);
             if (img) img.src = url.trim();
         }
+    }
+
+    let slideCounter = document.querySelectorAll('#banner1SlidesContainer .slide-card').length;
+
+    function addBanner1Slide() {
+        const container = document.getElementById('banner1SlidesContainer');
+        const sIdx = slideCounter++;
+        const count = container.children.length + 1;
+        
+        const html = `
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 slide-card relative animate-fade-in" data-slide-index="${sIdx}">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                    <span class="text-xs font-black text-slate-800 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs">${count}</span>
+                        <span>নতুন স্লাইড #${count}</span>
+                    </span>
+                    <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+                            <input type="checkbox" name="banner1_slides[${sIdx}][show_text]" value="1" class="rounded text-emerald-600">
+                            <span>টেক্সট দেখান</span>
+                        </label>
+                        <button type="button" onclick="this.closest('.slide-card').remove()" class="text-rose-600 hover:text-rose-700 text-xs font-bold flex items-center gap-1 cursor-pointer">
+                            <span>✕ মুছুন</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">টপ ব্যাজ (Badge)</label>
+                        <input type="text" name="banner1_slides[${sIdx}][badge]" value="🔥 স্পেশাল অফার" placeholder="যেমন: 🌿 স্পেশাল অফার" class="w-full text-xs rounded-lg border-slate-300 p-2 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">হেডলাইন (Title)</label>
+                        <input type="text" name="banner1_slides[${sIdx}][title]" value="" placeholder="স্লাইড শিরোনাম" class="w-full text-xs font-bold rounded-lg border-slate-300 p-2 bg-white">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">সাবটাইটেল (Description)</label>
+                        <input type="text" name="banner1_slides[${sIdx}][subtitle]" value="" placeholder="সংক্ষিপ্ত বিবরণ" class="w-full text-xs rounded-lg border-slate-300 p-2 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">বাটন টেক্সট</label>
+                        <input type="text" name="banner1_slides[${sIdx}][btn1_text]" value="অর্ডার করুন 🛒" class="w-full text-xs rounded-lg border-slate-300 p-2 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">বাটন লিংক</label>
+                        <input type="text" name="banner1_slides[${sIdx}][btn1_link]" value="/products" class="w-full text-xs font-mono rounded-lg border-slate-300 p-2 bg-white">
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="block text-[11px] font-bold text-slate-700">স্লাইড ছবি (Image Upload or URL)</label>
+                            <input type="file" name="banner1_slide_file_${sIdx}" accept="image/*" class="w-full text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" onchange="previewBannerFile(this, 'b1_slide_preview_${sIdx}')">
+                            <input type="url" name="banner1_slides[${sIdx}][image_url]" value="" placeholder="অথবা সরাসরি ইমেজ লিংক (https://...)" class="w-full text-xs font-mono rounded-lg border-slate-300 p-2 bg-white" oninput="previewBannerUrl(this.value, 'b1_slide_preview_${sIdx}')">
+                        </div>
+                        <div class="aspect-[16/10] max-h-24 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+                            <img id="b1_slide_preview_${sIdx}" src="https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
     }
 </script>
 @endsection
